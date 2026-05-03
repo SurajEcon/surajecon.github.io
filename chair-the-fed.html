@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chair the Fed — Monetary Policy Simulation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ── Reset & base ────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;
+  --panel:#111827;
+  --panel2:#1a2235;
+  --border:#1f2d47;
+  --teal:#00c9b1;
+  --amber:#f5a623;
+  --red:#ff4d6d;
+  --blue:#4da6ff;
+  --text:#e2e8f0;
+  --muted:#64748b;
+  --good:#22c55e;
+  --warn:#f59e0b;
+  --bad:#ef4444;
+  --font-mono:'Space Mono',monospace;
+  --font-body:'DM Sans',sans-serif;
+}
+html{font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
+
+/* ── Screens ────────────────────────────────────────── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex;flex-direction:column}
+
+/* ── INTRO SCREEN ───────────────────────────────────── */
+#screen-intro{
+  align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 60% 40%, #0d1f3c 0%, #0a0e1a 70%);
+  padding:2rem;
+  text-align:center;
+}
+.intro-seal{font-size:5rem;margin-bottom:1.5rem;filter:drop-shadow(0 0 32px rgba(0,201,177,.35))}
+.intro-title{font-family:var(--font-mono);font-size:clamp(1.6rem,4vw,2.8rem);font-weight:700;color:var(--teal);letter-spacing:-.02em;line-height:1.1;margin-bottom:.5rem}
+.intro-sub{font-size:1.05rem;color:var(--muted);margin-bottom:2.5rem;max-width:480px}
+.intro-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.5rem 2rem;margin-bottom:2rem;max-width:480px;text-align:left}
+.intro-card h3{font-family:var(--font-mono);font-size:.75rem;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1rem}
+.intro-card ul{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.intro-card li{display:flex;align-items:flex-start;gap:.75rem;font-size:.9rem;color:#94a3b8}
+.intro-card li span.ico{font-size:1rem;margin-top:.1rem;flex-shrink:0}
+.btn-start{
+  background:var(--teal);color:#0a0e1a;border:none;
+  font-family:var(--font-mono);font-weight:700;font-size:1rem;
+  padding:.9rem 2.8rem;border-radius:8px;cursor:pointer;
+  letter-spacing:.04em;transition:all .2s;
+  box-shadow:0 0 32px rgba(0,201,177,.3)
+}
+.btn-start:hover{transform:translateY(-2px);box-shadow:0 0 48px rgba(0,201,177,.5)}
+
+/* ── GAME SCREEN ─────────────────────────────────────── */
+#screen-game{background:var(--bg);padding:0;flex-direction:column}
+
+/* top bar */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.7rem 1.5rem;
+  background:var(--panel);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:10;
+}
+.topbar-title{font-family:var(--font-mono);font-size:.8rem;color:var(--teal);letter-spacing:.1em;text-transform:uppercase}
+.topbar-q{font-family:var(--font-mono);font-size:.8rem;color:var(--muted)}
+.topbar-progress{display:flex;gap:3px;align-items:center}
+.prog-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .3s}
+.prog-dot.done{background:var(--teal)}
+.prog-dot.current{background:var(--amber)}
+
+/* layout */
+.game-body{display:grid;grid-template-columns:1fr 340px;gap:1.5rem;padding:1.5rem;flex:1;max-width:1100px;margin:0 auto;width:100%}
+@media(max-width:800px){.game-body{grid-template-columns:1fr;padding:1rem}}
+
+/* news panel */
+.news-panel{display:flex;flex-direction:column;gap:1.2rem}
+.news-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .7rem;border-radius:4px;background:rgba(0,201,177,.12);color:var(--teal);border:1px solid rgba(0,201,177,.25);margin-bottom:.25rem}
+.news-headline{font-family:var(--font-mono);font-size:1.25rem;color:var(--text);line-height:1.3;font-weight:700;margin-bottom:.5rem}
+.news-body{font-size:.92rem;color:#94a3b8;line-height:1.65;margin-bottom:1rem}
+.news-shock{background:rgba(245,166,35,.07);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:.8rem 1rem;font-size:.88rem;color:#fbbf24;margin-bottom:1rem}
+.news-shock strong{display:block;margin-bottom:.25rem;font-family:var(--font-mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}
+
+/* indicators */
+.indicators{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.ind-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem}
+.ind-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem;font-family:var(--font-mono)}
+.ind-value{font-family:var(--font-mono);font-size:1.6rem;font-weight:700;line-height:1}
+.ind-delta{font-size:.75rem;margin-top:.3rem}
+.ind-card.good .ind-value{color:var(--good)}
+.ind-card.warn .ind-value{color:var(--warn)}
+.ind-card.bad  .ind-value{color:var(--bad)}
+.ind-card.neutral .ind-value{color:var(--blue)}
+
+/* chart */
+.chart-wrap{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem}
+.chart-title{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem;font-family:var(--font-mono)}
+canvas{width:100%!important;display:block}
+
+/* right panel */
+.right-panel{display:flex;flex-direction:column;gap:1.2rem}
+
+/* rate control */
+.rate-card{background:var(--panel);border:1px solid var(--teal);border-radius:12px;padding:1.3rem 1.4rem;box-shadow:0 0 24px rgba(0,201,177,.07)}
+.rate-label{font-family:var(--font-mono);font-size:.7rem;color:var(--teal);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.4rem}
+.rate-display{font-family:var(--font-mono);font-size:2.8rem;font-weight:700;color:var(--teal);line-height:1;margin-bottom:1rem}
+.rate-display span{font-size:1.4rem}
+.rate-slider{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--border);outline:none;margin-bottom:.6rem;cursor:pointer}
+.rate-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--teal);cursor:pointer;box-shadow:0 0 10px rgba(0,201,177,.5)}
+.rate-slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--teal);cursor:pointer;border:none}
+.rate-hint{font-size:.75rem;color:var(--muted);text-align:center;margin-bottom:1rem}
+.btn-confirm{width:100%;background:var(--teal);color:#0a0e1a;border:none;font-family:var(--font-mono);font-weight:700;font-size:.95rem;padding:.85rem;border-radius:8px;cursor:pointer;letter-spacing:.04em;transition:all .2s}
+.btn-confirm:hover{opacity:.9;transform:translateY(-1px)}
+.btn-confirm:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none}
+
+/* guidance box */
+.guidance-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem}
+.guidance-title{font-family:var(--font-mono);font-size:.7rem;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem}
+.guidance-text{font-size:.82rem;color:#94a3b8;line-height:1.55}
+
+/* history */
+.history-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;max-height:200px;overflow-y:auto}
+.history-title{font-family:var(--font-mono);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem}
+.history-row{display:grid;grid-template-columns:60px 1fr 1fr 1fr;font-family:var(--font-mono);font-size:.72rem;color:var(--muted);padding:.3rem 0;border-bottom:1px solid var(--border)}
+.history-row:last-child{border-bottom:none}
+.history-row.hdr{color:var(--teal);font-size:.65rem;margin-bottom:.2rem}
+
+/* ── RESULTS SCREEN ──────────────────────────────────── */
+#screen-results{
+  align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 30%, #0d1f3c 0%, #0a0e1a 65%);
+  padding:2rem;
+  text-align:center;
+}
+.result-grade{font-family:var(--font-mono);font-size:6rem;font-weight:700;line-height:1;margin-bottom:.25rem}
+.result-grade.A{color:var(--good);text-shadow:0 0 48px rgba(34,197,94,.4)}
+.result-grade.B{color:var(--teal);text-shadow:0 0 48px rgba(0,201,177,.4)}
+.result-grade.C{color:var(--amber);text-shadow:0 0 48px rgba(245,166,35,.4)}
+.result-grade.D{color:var(--warn);text-shadow:0 0 48px rgba(245,158,11,.4)}
+.result-grade.F{color:var(--bad);text-shadow:0 0 48px rgba(239,68,68,.4)}
+.result-title{font-size:1rem;color:var(--muted);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
+.result-headline{font-family:var(--font-mono);font-size:1.4rem;color:var(--text);margin-bottom:.4rem;font-weight:700}
+.result-sub{font-size:.9rem;color:var(--muted);max-width:440px;margin:0 auto 2rem;line-height:1.6}
+.result-stats{display:flex;gap:1.5rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap}
+.result-stat{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1rem 1.5rem;min-width:140px}
+.result-stat-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-family:var(--font-mono);margin-bottom:.3rem}
+.result-stat-val{font-family:var(--font-mono);font-size:1.8rem;font-weight:700;color:var(--text)}
+.result-detail{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1rem 1.5rem;max-width:500px;margin:0 auto 2rem;text-align:left}
+.result-detail h4{font-family:var(--font-mono);font-size:.75rem;color:var(--teal);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem}
+.result-detail p{font-size:.88rem;color:#94a3b8;line-height:1.6}
+.btn-replay{background:transparent;color:var(--teal);border:1px solid var(--teal);font-family:var(--font-mono);font-size:.85rem;padding:.65rem 1.8rem;border-radius:8px;cursor:pointer;letter-spacing:.04em;transition:all .2s}
+.btn-replay:hover{background:rgba(0,201,177,.1)}
+.screenshot-note{font-size:.78rem;color:var(--amber);margin-top:1.2rem;font-family:var(--font-mono)}
+
+/* scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* transitions */
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- ── INTRO ──────────────────────────────────────────── -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-seal">🏛️</div>
+  <div class="intro-title">Chair the Fed</div>
+  <div class="intro-sub">A monetary policy simulation for Principles of Macroeconomics</div>
+  <div class="intro-card">
+    <h3>Your Mission</h3>
+    <ul>
+      <li><span class="ico">📈</span>Set the federal funds rate each quarter to keep <strong>inflation near 2%</strong> and <strong>unemployment near the natural rate</strong>.</li>
+      <li><span class="ico">⏱️</span>Rate changes take <strong>1–2 quarters</strong> to work — don't overcorrect.</li>
+      <li><span class="ico">⚡</span>Unexpected <strong>supply shocks</strong> will test your policy skills.</li>
+      <li><span class="ico">📊</span>You'll be graded on your <strong>average inflation and unemployment</strong> over 20 quarters.</li>
+    </ul>
+  </div>
+  <button class="btn-start" onclick="startGame()">Take the Chair →</button>
+</div>
+
+<!-- ── GAME ───────────────────────────────────────────── -->
+<div id="screen-game" class="screen">
+  <div class="topbar">
+    <span class="topbar-title">⚖️ Chair the Fed</span>
+    <div class="topbar-progress" id="prog-dots"></div>
+    <span class="topbar-q" id="topbar-q">Quarter 1 of 20</span>
+  </div>
+  <div class="game-body">
+    <!-- left -->
+    <div class="news-panel fade-in" id="news-panel">
+      <div>
+        <div class="news-badge" id="news-badge">📰 Economic Briefing</div>
+        <div class="news-headline" id="news-headline">Loading...</div>
+        <div class="news-body" id="news-body">Loading...</div>
+        <div class="news-shock" id="news-shock" style="display:none">
+          <strong>⚡ Breaking: Supply Shock</strong>
+          <span id="news-shock-text"></span>
+        </div>
+      </div>
+      <div class="indicators" id="indicators">
+        <div class="ind-card neutral">
+          <div class="ind-label">Inflation Rate</div>
+          <div class="ind-value" id="ind-inflation">-</div>
+          <div class="ind-delta" id="ind-inflation-d"></div>
+        </div>
+        <div class="ind-card neutral">
+          <div class="ind-label">Unemployment</div>
+          <div class="ind-value" id="ind-unemp">-</div>
+          <div class="ind-delta" id="ind-unemp-d"></div>
+        </div>
+        <div class="ind-card neutral">
+          <div class="ind-label">Current Fed Rate</div>
+          <div class="ind-value" id="ind-rate">-</div>
+          <div class="ind-delta" id="ind-rate-d" style="color:var(--muted);font-size:.75rem">federal funds rate</div>
+        </div>
+        <div class="ind-card neutral">
+          <div class="ind-label">GDP Growth</div>
+          <div class="ind-value" id="ind-gdp">-</div>
+          <div class="ind-delta" id="ind-gdp-d" style="color:var(--muted);font-size:.75rem">annualized</div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Inflation &amp; Unemployment History</div>
+        <canvas id="history-chart" height="140"></canvas>
+      </div>
+    </div>
+    <!-- right -->
+    <div class="right-panel">
+      <div class="rate-card">
+        <div class="rate-label">Set Federal Funds Rate</div>
+        <div class="rate-display" id="rate-display">4.0<span>%</span></div>
+        <input type="range" class="rate-slider" id="rate-slider" min="0" max="10" step="0.25" value="4.0" oninput="updateSlider(this.value)"/>
+        <div class="rate-hint">0% ←───────────────→ 10%</div>
+        <button class="btn-confirm" id="btn-confirm" onclick="confirmRate()">Confirm Rate &amp; Advance →</button>
+      </div>
+      <div class="guidance-card">
+        <div class="guidance-title">📌 Policy Guidance</div>
+        <div class="guidance-text" id="guidance-text">Assessing current conditions...</div>
+      </div>
+      <div class="history-card">
+        <div class="history-title">Decision Log</div>
+        <div class="history-row hdr">
+          <span>Qtr</span><span>Rate</span><span>Infl.</span><span>Unemp.</span>
+        </div>
+        <div id="history-log"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RESULTS ─────────────────────────────────────────── -->
+<div id="screen-results" class="screen">
+  <div class="result-title">Federal Reserve Performance Review</div>
+  <div class="result-grade" id="result-grade">A</div>
+  <div class="result-headline" id="result-headline">Excellent Stewardship</div>
+  <div class="result-sub" id="result-sub"></div>
+  <div class="result-stats">
+    <div class="result-stat">
+      <div class="result-stat-label">Avg. Inflation</div>
+      <div class="result-stat-val" id="res-inflation">—</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">Avg. Unemployment</div>
+      <div class="result-stat-val" id="res-unemp">—</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">Quarters Played</div>
+      <div class="result-stat-val">20</div>
+    </div>
+  </div>
+  <div class="result-detail">
+    <h4>📋 For Your Canvas Submission</h4>
+    <p id="result-note"></p>
+  </div>
+  <button class="btn-replay" onclick="replay()">↩ Play Again</button>
+  <div class="screenshot-note">📸 Take a screenshot of this page before closing — you'll need it for Canvas.</div>
+</div>
+
+<script>
+// ── Economic model ───────────────────────────────────────
+const NAIRU       = 4.5;   // natural rate of unemployment (%)
+const INF_TARGET  = 2.0;   // inflation target (%)
+const NEUTRAL_R   = 4.0;   // neutral nominal fed funds rate (%)
+const TOTAL_Q     = 20;
+
+// State
+let state = {};
+let history = [];
+let shockSchedule = {};
+let chartCtx, chartData;
+
+function initState() {
+  state = {
+    q: 0,
+    rate: 4.0,
+    inflation: 2.5 + (Math.random() - 0.5) * 0.6,
+    unemployment: 4.8 + (Math.random() - 0.5) * 0.4,
+    expectedInflation: 2.2,
+    outputGap: 0.2,
+    gdp: 2.2,
+  };
+  history = [];
+  // Random shock schedule: 1–2 shocks at random quarters
+  shockSchedule = {};
+  const shockQtrs = [];
+  while (shockQtrs.length < 2) {
+    const q = 4 + Math.floor(Math.random() * 14);
+    if (!shockQtrs.includes(q)) shockQtrs.push(q);
+  }
+  const shockTypes = [
+    { label: "Oil prices surge 40% following geopolitical tensions in the Middle East.", effect: +1.5, eff_u: +0.4 },
+    { label: "Supply chain disruptions raise production costs across major sectors.",    effect: +1.0, eff_u: +0.3 },
+    { label: "Energy prices fall sharply after a surge in domestic production.",          effect: -1.0, eff_u: -0.2 },
+    { label: "A drought reduces agricultural output, pushing food prices higher.",        effect: +0.8, eff_u: +0.2 },
+    { label: "A major trade agreement lowers import costs across manufacturing.",         effect: -0.7, eff_u: -0.3 },
+  ];
+  shockQtrs.forEach((q, i) => {
+    shockSchedule[q] = shockTypes[Math.floor(Math.random() * shockTypes.length)];
+  });
+}
+
+function stepEconomy(chosenRate) {
+  const s = state;
+  const shock = shockSchedule[s.q] || null;
+  const shockInfl = shock ? shock.effect  : 0;
+  const shockUnemp= shock ? shock.eff_u   : 0;
+
+  // Real rate gap (how tight/loose relative to neutral)
+  const realRate = chosenRate - s.inflation;
+  const neutralReal = NEUTRAL_R - INF_TARGET;
+  const rateGap = realRate - neutralReal;   // positive = tight
+
+  // Output gap responds to rate with lag (IS curve)
+  const newOutputGap = s.outputGap * 0.7 - 0.4 * rateGap + (Math.random() - 0.5) * 0.15;
+
+  // Unemployment via Okun's law
+  const newUnemp = Math.max(1.5,
+    s.unemployment - 0.45 * newOutputGap + shockUnemp * 0.5 + (Math.random() - 0.5) * 0.12
+  );
+
+  // Inflation via Phillips curve + expectations
+  const newExpInfl = 0.65 * s.expectedInflation + 0.35 * s.inflation;
+  const newInflation = Math.max(-1,
+    newExpInfl - 0.55 * (newUnemp - NAIRU) + shockInfl * 0.6 + (Math.random() - 0.5) * 0.18
+  );
+
+  // GDP growth (rough)
+  const newGdp = 2.0 - 1.0 * rateGap + newOutputGap * 0.8 + (Math.random() - 0.5) * 0.3;
+
+  state.outputGap = newOutputGap;
+  state.expectedInflation = newExpInfl;
+
+  return {
+    inflation:    +newInflation.toFixed(2),
+    unemployment: +newUnemp.toFixed(2),
+    gdp:          +newGdp.toFixed(2),
+    shock,
+  };
+}
+
+// ── Game flow ────────────────────────────────────────────
+function startGame() {
+  initState();
+  showScreen('screen-game');
+  buildProgressDots();
+  buildChart();
+  renderQuarter();
+}
+
+function buildProgressDots() {
+  const el = document.getElementById('prog-dots');
+  el.innerHTML = '';
+  for (let i = 0; i < TOTAL_Q; i++) {
+    const d = document.createElement('div');
+    d.className = 'prog-dot' + (i === 0 ? ' current' : '');
+    d.id = `dot-${i}`;
+    el.appendChild(d);
+  }
+}
+
+function updateProgressDots(q) {
+  for (let i = 0; i < TOTAL_Q; i++) {
+    const d = document.getElementById(`dot-${i}`);
+    if (!d) continue;
+    d.className = 'prog-dot' + (i < q ? ' done' : i === q ? ' current' : '');
+  }
+}
+
+function buildChart() {
+  const canvas = document.getElementById('history-chart');
+  chartCtx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio || 500;
+  canvas.height = 140 * window.devicePixelRatio || 140;
+  canvas.style.height = '140px';
+  chartData = { inflation: [], unemployment: [], rates: [] };
+}
+
+function drawChart() {
+  const c = chartCtx;
+  const W = c.canvas.width, H = c.canvas.height;
+  const dpr = window.devicePixelRatio || 1;
+  c.clearRect(0, 0, W, H);
+
+  const pad = { l: 30 * dpr, r: 10 * dpr, t: 10 * dpr, b: 25 * dpr };
+  const cW = W - pad.l - pad.r;
+  const cH = H - pad.t - pad.b;
+
+  const n = chartData.inflation.length;
+  if (n < 2) return;
+
+  function xPos(i) { return pad.l + (i / (TOTAL_Q - 1)) * cW; }
+  function yPos(v, min, max) { return pad.t + cH - ((v - min) / (max - min)) * cH; }
+
+  const minY = -1, maxY = 10;
+
+  // Grid lines
+  c.strokeStyle = `rgba(31,45,71,${dpr > 1 ? 1 : 0.8})`;
+  c.lineWidth = dpr;
+  [2, 5, 8].forEach(v => {
+    const y = yPos(v, minY, maxY);
+    c.beginPath(); c.moveTo(pad.l, y); c.lineTo(W - pad.r, y); c.stroke();
+    c.fillStyle = 'rgba(100,116,139,0.8)';
+    c.font = `${9 * dpr}px Space Mono`;
+    c.fillText(v + '%', 0, y + 3 * dpr);
+  });
+
+  // Target line at 2%
+  c.strokeStyle = 'rgba(0,201,177,0.2)';
+  c.setLineDash([4 * dpr, 4 * dpr]);
+  const y2 = yPos(INF_TARGET, minY, maxY);
+  c.beginPath(); c.moveTo(pad.l, y2); c.lineTo(W - pad.r, y2); c.stroke();
+  c.setLineDash([]);
+
+  // NAIRU line
+  c.strokeStyle = 'rgba(77,166,255,0.2)';
+  c.setLineDash([4 * dpr, 4 * dpr]);
+  const yN = yPos(NAIRU, minY, maxY);
+  c.beginPath(); c.moveTo(pad.l, yN); c.lineTo(W - pad.r, yN); c.stroke();
+  c.setLineDash([]);
+
+  function drawLine(data, color) {
+    if (data.length < 2) return;
+    c.strokeStyle = color;
+    c.lineWidth = 2 * dpr;
+    c.beginPath();
+    data.forEach((v, i) => {
+      const x = xPos(i), y = yPos(v, minY, maxY);
+      i === 0 ? c.moveTo(x, y) : c.lineTo(x, y);
+    });
+    c.stroke();
+    // dot at last point
+    const last = data.length - 1;
+    c.fillStyle = color;
+    c.beginPath();
+    c.arc(xPos(last), yPos(data[last], minY, maxY), 3 * dpr, 0, Math.PI * 2);
+    c.fill();
+  }
+
+  drawLine(chartData.inflation,    'rgba(0,201,177,0.9)');
+  drawLine(chartData.unemployment, 'rgba(77,166,255,0.9)');
+
+  // Legend
+  c.font = `${9 * dpr}px Space Mono`;
+  c.fillStyle = 'rgba(0,201,177,0.9)'; c.fillText('─ Inflation', pad.l, H - 5 * dpr);
+  c.fillStyle = 'rgba(77,166,255,0.9)'; c.fillText('─ Unemployment', pad.l + 70 * dpr, H - 5 * dpr);
+}
+
+function renderQuarter() {
+  const q = state.q;
+  document.getElementById('topbar-q').textContent = `Quarter ${q + 1} of ${TOTAL_Q}`;
+  updateProgressDots(q);
+
+  // Update slider to current rate
+  const slider = document.getElementById('rate-slider');
+  slider.value = state.rate;
+  document.getElementById('rate-display').innerHTML = `${state.rate.toFixed(2)}<span>%</span>`;
+
+  // Indicators
+  setIndicator('ind-inflation', state.inflation, '%', state.inflation - INF_TARGET, 'inflation');
+  setIndicator('ind-unemp',     state.unemployment, '%', state.unemployment - NAIRU, 'unemployment');
+  document.getElementById('ind-rate').textContent = state.rate.toFixed(2) + '%';
+  setGDPIndicator('ind-gdp', state.gdp);
+
+  // News
+  const shock = shockSchedule[q];
+  const shockEl = document.getElementById('news-shock');
+  if (shock) {
+    shockEl.style.display = 'block';
+    document.getElementById('news-shock-text').textContent = shock.label;
+  } else {
+    shockEl.style.display = 'none';
+  }
+
+  const {headline, body} = generateNews(state, q, shock);
+  document.getElementById('news-headline').textContent = headline;
+  document.getElementById('news-body').textContent = body;
+  document.getElementById('news-badge').textContent = `📰 Q${q + 1} · Year ${Math.ceil((q + 1) / 4)} Briefing`;
+
+  // Guidance
+  document.getElementById('guidance-text').innerHTML = getGuidance(state);
+
+  // Chart
+  chartData.inflation.push(state.inflation);
+  chartData.unemployment.push(state.unemployment);
+  drawChart();
+
+  // History log
+  if (q > 0) {
+    const prev = history[history.length - 1];
+    addLogRow(q, prev.rate, state.inflation, state.unemployment);
+  }
+
+  document.getElementById('btn-confirm').disabled = false;
+
+  // Fade in news panel
+  const panel = document.getElementById('news-panel');
+  panel.classList.remove('fade-in');
+  void panel.offsetWidth;
+  panel.classList.add('fade-in');
+}
+
+function setIndicator(id, value, unit, gap, type) {
+  const el = document.getElementById(id);
+  const dEl = document.getElementById(id + '-d');
+  if (!el) return;
+  el.textContent = value.toFixed(1) + unit;
+  const card = el.parentElement;
+  card.className = 'ind-card';
+  let status = 'neutral';
+  if (type === 'inflation') {
+    if (Math.abs(gap) < 0.5) status = 'good';
+    else if (Math.abs(gap) < 1.5) status = 'warn';
+    else status = 'bad';
+    if (dEl) dEl.innerHTML = `<span style="color:var(--muted)">Target: 2.0% ${gap > 0 ? '↑ High' : gap < 0 ? '↓ Low' : '✓ On target'}</span>`;
+  } else if (type === 'unemployment') {
+    if (Math.abs(gap) < 0.4) status = 'good';
+    else if (Math.abs(gap) < 1.2) status = 'warn';
+    else status = 'bad';
+    if (dEl) dEl.innerHTML = `<span style="color:var(--muted)">Natural rate: 4.5% ${gap > 0 ? '↑ High' : gap < 0 ? '↓ Low' : '✓ On target'}</span>`;
+  }
+  card.classList.add(status);
+}
+
+function setGDPIndicator(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = val.toFixed(1) + '%';
+  const card = el.parentElement;
+  card.className = 'ind-card' + (val > 2 ? ' good' : val > 0 ? ' warn' : ' bad');
+}
+
+function generateNews(s, q, shock) {
+  const inflGap  = s.inflation  - INF_TARGET;
+  const unempGap = s.unemployment - NAIRU;
+  const yr = Math.ceil((q + 1) / 4);
+  const qInYr = ((q) % 4) + 1;
+
+  const headlines = [];
+  if (inflGap > 1.5)       headlines.push("Fed Under Pressure as Inflation Runs Hot");
+  else if (inflGap > 0.5)  headlines.push("Inflation Creeps Above Target");
+  else if (inflGap < -1)   headlines.push("Deflation Risk Emerges — Prices Falling");
+  else if (inflGap < -0.3) headlines.push("Inflation Below Target — Room to Stimulate");
+  else                     headlines.push("Inflation Holding Steady Near Target");
+
+  if (unempGap > 1.5)       headlines.push("Labor Market Weakens — Jobs Data Disappoint");
+  else if (unempGap > 0.5)  headlines.push("Unemployment Edges Higher");
+  else if (unempGap < -1)   headlines.push("Labor Market Overheating");
+  else if (unempGap < -0.4) headlines.push("Jobs Market Tight — Wages Rising");
+  else                      headlines.push("Employment Near Full Capacity");
+
+  const headline = (shock ? "⚡ " : "") + headlines[Math.floor(Math.random() * headlines.length)];
+
+  const bodies = [];
+  if (inflGap > 1 && unempGap < 0) bodies.push(`The economy is running hot. Inflation at ${s.inflation.toFixed(1)}% is well above the 2% target, and the labor market is tight with unemployment at ${s.unemployment.toFixed(1)}%. The Fed faces upward wage pressure and rising consumer prices. Raising the federal funds rate can cool demand, but a sharp increase risks slowing growth too quickly.`);
+  else if (inflGap < -0.5 && unempGap > 0.5) bodies.push(`The economy is cooling. Inflation at ${s.inflation.toFixed(1)}% is below target, and unemployment at ${s.unemployment.toFixed(1)}% is above the natural rate. A cut in the federal funds rate could stimulate borrowing and investment, but the effects will take a few quarters to appear.`);
+  else if (shock && shock.effect > 0) bodies.push(`A supply shock is pushing production costs higher and straining the economy. Inflation is at ${s.inflation.toFixed(1)}% and unemployment at ${s.unemployment.toFixed(1)}%. This is the classic stagflation challenge — raising rates fights inflation but further slows an already stressed economy.`);
+  else if (shock && shock.effect < 0) bodies.push(`A favorable supply shock is providing relief. Inflation eases to ${s.inflation.toFixed(1)}% as costs fall. Unemployment stands at ${s.unemployment.toFixed(1)}%. This may give the Fed room to hold or cut rates while growth strengthens.`);
+  else bodies.push(`Year ${yr}, Quarter ${qInYr}: Inflation stands at ${s.inflation.toFixed(1)}% with unemployment at ${s.unemployment.toFixed(1)}%. The current fed funds rate is ${s.rate.toFixed(2)}%. Monitor the data and adjust policy as needed — remember that rate changes take one to two quarters to fully filter through the economy.`);
+
+  return { headline, body: bodies[0] };
+}
+
+function getGuidance(s) {
+  const iGap = s.inflation - INF_TARGET;
+  const uGap = s.unemployment - NAIRU;
+  const tips = [];
+  if (iGap > 1.5)      tips.push('<span style="color:var(--red)">🔺 Inflation well above target — consider <strong>raising rates</strong>.</span>');
+  else if (iGap > 0.5) tips.push('<span style="color:var(--warn)">↑ Inflation slightly elevated — modest rate increase may help.</span>');
+  else if (iGap < -1)  tips.push('<span style="color:var(--blue)">🔻 Inflation falling below target — consider <strong>cutting rates</strong>.</span>');
+  else if (iGap < -0.3)tips.push('<span style="color:var(--blue)">↓ Inflation below target — a small cut could help.</span>');
+  else                  tips.push('<span style="color:var(--good)">✓ Inflation near target — hold or make only small adjustments.</span>');
+
+  if (uGap > 1.2)       tips.push('<span style="color:var(--blue)">High unemployment — cutting rates may stimulate hiring.</span>');
+  else if (uGap > 0.4)  tips.push('<span style="color:var(--warn)">Unemployment slightly above natural rate — watch closely.</span>');
+  else if (uGap < -1)   tips.push('<span style="color:var(--red)">Very tight labor market — overheating risk.</span>');
+  else                   tips.push('<span style="color:var(--good)">✓ Employment near natural rate.</span>');
+
+  tips.push('<span style="color:var(--muted)">Reminder: rate changes take 1–2 quarters to take effect.</span>');
+  return tips.join('<br/>');
+}
+
+function addLogRow(q, rate, infl, unemp) {
+  const log = document.getElementById('history-log');
+  const row = document.createElement('div');
+  row.className = 'history-row';
+  row.innerHTML = `<span>Q${q}</span><span>${rate.toFixed(2)}%</span><span>${infl.toFixed(1)}%</span><span>${unemp.toFixed(1)}%</span>`;
+  log.prepend(row);
+}
+
+function updateSlider(v) {
+  state.rate = parseFloat(v);
+  document.getElementById('rate-display').innerHTML = `${parseFloat(v).toFixed(2)}<span>%</span>`;
+}
+
+function confirmRate() {
+  document.getElementById('btn-confirm').disabled = true;
+
+  // Log current state before stepping
+  history.push({ q: state.q + 1, rate: state.rate, inflation: state.inflation, unemployment: state.unemployment });
+
+  // Step economy
+  const result = stepEconomy(state.rate);
+  state.q++;
+
+  if (state.q >= TOTAL_Q) {
+    state.inflation    = result.inflation;
+    state.unemployment = result.unemployment;
+    state.gdp          = result.gdp;
+    showResults();
+    return;
+  }
+
+  state.inflation    = result.inflation;
+  state.unemployment = result.unemployment;
+  state.gdp          = result.gdp;
+  renderQuarter();
+}
+
+// ── Results ──────────────────────────────────────────────
+function showResults() {
+  // Averages from history
+  const avgInfl  = history.reduce((s, r) => s + r.inflation, 0) / history.length;
+  const avgUnemp = history.reduce((s, r) => s + r.unemployment, 0) / history.length;
+
+  const inflScore  = Math.abs(avgInfl  - INF_TARGET);
+  const unempScore = Math.abs(avgUnemp - NAIRU);
+  const combined   = inflScore + unempScore;
+
+  let grade, headline, sub;
+  if      (combined < 0.8)  { grade='A'; headline='Exceptional Stewardship'; sub='You navigated the economy with precision. Inflation stayed close to target and employment remained strong. The textbook would be proud.'; }
+  else if (combined < 1.4)  { grade='B'; headline='Solid Policy Performance'; sub='A generally strong run. The economy stayed mostly on track, with only minor deviations from your targets. A few sharp shocks tested your resolve.'; }
+  else if (combined < 2.2)  { grade='C'; headline='Adequate but Uneven'; sub='You kept the economy from disaster, but inflation or unemployment drifted significantly at times. Consider how lagged effects and supply shocks complicated your decisions.'; }
+  else if (combined < 3.2)  { grade='D'; headline='Significant Instability'; sub='The economy experienced notable swings under your tenure. Overcorrections, delayed responses, or adverse shocks led to sustained deviations from targets.'; }
+  else                      { grade='F'; headline='Economic Turbulence'; sub='The economy struggled under your decisions. Revisit the Phillips curve tradeoff and think about how expectations and lags affect policy outcomes. Try again!'; }
+
+  document.getElementById('result-grade').textContent = grade;
+  document.getElementById('result-grade').className = `result-grade ${grade}`;
+  document.getElementById('result-headline').textContent = headline;
+  document.getElementById('result-sub').textContent = sub;
+  document.getElementById('res-inflation').textContent  = avgInfl.toFixed(2) + '%';
+  document.getElementById('res-unemp').textContent      = avgUnemp.toFixed(2) + '%';
+  document.getElementById('result-note').innerHTML =
+    `For your Canvas quiz, you will need: <strong>Grade: ${grade}</strong>, ` +
+    `<strong>Avg. Inflation: ${avgInfl.toFixed(2)}%</strong>, ` +
+    `<strong>Avg. Unemployment: ${avgUnemp.toFixed(2)}%</strong>. ` +
+    `Take a screenshot of this page now, then return to Canvas to answer the reflection questions.`;
+
+  showScreen('screen-results');
+}
+
+function replay() {
+  showScreen('screen-intro');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+</script>
+</body>
+</html>

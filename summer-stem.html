@@ -8,93 +8,43 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-/* BANNER */
-.course-banner {
-  background: var(--forest, #2d5016);
-  padding: 4rem 8vw 3.5rem;
-  position: relative; overflow: hidden;
-}
-.course-banner::after {
-  content: ''; position: absolute; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='400'%3E%3Cg fill='none' stroke='%23b8d4a0' stroke-width='0.7' opacity='0.13'%3E%3Cellipse cx='580' cy='200' rx='280' ry='118'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: cover; pointer-events: none;
-}
-.course-banner-inner { position: relative; z-index: 1; }
-.back-link {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(255,255,255,0.45); text-decoration: none;
-  margin-bottom: 1.5rem; transition: color 0.2s;
-}
-.back-link:hover { color: var(--sage-light, #b8d4a0); }
-.course-banner-label {
-  font-size: 0.65rem; letter-spacing: 0.22em;
-  text-transform: uppercase; color: var(--sage-light, #b8d4a0);
-  font-weight: 500; margin-bottom: 0.6rem;
-}
-.course-banner-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  font-weight: 300; color: #fff; line-height: 1.1;
-  margin-bottom: 1rem;
-}
-.course-banner-title em { font-style: italic; color: var(--sage-light, #b8d4a0); }
-.course-banner-meta {
-  display: flex; gap: 1.5rem; flex-wrap: wrap;
-  font-size: 0.78rem; color: rgba(255,255,255,0.8);
-  margin-bottom: 1rem;
-}
-.cbm-item { display: flex; align-items: center; gap: 0.4rem; }
-.course-banner-desc {
-  font-size: 0.88rem; color: rgba(255,255,255,0.7);
-  max-width: 600px; line-height: 1.75;
-}
+/* ── COURSE SPECIFIC OVERRIDES ── */
 
 /* QUICK ACCESS BAR */
 .quick-access {
-  background: var(--cream-dark, #f4f1ea);
-  border-bottom: 1px solid var(--rule, #e5e0d8);
+  background: var(--cream-dark);
+  border-bottom: 1px solid var(--rule);
   padding: 0.8rem 8vw;
   display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
 }
 .qa-label {
   font-size: 0.63rem; letter-spacing: 0.18em;
-  text-transform: uppercase; color: var(--text-muted, #666);
+  text-transform: uppercase; color: var(--text-muted);
   white-space: nowrap;
 }
 .qa-links { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .qa-link {
   padding: 0.28rem 0.85rem;
   font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
-  border: 1px solid var(--rule, #e5e0d8); background: #fff;
-  color: var(--text-muted, #666); text-decoration: none;
+  border: 1px solid var(--rule); background: #fff;
+  color: var(--text-muted); text-decoration: none;
   transition: all 0.18s; cursor: pointer;
 }
-.qa-link:hover { border-color: var(--forest, #2d5016); color: var(--forest, #2d5016); }
+.qa-link:hover { border-color: var(--forest); color: var(--forest); }
 
-/* SCHEDULE */
-.schedule-section { padding: 4rem 8vw; background: var(--cream, #faf8f5); }
-.schedule-section h2 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.6rem; font-weight: 400;
-  color: var(--navy, #1a2b3c); margin-bottom: 0.3rem;
-}
+/* DAY TOGGLES (Accordion) */
 .schedule-note {
-  font-size: 0.82rem; color: var(--text-muted, #666);
+  font-size: 0.82rem; color: var(--text-muted);
   margin-bottom: 2.5rem; line-height: 1.6;
 }
-
-/* DAY TOGGLES */
 .day-block { 
   margin-bottom: 1rem; 
   background: #fff;
-  border: 1px solid var(--rule, #e5e0d8);
-  border-radius: 6px;
-  overflow: hidden;
+  border: 1px solid var(--rule);
   transition: all 0.3s ease;
 }
 .day-block.active-day {
-  border-left: 5px solid var(--forest, #2d5016);
+  border-left: 5px solid var(--forest);
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 .day-header {
@@ -107,11 +57,11 @@
   background: #fff;
   transition: background 0.2s;
 }
-.day-header:hover { background: var(--cream-dark, #f4f1ea); }
+.day-header:hover { background: var(--cream-dark); }
 .day-header::after {
   content: '▼';
   font-size: 0.8rem;
-  color: var(--forest, #2d5016);
+  color: var(--forest);
   transition: transform 0.3s ease;
   justify-self: end;
 }
@@ -120,15 +70,15 @@
 .day-label {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.5rem; font-weight: 600;
-  color: var(--forest, #2d5016); line-height: 1;
+  color: var(--forest); line-height: 1;
 }
 .day-theme {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.1rem; font-weight: 500;
-  color: var(--navy, #1a2b3c); font-style: italic;
+  color: var(--navy); font-style: italic;
 }
 
-/* SESSIONS (Hidden by default) */
+/* SESSIONS */
 .sessions { 
   display: none; 
   flex-direction: column; 
@@ -141,57 +91,51 @@
   display: grid;
   grid-template-columns: 110px 1fr;
   gap: 0;
-  border: 1px solid var(--rule, #e5e0d8);
+  border: 1px solid var(--rule);
   background: #fff;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s, border-color 0.2s;
 }
+/* Gamified Hover Effect */
+.session:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(45, 80, 22, 0.08);
+  border-color: var(--sage);
+}
+
 .session-time {
   padding: 0.75rem 1rem;
-  background: var(--cream-dark, #f4f1ea);
-  border-right: 1px solid var(--rule, #e5e0d8);
-  font-size: 0.7rem; color: var(--text-muted, #666);
+  background: var(--cream-dark);
+  border-right: 1px solid var(--rule);
+  font-size: 0.7rem; color: var(--text-muted);
   letter-spacing: 0.05em; line-height: 1.4;
   display: flex; align-items: center;
 }
 .session-content { padding: 0.75rem 1.1rem; }
 .session-title {
   font-size: 0.88rem; font-weight: 500;
-  color: var(--navy, #1a2b3c); margin-bottom: 0.15rem;
+  color: var(--navy); margin-bottom: 0.15rem;
 }
-.session-desc { font-size: 0.78rem; color: var(--text-muted, #666); line-height: 1.5; }
+.session-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
 .session-game {
   display: inline-flex; align-items: center; gap: 0.4rem;
   margin-top: 0.4rem;
   font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--forest, #2d5016); text-decoration: none;
+  color: var(--forest); text-decoration: none;
   border-bottom: 1px solid rgba(45,80,22,0.25);
   padding-bottom: 1px; transition: border-color 0.2s;
 }
-.session-game:hover { border-color: var(--forest, #2d5016); }
+.session-game:hover { border-color: var(--forest); }
 
-.session.highlight { border-color: var(--sage-light, #b8d4a0); }
-.session.highlight .session-time { background: var(--sage-pale, #e8eedf); }
-.session.lunch { opacity: 0.5; }
+.session.highlight { border-color: var(--sage-light); border-left: 3px solid var(--sage); }
+.session.highlight .session-time { background: var(--sage-pale); }
+.session.lunch { opacity: 0.6; }
 .session.lunch .session-title { font-weight: 300; font-style: italic; }
 
-/* MATERIALS */
-.materials-section { padding: 3.5rem 8vw; background: var(--cream-dark, #f4f1ea); }
+/* MATERIALS SECTION */
 .materials-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
 }
-.materials-section h2 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.6rem; font-weight: 400;
-  color: var(--navy, #1a2b3c); margin: 0;
-}
-.toggle-materials-btn {
-  background: var(--forest, #2d5016); color: #fff;
-  border: none; padding: 0.6rem 1.2rem;
-  font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
-  cursor: pointer; transition: background 0.2s; border-radius: 4px;
-}
-.toggle-materials-btn:hover { background: var(--navy, #1a2b3c); }
-
 .materials-grid {
   display: none; /* Hidden by default */
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -199,29 +143,32 @@
 }
 .materials-grid.open { display: grid; }
 .material-card {
-  background: #fff; border: 1px solid var(--rule, #e5e0d8);
+  background: #fff; border: 1px solid var(--rule);
   padding: 1.2rem 1.4rem;
   display: flex; flex-direction: column;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, transform 0.2s;
 }
-.material-card:hover { border-color: var(--sage-light, #b8d4a0); }
+.material-card:hover { 
+  border-color: var(--sage-light); 
+  transform: translateY(-2px);
+}
 .mc-day {
   font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--sage, #7a9c59); margin-bottom: 0.3rem; font-weight: 500;
+  color: var(--sage); margin-bottom: 0.3rem; font-weight: 500;
 }
 .mc-name {
   font-weight: 500; font-size: 0.88rem;
-  color: var(--navy, #1a2b3c); margin-bottom: 0.3rem; line-height: 1.35;
+  color: var(--navy); margin-bottom: 0.3rem; line-height: 1.35;
 }
-.mc-desc { font-size: 0.78rem; color: var(--text-muted, #666); line-height: 1.55; flex: 1; margin-bottom: 0.9rem; }
+.mc-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; flex: 1; margin-bottom: 0.9rem; }
 .mc-link {
   font-size: 0.67rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--forest, #2d5016); text-decoration: none;
+  color: var(--forest); text-decoration: none;
   display: inline-flex; align-items: center; gap: 0.3rem;
   border-bottom: 1px solid rgba(45,80,22,0.25); padding-bottom: 1px;
   align-self: flex-start; transition: border-color 0.2s;
 }
-.mc-link:hover { border-color: var(--forest, #2d5016); }
+.mc-link:hover { border-color: var(--forest); }
 .mc-link.pdf::before { content: '📄 '; }
 
 @media (max-width: 640px) {
@@ -238,26 +185,35 @@
     <div class="nav-monogram">SG</div>
     <span class="nav-wordmark">Suraj Ghimire</span>
   </a>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="research.html" onclick="closeNav()">Research</a></li>
+    <li><a href="teaching.html" class="active" onclick="closeNav()">Teaching</a></li>
+    <li><a href="about.html" onclick="closeNav()">About</a></li>
+    <li><a href="about.html#contact" onclick="closeNav()">Contact</a></li>
+  </ul>
 </nav>
 
 <div class="page-wrap">
 
-  <!-- BANNER -->
-  <div class="course-banner">
-    <div class="course-banner-inner">
-      <a class="back-link" href="teaching.html">← All Courses</a>
-      <p class="course-banner-label">NMT Summer STEM 2026 &mdash; Outreach Course</p>
-      <h1 class="course-banner-title">Money Hacks:<br><em>Engineering Your Financial Future</em></h1>
-      <div class="course-banner-meta">
-        <span class="cbm-item">📅 June 2026</span>
-        <span class="cbm-item">⏰ Mon–Thu 9am–4pm &nbsp;|&nbsp; Fri 9am–noon</span>
-        <span class="cbm-item">👤 Instructor: Dr. Suraj Ghimire</span>
+  <div class="page-banner banner-forest">
+    <div class="topo-overlay"></div>
+    <div class="page-banner-inner">
+      <a class="btn btn-light" href="teaching.html" style="margin-bottom: 1.5rem; padding: 0.3rem 0.8rem; font-size: 0.6rem;">← Back to Courses</a>
+      <p class="page-banner-eyebrow">NMT Summer STEM 2026</p>
+      <h1 class="page-banner-title">Money Hacks:<br><em>Engineering Your Financial Future</em></h1>
+      
+      <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.78rem; color: rgba(255,255,255,0.8); margin-bottom: 1rem;">
+        <span>📅 June 2026</span>
+        <span>⏰ Mon–Thu 9am–4pm | Fri 9am–noon</span>
+        <span>👤 Instructor: Dr. Suraj Ghimire</span>
       </div>
-      <p class="course-banner-desc">A weeklong intensive on personal finance for advanced high school students. You will leave with a completed Personal Financial Blueprint, a business plan, and the vocabulary to make smarter financial decisions.</p>
+      <p class="page-banner-sub">A weeklong intensive on personal finance for advanced high school students. You will leave with a completed Personal Financial Blueprint, a business plan, and the vocabulary to make smarter financial decisions.</p>
     </div>
   </div>
 
-  <!-- QUICK ACCESS -->
   <div class="quick-access">
     <span class="qa-label">Jump to</span>
     <div class="qa-links">
@@ -266,293 +222,7 @@
     </div>
   </div>
 
-  <!-- WEEK SCHEDULE -->
-  <div class="schedule-section page-section" id="schedule">
-    <h2>Weekly Schedule</h2>
-    <p class="schedule-note">Click on any day to expand and view the session details. <em>Lunch is at Fidel from 12:00–1:00 PM daily.</em></p>
-
-    <!-- MONDAY -->
-    <div class="day-block" data-day="1">
-      <div class="day-header">
-        <span class="day-label">Mon</span>
-        <span class="day-theme">Money &amp; Mindset — Where does your money go?</span>
-      </div>
-      <div class="sessions">
-        <div class="session">
-          <div class="session-time">9:00–9:30</div>
-          <div class="session-content">
-            <div class="session-title">Introductions + Ice Breaker</div>
-            <div class="session-desc">"What would you do with $1 million?" — round-the-room, no wrong answers.</div>
-          </div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">10:00–10:45</div>
-          <div class="session-content">
-            <div class="session-title">🃏 Budget Battleground</div>
-            <div class="session-desc">Allocate your monthly income across expense categories using play money.</div>
-          </div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">11:00–11:45</div>
-          <div class="session-content">
-            <div class="session-title">💻 Spend or Save?</div>
-            <div class="session-desc">Ten rounds of real-life decisions that compound.</div>
-            <a class="session-game" href="spend-or-save.html" target="_blank">▶ Open Game</a>
-          </div>
-        </div>
-        <div class="session lunch">
-          <div class="session-time">12:00–1:00</div>
-          <div class="session-content"><div class="session-title">Lunch — Walk to Fidel</div></div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">1:30–2:30</div>
-          <div class="session-content">
-            <div class="session-title">🃏 The Keeping Up Game</div>
-            <div class="session-desc">Decide each round: match your peers or save?</div>
-          </div>
-        </div>
-        <div class="session">
-          <div class="session-time">2:30–3:30</div>
-          <div class="session-content">
-            <div class="session-title">Blueprint Work — Section 1</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TUESDAY -->
-    <div class="day-block" data-day="2">
-      <div class="day-header">
-        <span class="day-label">Tue</span>
-        <span class="day-theme">Make Your Money Work — Investing &amp; Markets</span>
-      </div>
-      <div class="sessions">
-        <div class="session highlight">
-          <div class="session-time">9:50–10:30</div>
-          <div class="session-content">
-            <div class="session-title">💻 The Time Machine</div>
-            <div class="session-desc">Discover what happens when you start investing at 18 vs 28.</div>
-            <a class="session-game" href="compound-interest.html" target="_blank">▶ Open Calculator</a>
-          </div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">11:00–11:45</div>
-          <div class="session-content">
-            <div class="session-title">💻 Bull or Bear?</div>
-            <div class="session-desc">Competitive news headline simulator — first to 7 correct wins.</div>
-            <a class="session-game" href="bull-or-bear.html" target="_blank">▶ Open Game</a>
-          </div>
-        </div>
-        <div class="session lunch">
-          <div class="session-time">12:00–1:00</div>
-          <div class="session-content"><div class="session-title">Lunch — Walk to Fidel</div></div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">1:30–2:30</div>
-          <div class="session-content">
-            <div class="session-title">🃏 Fund Manager Showdown</div>
-            <div class="session-desc">Pick 5 companies to invest in blind. Who picked better?</div>
-          </div>
-        </div>
-        <div class="session">
-          <div class="session-time">2:30–3:30</div>
-          <div class="session-content">
-            <div class="session-title">Blueprint Work — Section 2</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- WEDNESDAY -->
-    <div class="day-block" data-day="3">
-      <div class="day-header">
-        <span class="day-label">Wed</span>
-        <span class="day-theme">Build Something — Entrepreneurship &amp; Dropshipping</span>
-      </div>
-      <div class="sessions">
-        <div class="session">
-          <div class="session-time">9:45–10:30</div>
-          <div class="session-content">
-            <div class="session-title">Shark Tank Lite — Round 1 Prep</div>
-            <div class="session-desc">Pick a side-hustle idea and start your one-page business plan.</div>
-          </div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">11:00–11:45</div>
-          <div class="session-content">
-            <div class="session-title">💻 Dropship or Flop?</div>
-            <div class="session-desc">Evaluate ten products for viable dropshipping margins.</div>
-            <a class="session-game" href="dropship-or-flop.html" target="_blank">▶ Open Game</a>
-          </div>
-        </div>
-        <div class="session lunch">
-          <div class="session-time">12:00–1:00</div>
-          <div class="session-content"><div class="session-title">Lunch — Walk to Fidel</div></div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">1:30–2:15</div>
-          <div class="session-content">
-            <div class="session-title">💻 Crash or Moon?</div>
-            <div class="session-desc">Draw where you think the crypto chart goes next.</div>
-            <a class="session-game" href="crypto-crash-or-moon.html" target="_blank">▶ Open Game</a>
-          </div>
-        </div>
-        <div class="session">
-          <div class="session-time">2:30–3:30</div>
-          <div class="session-content">
-            <div class="session-title">Blueprint Work — Section 3 (Side Hustle Plan)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- THURSDAY -->
-    <div class="day-block" data-day="4">
-      <div class="day-header">
-        <span class="day-label">Thu</span>
-        <span class="day-theme">Debt, Credit &amp; Pulling It Together</span>
-      </div>
-      <div class="sessions">
-        <div class="session highlight">
-          <div class="session-time">10:15–11:00</div>
-          <div class="session-content">
-            <div class="session-title">💻 Credit Score Simulator</div>
-            <div class="session-desc">Watch your score shift in real time based on your decisions.</div>
-            <a class="session-game" href="credit-score-simulator.html" target="_blank">▶ Open Game</a>
-          </div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">11:00–11:45</div>
-          <div class="session-content">
-            <div class="session-title">🃏 Debt Avalanche vs. Snowball</div>
-            <div class="session-desc">Calculate total interest paid to see which method wins mathematically.</div>
-          </div>
-        </div>
-        <div class="session lunch">
-          <div class="session-time">12:00–1:00</div>
-          <div class="session-content"><div class="session-title">Lunch — Walk to Fidel</div></div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">1:00–2:15</div>
-          <div class="session-content">
-            <div class="session-title">🎤 Shark Tank Lite — Pitches</div>
-            <div class="session-desc">Each student gives a 3-minute pitch for funding.</div>
-          </div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">3:15–3:45</div>
-          <div class="session-content">
-            <div class="session-title">💻 Financial Future Flashforward</div>
-            <div class="session-desc">Watch your projected net worth at 40 change with big life decisions.</div>
-            <a class="session-game" href="financial-future-flashforward.html" target="_blank">▶ Open Game</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FRIDAY -->
-    <div class="day-block" data-day="5">
-      <div class="day-header">
-        <span class="day-label">Fri</span>
-        <span class="day-theme">Your Financial Future Starts Now</span>
-      </div>
-      <div class="sessions">
-        <div class="session">
-          <div class="session-time">9:20–10:00</div>
-          <div class="session-content">
-            <div class="session-title">Blueprint Presentations</div>
-            <div class="session-desc">Share what you built this week. No grades, no pressure.</div>
-          </div>
-        </div>
-        <div class="session highlight">
-          <div class="session-time">10:30–11:00</div>
-          <div class="session-content">
-            <div class="session-title">💻 Final Boss Quiz</div>
-            <div class="session-desc">15 questions, 5 categories, streak bonuses.</div>
-            <a class="session-game" href="final-boss-quiz.html" target="_blank">▶ Open Quiz</a>
-          </div>
-        </div>
-        <div class="session">
-          <div class="session-time">11:00–11:50</div>
-          <div class="session-content">
-            <div class="session-title">Closing Circle + Certificates</div>
-            <div class="session-desc">Say one thing you will do differently with your money.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- MATERIALS -->
-  <div class="materials-section page-section" id="materials">
-    <div class="materials-header">
-      <h2>Course Materials</h2>
-      <button class="toggle-materials-btn" id="toggle-materials-btn">Show Course Materials</button>
-    </div>
-    <div class="materials-grid" id="materials-grid">
-      <div class="material-card">
-        <div class="mc-day">All Week</div>
-        <div class="mc-name">Personal Financial Blueprint</div>
-        <div class="mc-desc">6-page printable workbook including a budget worksheet, investment plan, and side-hustle template.</div>
-        <a class="mc-link pdf" href="financial_blueprint.pdf" target="_blank">Download PDF</a>
-      </div>
-      <div class="material-card">
-        <div class="mc-day">Monday</div>
-        <div class="mc-name">Budget Battleground Life Cards</div>
-        <div class="mc-desc">8 character cards with salary, expense breakdown, and a twist.</div>
-        <a class="mc-link pdf" href="game_cards.pdf" target="_blank">Download Card Set</a>
-      </div>
-      <div class="material-card">
-        <div class="mc-day">Tuesday</div>
-        <div class="mc-name">Stock Portfolio Tracker</div>
-        <div class="mc-desc">Printed sheet for recording starting prices Tuesday and closing prices Thursday.</div>
-        <a class="mc-link pdf" href="game_cards.pdf" target="_blank">In Card Set PDF</a>
-      </div>
-      <div class="material-card">
-        <div class="mc-day">Friday</div>
-        <div class="mc-name">Completion Certificates</div>
-        <div class="mc-desc">Optional printed certificates for students.</div>
-        <a class="mc-link pdf" href="#" style="opacity:0.4;pointer-events:none">Coming Soon</a>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<script>
-  // Dynamic Schedule Logic
-  document.addEventListener("DOMContentLoaded", () => {
-    const currentDay = new Date().getDay(); // 0 is Sunday, 1 is Monday... 5 is Friday
-    const dayBlocks = document.querySelectorAll('.day-block');
-
-    dayBlocks.forEach(block => {
-      const header = block.querySelector('.day-header');
-      const sessions = block.querySelector('.sessions');
-      const dayVal = parseInt(block.getAttribute('data-day'));
-
-      // Toggle functionality for clicking
-      header.addEventListener('click', () => {
-        header.classList.toggle('open');
-        sessions.classList.toggle('open');
-      });
-
-      // Auto-open and highlight if it is the current day of the week
-      if (dayVal === currentDay) {
-        header.classList.add('open');
-        sessions.classList.add('open');
-        block.classList.add('active-day');
-      }
-    });
-
-    // Toggle Materials Logic
-    const matBtn = document.getElementById('toggle-materials-btn');
-    const matGrid = document.getElementById('materials-grid');
-    matBtn.addEventListener('click', () => {
-      matGrid.classList.toggle('open');
-      matBtn.textContent = matGrid.classList.contains('open') ? 'Hide Course Materials' : 'Show Course Materials';
-    });
-  });
-</script>
-</body>
-</html>
+  <div class="page-section" id="schedule">
+    <h2 class="section-heading">Weekly Schedule</h2>
+    <div class="rule-line"></div>
+    <p class="schedule-note">Click on any day to expand and view the session details. <em>Lunch is at Fidel from 12:

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spend or Save? — Money Hacks</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --green: #39d353;
+    --green-dim: #1a4f28;
+    --red: #f85149;
+    --red-dim: #4d1a1a;
+    --gold: #f0c040;
+    --gold-dim: #4a3800;
+    --blue: #58a6ff;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --border: #30363d;
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* ── HEADER ── */
+  .game-header {
+    text-align: center;
+    margin-bottom: 32px;
+    animation: fadeDown 0.6s ease both;
+  }
+  .game-header .eyebrow {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+  .game-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 6vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    background: linear-gradient(135deg, var(--text) 30%, var(--green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .game-header p {
+    color: var(--muted);
+    font-size: 15px;
+    margin-top: 10px;
+    font-weight: 300;
+  }
+
+  /* ── HUD ── */
+  .hud {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 28px;
+    animation: fadeDown 0.6s 0.1s ease both;
+  }
+  .hud-cell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .hud-cell .label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .hud-cell .value {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .hud-cell.balance .value { color: var(--green); }
+  .hud-cell.round .value   { color: var(--gold); }
+  .hud-cell.streak .value  { color: var(--blue); }
+
+  /* balance change flash */
+  .flash-up   { animation: flashGreen 0.6s ease; }
+  .flash-down { animation: flashRed   0.6s ease; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    background: var(--surface);
+    border-radius: 99px;
+    height: 6px;
+    margin-bottom: 28px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-dim), var(--green));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── SCENARIO CARD ── */
+  .scenario-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 28px 24px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.4s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .scenario-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green), var(--blue), var(--gold));
+  }
+  .round-badge {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .scenario-emoji {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+    animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .scenario-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .scenario-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .scenario-desc {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── OPTIONS ── */
+  .options-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .option-btn {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    font-size: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--green);
+    background: rgba(57,211,83,0.06);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(57,211,83,0.12);
+  }
+  .option-btn:disabled { cursor: default; }
+  .option-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    width: 40px;
+    text-align: center;
+  }
+  .option-text { flex: 1; }
+  .option-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .option-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .option-impact {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .option-btn.chosen-good {
+    border-color: var(--green);
+    background: rgba(57,211,83,0.08);
+  }
+  .option-btn.chosen-okay {
+    border-color: var(--gold);
+    background: rgba(240,192,64,0.08);
+  }
+  .option-btn.chosen-bad {
+    border-color: var(--red);
+    background: rgba(248,81,73,0.08);
+  }
+  .option-btn.unchosen { opacity: 0.4; }
+
+  /* ── FEEDBACK PANEL ── */
+  .feedback {
+    margin-top: 20px;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    border-left: 4px solid;
+    animation: fadeUp 0.3s ease both;
+    display: none;
+  }
+  .feedback.good  { border-color: var(--green); background: rgba(57,211,83,0.06); }
+  .feedback.okay  { border-color: var(--gold);  background: rgba(240,192,64,0.06); }
+  .feedback.bad   { border-color: var(--red);   background: rgba(248,81,73,0.06); }
+  .feedback-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  .feedback-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .feedback-compound {
+    margin-top: 10px;
+    font-size: 13px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    color: var(--text);
+  }
+  .feedback-compound span {
+    color: var(--green);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+  }
+
+  .next-btn {
+    margin-top: 16px;
+    width: 100%;
+    padding: 14px;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+  }
+  .next-btn:hover {
+    background: #5aed72;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(57,211,83,0.35);
+  }
+
+  /* ── END SCREEN ── */
+  #end-screen {
+    display: none;
+    text-align: center;
+    animation: fadeUp 0.5s ease both;
+  }
+  .end-grade {
+    font-family: 'Syne', sans-serif;
+    font-size: 96px;
+    font-weight: 800;
+    line-height: 1;
+    margin: 16px 0;
+  }
+  .end-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .end-balance {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--green);
+    margin: 16px 0;
+  }
+  .end-msg {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 480px;
+    margin: 0 auto 28px;
+    line-height: 1.6;
+  }
+  .end-breakdown {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+  }
+  .breakdown-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .r-label { color: var(--muted); }
+  .breakdown-row .r-val { font-weight: 500; }
+  .breakdown-row .r-val.pos { color: var(--green); }
+  .breakdown-row .r-val.neg { color: var(--red); }
+
+  .play-again-btn {
+    padding: 16px 48px;
+    background: transparent;
+    color: var(--green);
+    border: 2px solid var(--green);
+    border-radius: var(--radius);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+  }
+  .play-again-btn:hover {
+    background: var(--green);
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(57,211,83,0.35);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  @keyframes flashGreen {
+    0%   { box-shadow: 0 0 0 0 rgba(57,211,83,0.7); }
+    50%  { box-shadow: 0 0 0 12px rgba(57,211,83,0); }
+    100% { box-shadow: 0 0 0 0 rgba(57,211,83,0); }
+  }
+  @keyframes flashRed {
+    0%   { box-shadow: 0 0 0 0 rgba(248,81,73,0.7); }
+    50%  { box-shadow: 0 0 0 12px rgba(248,81,73,0); }
+    100% { box-shadow: 0 0 0 0 rgba(248,81,73,0); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25%     { transform: translateX(-6px); }
+    75%     { transform: translateX(6px); }
+  }
+
+  .start-screen {
+    text-align: center;
+    padding: 20px 0;
+    animation: fadeUp 0.5s ease both;
+  }
+  .start-screen h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+  .start-screen p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 480px;
+    margin: 0 auto 28px;
+  }
+  .start-btn {
+    padding: 16px 48px;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+  }
+  .start-btn:hover {
+    background: #5aed72;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(57,211,83,0.35);
+  }
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 24px 0;
+    text-align: left;
+  }
+  .rule-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .rule-card strong { color: var(--text); display: block; margin-bottom: 4px; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="game-header">
+    <div class="eyebrow">Money Hacks · NMT Summer STEM</div>
+    <h1>Spend or Save?</h1>
+    <p>10 rounds. Real choices. Watch your balance grow — or disappear.</p>
+  </div>
+
+  <!-- START SCREEN -->
+  <div class="start-screen" id="start-screen">
+    <h2>Here's how it works</h2>
+    <p>You're 22. You just started your first job. Every round, something happens and you have to decide what to do with your money. Your decisions compound — a bad choice early can cost you thousands by the end.</p>
+    <div class="rules-grid">
+      <div class="rule-card"><strong>💰 Starting Balance</strong>You begin with $500 in savings. Every round adds or subtracts from it.</div>
+      <div class="rule-card"><strong>⚡ 10 Rounds</strong>Each round is a real-life situation. Pick the best option you can.</div>
+      <div class="rule-card"><strong>📈 Compound Effect</strong>Saved money earns interest. Debt costs you extra. It adds up fast.</div>
+      <div class="rule-card"><strong>🏆 Final Score</strong>Your ending balance determines your financial grade. Beat $2,000!</div>
+    </div>
+    <button class="start-btn" onclick="startGame()">Start the Game →</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" style="display:none;">
+    <div class="hud">
+      <div class="hud-cell balance">
+        <div class="label">Balance</div>
+        <div class="value" id="hud-balance">$500</div>
+      </div>
+      <div class="hud-cell round">
+        <div class="label">Round</div>
+        <div class="value" id="hud-round">1 / 10</div>
+      </div>
+      <div class="hud-cell streak">
+        <div class="label">Smart Moves</div>
+        <div class="value" id="hud-streak">0</div>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:10%"></div>
+    </div>
+
+    <div class="scenario-card" id="scenario-card">
+      <span class="round-badge" id="round-label">Round 1 of 10</span>
+      <span class="scenario-emoji" id="scenario-emoji">💸</span>
+      <div class="scenario-amount" id="scenario-amount">+$500</div>
+      <div class="scenario-title" id="scenario-title">Loading...</div>
+      <div class="scenario-desc" id="scenario-desc"></div>
+    </div>
+
+    <div class="options-grid" id="options-grid"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="feedback-title" id="feedback-title"></div>
+      <div class="feedback-body" id="feedback-body"></div>
+      <div class="feedback-compound" id="feedback-compound" style="display:none"></div>
+      <button class="next-btn" id="next-btn" onclick="nextRound()">Next Round →</button>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="end-screen">
+    <div class="eyebrow">Game Over</div>
+    <div class="end-grade" id="end-grade">A</div>
+    <div class="end-title" id="end-title">Financial Wizard!</div>
+    <div class="end-balance" id="end-balance">$3,200</div>
+    <p class="end-msg" id="end-msg"></p>
+    <div class="end-breakdown" id="end-breakdown"></div>
+    <button class="play-again-btn" onclick="resetGame()">Play Again</button>
+  </div>
+
+</div>
+
+<script>
+const SCENARIOS = [
+  {
+    emoji: "💵",
+    amount: "+$500",
+    title: "Tax Refund!",
+    desc: "You filed your taxes and the government owes you $500. It just hit your bank account. What do you do?",
+    options: [
+      { icon:"🛍️", name:"Treat yourself", sub:"New clothes, a gadget, dinner with friends", impact:"-$500", delta:-500, quality:"bad",
+        feedback:"Feels great for a week. Then it's gone.", explain:"$500 spent on things that lose value immediately is $500 that can never grow. Invested at 7%, that $500 becomes over $3,800 in 30 years.", compound:true },
+      { icon:"💰", name:"Bank half, spend half", sub:"$250 saved, $250 for fun", impact:"-$250", delta:-250, quality:"okay",
+        feedback:"A solid middle ground.", explain:"Splitting a windfall is a smart habit. You enjoy some of it and build your future at the same time.", compound:false },
+      { icon:"📈", name:"Invest the whole thing", sub:"Put it in an index fund", impact:"+$500", delta:500, quality:"good",
+        feedback:"Future you says thank you.", explain:"$500 invested today at 7% average return becomes $1,900 in 20 years. Every dollar you invest young is worth multiples later.", compound:true },
+    ]
+  },
+  {
+    emoji: "🚗",
+    amount: "$3,000",
+    title: "Your Car Needs Repairs",
+    desc: "Your check engine light is on. The mechanic says it'll cost $3,000 to fix properly — or $400 to patch it temporarily. You have $2,000 saved.",
+    options: [
+      { icon:"💳", name:"Put it on a credit card", sub:"Pay $3,000 now, deal with it later", impact:"-$3,000", delta:-600, quality:"bad",
+        feedback:"Danger zone — credit card debt at 24% APR is brutal.", explain:"If you only make minimum payments on $3,000 at 24% APR, you'll pay over $1,100 extra in interest and it could take 3+ years to pay off.", compound:true },
+      { icon:"🔧", name:"Patch it for $400", sub:"Buy some time to save up", impact:"-$400", delta:-400, quality:"okay",
+        feedback:"Smart short-term move — if you actually save up the rest.", explain:"Kicking the can is okay IF you use the time to build an emergency fund. The danger is ignoring the problem.", compound:false },
+      { icon:"🏦", name:"Use $2,000 of savings + borrow $1,000 from family", sub:"Fix it properly, no interest", impact:"-$2,000", delta:-2000, quality:"okay",
+        feedback:"Responsible — zero interest is always better than credit cards.", explain:"Borrowing from family at no interest beats a credit card every time. Just make sure you actually pay them back.", compound:false },
+    ]
+  },
+  {
+    emoji: "🎓",
+    amount: "$200/mo",
+    title: "Student Loan Payment Starts",
+    desc: "Your student loan grace period ends. Your minimum payment is $200/month. You can afford $350/month. What do you do?",
+    options: [
+      { icon:"💤", name:"Pay the minimum ($200)", sub:"Keep more cash in hand", impact:"-$200", delta:-200, quality:"okay",
+        feedback:"Fine — but you'll pay more interest over time.", explain:"Paying minimum on a $18,000 loan at 5.5% takes 10 years and you pay ~$5,400 in interest. Manageable, but not optimal.", compound:false },
+      { icon:"💪", name:"Pay the maximum you can ($350)", sub:"Attack the principal faster", impact:"-$350", delta:-50, quality:"good",
+        feedback:"Excellent! Extra payments go straight to principal.", explain:"Paying $350/mo instead of $200 means you pay off the loan in ~5 years instead of 10, saving over $2,500 in interest.", compound:true },
+      { icon:"🙈", name:"Skip this month's payment", sub:"You need the money for other things", impact:"$0", delta:0, quality:"bad",
+        feedback:"Never skip loan payments — this damages your credit score.", explain:"A missed payment stays on your credit report for 7 years. A low credit score costs you more on every future loan, apartment, and sometimes even job applications.", compound:true },
+    ]
+  },
+  {
+    emoji: "📱",
+    amount: "$1,200",
+    title: "New Phone Temptation",
+    desc: "Your phone works fine. But the new model just dropped and it's only $1,200. Your friends all have it. You can afford it.",
+    options: [
+      { icon:"📱", name:"Buy the new phone immediately", sub:"Gotta have the latest!", impact:"-$1,200", delta:-1200, quality:"bad",
+        feedback:"Classic lifestyle creep.", explain:"A phone is a depreciating asset — worth half in 2 years. $1,200 invested instead grows to ~$4,600 in 20 years. The 'old' phone would have worked fine.", compound:true },
+      { icon:"⏳", name:"Wait 6 months — buy it refurbished for $700", sub:"Same phone, way less money", impact:"-$700", delta:-700, quality:"okay",
+        feedback:"Patient spending. $500 saved by waiting.", explain:"Refurbished flagship phones are almost always a smart buy. You get 95% of the experience for 60% of the price.", compound:false },
+      { icon:"🔋", name:"Keep your current phone", sub:"It works. Don't fix what isn't broken.", impact:"+$0", delta:0, quality:"good",
+        feedback:"The most underrated financial move: not spending.", explain:"Every time you don't upgrade something that still works, you bank the difference. Over a lifetime, this habit is worth hundreds of thousands of dollars.", compound:true },
+    ]
+  },
+  {
+    emoji: "🏦",
+    amount: "Free Money?",
+    title: "Your Job Offers a 401(k) Match",
+    desc: "Your employer will match 100% of retirement contributions up to 4% of your salary ($1,600/year). You'd have to contribute $133/month to get the full match.",
+    options: [
+      { icon:"🙅", name:"Skip it — retirement is 40 years away", sub:"Keep the $133/month now", impact:"-$1,600/yr", delta:-100, quality:"bad",
+        feedback:"You just turned down free money. This is the #1 financial mistake young workers make.", explain:"A 100% match is an instant 100% return on investment. Passing on it is literally leaving your salary on the table. No other investment can match that.", compound:true },
+      { icon:"✅", name:"Contribute just enough to get the full match", sub:"$133/mo to get $266/mo going to retirement", impact:"+$1,600/yr free", delta:200, quality:"good",
+        feedback:"PERFECT. Always, always get the full employer match.", explain:"Contributing $133/mo gets you $266/mo going to retirement. That $1,600 in free money each year grows to over $300,000 extra by retirement at 7%.", compound:true },
+      { icon:"💸", name:"Contribute the maximum allowed ($500/mo)", sub:"Max out retirement savings early", impact:"-$500/mo", delta:-300, quality:"okay",
+        feedback:"Great discipline — if you can afford it without going into debt.", explain:"Maxing out early is powerful, but only if you have an emergency fund first. Don't over-contribute if you'd need to put emergencies on a credit card.", compound:false },
+    ]
+  },
+  {
+    emoji: "🎰",
+    amount: "$5,000",
+    title: "Crypto FOMO",
+    desc: "Your cousin made $5,000 buying a meme coin last month. He says the next one is going to 100x. You have $2,000 in savings.",
+    options: [
+      { icon:"🚀", name:"Go all in — $2,000 into the meme coin", sub:"YOLO, get rich or go broke", impact:"???", delta:-2000, quality:"bad",
+        feedback:"Your $2,000 is now most likely $0.", explain:"95% of meme coins go to zero. Your cousin got lucky — survivorship bias makes it look like everyone wins, but most people lost everything. This is gambling, not investing.", compound:true },
+      { icon:"🎲", name:"Put in $200 — money you can afford to lose", sub:"Small bet, stay mostly safe", impact:"-$200", delta:-200, quality:"okay",
+        feedback:"Reasonable — IF you truly treat it as entertainment money, not investing.", explain:"Speculating with 5-10% of your savings on high-risk assets is defensible. Just never invest money in crypto that you can't afford to lose completely.", compound:false },
+      { icon:"📊", name:"Skip it — invest $200 in an index fund instead", sub:"Boring. Safe. Actually works.", impact:"+$200", delta:200, quality:"good",
+        feedback:"The boring choice consistently beats the exciting choice over time.", explain:"The S&P 500 has averaged ~10% annual returns for a century. Index funds beat 90% of professional money managers. Boring is beautiful.", compound:true },
+    ]
+  },
+  {
+    emoji: "🏠",
+    amount: "$200/mo extra",
+    title: "Apartment Upgrade",
+    desc: "Your current apartment is fine. Your friend is moving out and has a nicer place for $200 more per month. It has a gym and is closer to work.",
+    options: [
+      { icon:"🏡", name:"Upgrade — treat yourself, you work hard", sub:"+$200/mo, nicer apartment", impact:"-$200/mo", delta:-200, quality:"bad",
+        feedback:"Lifestyle inflation — the silent savings killer.", explain:"$200/month extra is $2,400/year. Invested for 20 years that's over $100,000 lost. The gym and shorter commute rarely justify the long-term cost.", compound:true },
+      { icon:"🧮", name:"Upgrade only if you cut something else by $200", sub:"Budget neutral lifestyle improvement", impact:"$0 net", delta:0, quality:"good",
+        feedback:"Smart. Lifestyle changes should be budget-neutral.", explain:"Wanting nicer things is fine — as long as you fund them by cutting elsewhere, not by spending more overall. This is discipline.", compound:false },
+      { icon:"😊", name:"Stay put, bank the $200 difference", sub:"Contentment is a superpower", impact:"+$200/mo", delta:200, quality:"good",
+        feedback:"Your future self is building wealth. Current self might be slightly annoyed.", explain:"Happiness research shows people adapt quickly to housing upgrades. The financial benefit of staying put compounds massively over time.", compound:true },
+    ]
+  },
+  {
+    emoji: "🤒",
+    amount: "$1,800",
+    title: "Medical Emergency",
+    desc: "You broke your wrist playing basketball. The ER bill comes to $1,800 after insurance. You have no emergency fund — just your checking account.",
+    options: [
+      { icon:"💳", name:"Put it on a credit card", sub:"Deal with it over time", impact:"-$1,800+", delta:-600, quality:"bad",
+        feedback:"This is exactly why emergency funds exist.", explain:"$1,800 on a credit card at 24% APR, making minimum payments, will cost you over $2,400 total. Every month you carry it, interest compounds against you.", compound:true },
+      { icon:"📞", name:"Call the hospital — ask for a payment plan", sub:"Many hospitals offer 0% payment plans", impact:"-$150/mo", delta:-150, quality:"good",
+        feedback:"Most people don't know this works. It almost always does.", explain:"Hospitals routinely offer payment plans with no interest. Always call before paying a medical bill in full or putting it on a card. This is free money most people leave on the table.", compound:true },
+      { icon:"👨‍👩‍👦", name:"Borrow from family, pay back in 3 months", sub:"Informal 0% loan", impact:"-$1,800 now, back in 3 mo", delta:-200, quality:"okay",
+        feedback:"Not ideal — but way better than credit card debt.", explain:"Borrowing from family is humbling but financially smart if the alternative is high-interest debt. Make a written agreement and stick to it to protect the relationship.", compound:false },
+    ]
+  },
+  {
+    emoji: "📈",
+    amount: "+$3,000 bonus",
+    title: "Year-End Work Bonus",
+    desc: "You crushed it this year and your boss gives you a $3,000 bonus. You've been eyeing a vacation, a new couch, and your savings are low.",
+    options: [
+      { icon:"✈️", name:"Vacation + new couch — you earned it!", sub:"$2,500 on experiences and things", impact:"-$2,500", delta:-2500, quality:"bad",
+        feedback:"The 'I deserve it' trap. You do deserve it — and also deserve financial security.", explain:"Spending windfalls feels great but keeps you financially stuck. A vacation is fine; spending 83% of a bonus on non-essentials with low savings is a pattern that's hard to break.", compound:true },
+      { icon:"⚖️", name:"Rule of thirds: save, invest, spend", sub:"$1,000 saved · $1,000 invested · $1,000 fun", impact:"+$2,000 net", delta:2000, quality:"good",
+        feedback:"This is genuinely one of the best personal finance frameworks.", explain:"The rule of thirds ensures every windfall strengthens your foundation AND lets you enjoy life. It's sustainable because you're not saying no to everything.", compound:true },
+      { icon:"💰", name:"Bank the whole thing — emergency fund first", sub:"Put it all in savings", impact:"+$3,000", delta:3000, quality:"good",
+        feedback:"Responsible — especially if your emergency fund is thin.", explain:"Financial planners recommend 3-6 months of expenses in an emergency fund before investing. If you don't have that, building it first is the right call.", compound:false },
+    ]
+  },
+  {
+    emoji: "🌱",
+    amount: "The Long Game",
+    title: "Final Decision: Your Financial Future",
+    desc: "You're 30 now. Looking back, what's the ONE habit that would have changed everything? Pick your commitment going forward.",
+    options: [
+      { icon:"⚡", name:"Automate savings before I can spend it", sub:"Pay yourself first, every paycheck", impact:"Game changer", delta:500, quality:"good",
+        feedback:"This is the #1 habit of people who build wealth.", explain:"Automation removes willpower from the equation. When savings happen automatically before you see the money, you adapt to living on less without feeling the pain.", compound:true },
+      { icon:"📊", name:"Track every dollar I spend for one year", sub:"Know exactly where money goes", impact:"Eye-opening", delta:400, quality:"good",
+        feedback:"You can't manage what you don't measure.", explain:"Studies show people who track spending consistently save 15-20% more than those who don't. Awareness alone changes behavior.", compound:false },
+      { icon:"🎓", name:"Keep learning about money — read one book/article a month", sub:"Financial literacy compounds like interest", impact:"Long-term win", delta:350, quality:"good",
+        feedback:"Knowledge is the foundation every other habit builds on.", explain:"Most financial mistakes come from not knowing better. People who invest in financial education make dramatically better decisions over a lifetime.", compound:false },
+    ]
+  },
+];
+
+let currentRound = 0;
+let balance = 500;
+let smartMoves = 0;
+let history = [];
+let answered = false;
+
+function startGame() {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  renderRound();
+}
+
+function fmt(n) {
+  return (n >= 0 ? '+$' : '-$') + Math.abs(n).toLocaleString();
+}
+function fmtBalance(n) {
+  return '$' + Math.max(0, n).toLocaleString();
+}
+
+function renderRound() {
+  const s = SCENARIOS[currentRound];
+  answered = false;
+
+  document.getElementById('round-label').textContent = `Round ${currentRound + 1} of ${SCENARIOS.length}`;
+  document.getElementById('scenario-emoji').textContent = s.emoji;
+  document.getElementById('scenario-amount').textContent = s.amount;
+  document.getElementById('scenario-title').textContent = s.title;
+  document.getElementById('scenario-desc').textContent = s.desc;
+  document.getElementById('hud-round').textContent = `${currentRound + 1} / ${SCENARIOS.length}`;
+  document.getElementById('hud-balance').textContent = fmtBalance(balance);
+  document.getElementById('hud-streak').textContent = smartMoves;
+  document.getElementById('progress-bar').style.width = `${((currentRound) / SCENARIOS.length) * 100}%`;
+
+  const feedback = document.getElementById('feedback');
+  feedback.style.display = 'none';
+  feedback.className = 'feedback';
+
+  // Rebuild scenario card animation
+  const card = document.getElementById('scenario-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'fadeUp 0.4s ease both';
+
+  // render options
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  s.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `
+      <div class="option-icon">${opt.icon}</div>
+      <div class="option-text">
+        <div class="option-name">${opt.name}</div>
+        <div class="option-sub">${opt.sub}</div>
+      </div>
+      <div class="option-impact" style="color:${opt.delta > 0 ? 'var(--green)' : opt.delta < -800 ? 'var(--red)' : 'var(--gold)'}">${opt.impact}</div>
+    `;
+    btn.onclick = () => choose(i);
+    grid.appendChild(btn);
+  });
+}
+
+function choose(idx) {
+  if (answered) return;
+  answered = true;
+
+  const s = SCENARIOS[currentRound];
+  const opt = s.options[idx];
+
+  balance = Math.max(0, balance + opt.delta);
+  if (opt.quality === 'good') smartMoves++;
+
+  history.push({ round: currentRound + 1, title: s.title, choice: opt.name, delta: opt.delta, quality: opt.quality });
+
+  // style buttons
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === idx) {
+      btn.classList.add(`chosen-${opt.quality}`);
+    } else {
+      btn.classList.add('unchosen');
+    }
+  });
+
+  // update HUD
+  document.getElementById('hud-balance').textContent = fmtBalance(balance);
+  document.getElementById('hud-streak').textContent = smartMoves;
+
+  const balCell = document.querySelector('.hud-cell.balance');
+  balCell.classList.remove('flash-up', 'flash-down');
+  balCell.offsetHeight;
+  balCell.classList.add(opt.delta >= 0 ? 'flash-up' : 'flash-down');
+
+  // show feedback
+  const feedback = document.getElementById('feedback');
+  feedback.style.display = 'block';
+  feedback.className = `feedback ${opt.quality}`;
+
+  const icons = { good: '✅', okay: '⚠️', bad: '❌' };
+  document.getElementById('feedback-title').textContent = `${icons[opt.quality]} ${opt.feedback}`;
+  document.getElementById('feedback-body').textContent = opt.explain;
+
+  const compEl = document.getElementById('feedback-compound');
+  if (opt.compound && opt.delta > 0) {
+    const future = Math.round(Math.abs(opt.delta) * Math.pow(1.07, 30));
+    compEl.style.display = 'block';
+    compEl.innerHTML = `💡 In 30 years at 7% return, <span>$${Math.abs(opt.delta).toLocaleString()}</span> invested today becomes <span>$${future.toLocaleString()}</span>.`;
+  } else if (opt.compound && opt.delta < 0) {
+    const lost = Math.round(Math.abs(opt.delta) * Math.pow(1.07, 30));
+    compEl.style.display = 'block';
+    compEl.innerHTML = `💡 That <span>$${Math.abs(opt.delta).toLocaleString()}</span> spent could have grown to <span>$${lost.toLocaleString()}</span> in 30 years.`;
+  } else {
+    compEl.style.display = 'none';
+  }
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.textContent = currentRound + 1 >= SCENARIOS.length ? 'See My Results →' : 'Next Round →';
+}
+
+function nextRound() {
+  currentRound++;
+  if (currentRound >= SCENARIOS.length) {
+    showEnd();
+  } else {
+    renderRound();
+  }
+}
+
+function showEnd() {
+  document.getElementById('game-screen').style.display = 'none';
+  const end = document.getElementById('end-screen');
+  end.style.display = 'block';
+
+  document.getElementById('progress-bar') && (document.getElementById('progress-bar').style.width = '100%');
+
+  const grades = [
+    { min: 4000, grade:'S', color:'var(--gold)',  title:'Financial Legend', msg:'You made near-perfect decisions at every turn. Your future self is living comfortably and stress-free. This is the stuff of early retirement.' },
+    { min: 2500, grade:'A', color:'var(--green)', title:'Smart Money Manager', msg:'You consistently made good calls. A few imperfect decisions, but your fundamentals are solid. Keep this up and you\'ll be financially free well before most people.' },
+    { min: 1200, grade:'B', color:'var(--blue)',  title:'Getting There', msg:'You made some smart moves but let some money slip through. The good news: you learned where the traps are. Awareness is the first step.' },
+    { min: 400,  grade:'C', color:'var(--gold)',  title:'Room to Grow', msg:'Some tough decisions came back to bite you. But you finished the game — which means you know more than when you started. Try again with what you\'ve learned.' },
+    { min: 0,    grade:'D', color:'var(--red)',   title:'Life is Expensive', msg:'Money is hard! The game was designed to show you where the traps are. Every round taught you something real. Play again — you\'ll do better.' },
+  ];
+
+  const g = grades.find(g => balance >= g.min) || grades[grades.length - 1];
+  document.getElementById('end-grade').textContent = g.grade;
+  document.getElementById('end-grade').style.color = g.color;
+  document.getElementById('end-title').textContent = g.title;
+  document.getElementById('end-balance').textContent = fmtBalance(balance);
+  document.getElementById('end-msg').textContent = g.msg;
+
+  // breakdown
+  const bd = document.getElementById('end-breakdown');
+  bd.innerHTML = `<div class="breakdown-title">Your Decisions</div>` +
+    history.map(h => {
+      const cls = h.delta > 0 ? 'pos' : h.delta < 0 ? 'neg' : '';
+      const sign = h.delta > 0 ? '+$' : h.delta < 0 ? '-$' : '$';
+      return `<div class="breakdown-row">
+        <span class="r-label">R${h.round}: ${h.title}</span>
+        <span class="r-val ${cls}">${sign}${Math.abs(h.delta).toLocaleString()}</span>
+      </div>`;
+    }).join('') +
+    `<div class="breakdown-row">
+      <span class="r-label"><strong>Final Balance</strong></span>
+      <span class="r-val pos"><strong>${fmtBalance(balance)}</strong></span>
+    </div>`;
+}
+
+function resetGame() {
+  currentRound = 0;
+  balance = 500;
+  smartMoves = 0;
+  history = [];
+  answered = false;
+  document.getElementById('end-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  renderRound();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Future Flashforward — Money Hacks</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #f8f4ee;
+    --surface:  #ffffff;
+    --surface2: #f0ebe1;
+    --border:   #e0d8cc;
+    --ink:      #1c1510;
+    --ink2:     #3d3028;
+    --muted:    #8a7a68;
+    --green:    #2d6a4f;
+    --green-bg: #d8f3dc;
+    --red:      #9b2226;
+    --red-bg:   #ffe3e3;
+    --gold:     #c77d2e;
+    --gold-bg:  #fff4e0;
+    --blue:     #1d4e89;
+    --blue-bg:  #dbeafe;
+    --purple:   #6b2d8b;
+    --purple-bg:#f3e8ff;
+    --radius:   12px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Epilogue', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 15% 25%, rgba(199,125,46,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 85% 75%, rgba(45,106,79,0.06) 0%, transparent 50%);
+  }
+
+  .wrapper {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 28px 16px 80px;
+  }
+
+  /* ── HEADER ── */
+  .game-header {
+    text-align: center;
+    margin-bottom: 28px;
+    animation: fadeDown 0.5s ease both;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .game-header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(32px, 6vw, 60px);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .game-header h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .game-header p {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+    font-weight: 400;
+  }
+
+  /* ── NET WORTH DISPLAY ── */
+  .worth-card {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 20px;
+    padding: 24px 24px 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeDown 0.5s 0.1s ease both;
+  }
+  .worth-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(199,125,46,0.25), transparent 70%);
+    pointer-events: none;
+  }
+  .worth-card::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: -20px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(45,106,79,0.2), transparent 70%);
+    pointer-events: none;
+  }
+  .worth-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .worth-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 6px;
+  }
+  .worth-amount {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(38px, 7vw, 60px);
+    font-weight: 900;
+    line-height: 1;
+    color: var(--gold);
+    transition: all 0.4s ease;
+    font-variant-numeric: tabular-nums;
+  }
+  .worth-age {
+    text-align: right;
+  }
+  .worth-age .age-num {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1;
+    color: rgba(255,255,255,0.9);
+  }
+  .worth-age .age-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* progress timeline */
+  .worth-timeline {
+    display: flex;
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .wt-segment {
+    flex: 1;
+    height: 6px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.12);
+    transition: background 0.4s ease;
+    position: relative;
+  }
+  .wt-segment.filled-good   { background: var(--green); }
+  .wt-segment.filled-okay   { background: var(--gold); }
+  .wt-segment.filled-bad    { background: var(--red); }
+  .wt-segment.current       { background: rgba(255,255,255,0.5); animation: segPulse 1s ease infinite alternate; }
+  @keyframes segPulse { from{opacity:0.4} to{opacity:1} }
+
+  /* breakdown pills */
+  .worth-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .w-pill {
+    padding: 5px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.7);
+    transition: all 0.3s;
+  }
+  .w-pill.assets  { border-color: rgba(45,106,79,0.5);  color: #86efac; }
+  .w-pill.debt    { border-color: rgba(155,34,38,0.5);  color: #fca5a5; }
+  .w-pill.savings { border-color: rgba(199,125,46,0.5); color: #fcd34d; }
+
+  /* ── DECISION CARD ── */
+  .decision-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    animation: cardIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+    box-shadow: 0 4px 20px rgba(28,21,16,0.06);
+  }
+  @keyframes cardIn {
+    from { opacity:0; transform:translateY(24px) scale(0.97); }
+    to   { opacity:1; transform:translateY(0)    scale(1); }
+  }
+  .dc-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .dc-icon {
+    font-size: 44px;
+    flex-shrink: 0;
+    animation: iconPop 0.4s cubic-bezier(.34,1.56,.64,1) 0.1s both;
+  }
+  @keyframes iconPop {
+    from { transform:scale(0.4) rotate(-15deg); opacity:0; }
+    to   { transform:scale(1)   rotate(0deg);   opacity:1; }
+  }
+  .dc-meta {}
+  .dc-chapter {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .dc-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(18px, 3.5vw, 24px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .dc-sub {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .dc-body {
+    padding: 18px 24px 16px;
+    font-size: 14px;
+    color: var(--ink2);
+    line-height: 1.7;
+    border-bottom: 1px solid var(--border);
+  }
+  .dc-stakes {
+    padding: 12px 24px;
+    background: var(--surface2);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .stake-tag {
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--gold-bg);
+    color: var(--gold);
+    border: 1px solid rgba(199,125,46,0.3);
+  }
+
+  /* ── OPTIONS ── */
+  .options-grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .opt-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 14px;
+    font-family: 'Epilogue', sans-serif;
+    color: var(--ink);
+    box-shadow: 0 2px 8px rgba(28,21,16,0.04);
+  }
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    transform: translateX(4px);
+    box-shadow: 0 4px 16px rgba(199,125,46,0.12);
+  }
+  .opt-btn:disabled { cursor: default; }
+  .opt-num {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .opt-content {}
+  .opt-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .opt-desc { font-size: 12px; color: var(--muted); }
+  .opt-delta {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .opt-btn.chose-great { border-color:var(--green);  background:var(--green-bg); }
+  .opt-btn.chose-great .opt-num { background:var(--green);  color:#fff; border-color:var(--green); }
+  .opt-btn.chose-okay  { border-color:var(--gold);   background:var(--gold-bg); }
+  .opt-btn.chose-okay  .opt-num { background:var(--gold);   color:#fff; border-color:var(--gold); }
+  .opt-btn.chose-bad   { border-color:var(--red);    background:var(--red-bg); }
+  .opt-btn.chose-bad   .opt-num { background:var(--red);    color:#fff; border-color:var(--red); }
+  .opt-btn.dimmed      { opacity: 0.3; }
+
+  /* ── OUTCOME PANEL ── */
+  .outcome-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 14px;
+    display: none;
+    animation: fadeUp 0.3s ease both;
+    box-shadow: 0 4px 20px rgba(28,21,16,0.06);
+  }
+  .outcome-panel.show { display: block; }
+  .op-bar {
+    height: 5px;
+  }
+  .op-bar.great { background: linear-gradient(90deg, var(--green), #52b788); }
+  .op-bar.okay  { background: linear-gradient(90deg, var(--gold), #f4a261); }
+  .op-bar.bad   { background: linear-gradient(90deg, var(--red), #e76f51); }
+
+  .op-body { padding: 18px 20px; }
+  .op-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .op-verdict {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+  }
+  .op-verdict.great { background: var(--green-bg);  color: var(--green); }
+  .op-verdict.okay  { background: var(--gold-bg);   color: var(--gold); }
+  .op-verdict.bad   { background: var(--red-bg);    color: var(--red); }
+
+  .op-delta {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .op-delta.pos { color: var(--green); }
+  .op-delta.neg { color: var(--red); }
+  .op-delta.neu { color: var(--muted); }
+
+  .op-age-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: auto;
+    font-weight: 500;
+  }
+
+  .op-explain {
+    font-size: 13px;
+    color: var(--ink2);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .op-ripple {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    border-left: 3px solid var(--gold);
+  }
+  .op-ripple strong { color: var(--ink); }
+
+  /* compound callout */
+  .compound-callout {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--green-bg);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--green);
+    font-weight: 500;
+    border: 1px solid rgba(45,106,79,0.2);
+    display: none;
+  }
+  .compound-callout.show { display: block; }
+
+  .next-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: none;
+    letter-spacing: 0.5px;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:hover { background: var(--ink2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(28,21,16,0.2); }
+
+  /* ── START ── */
+  .start-screen {
+    text-align: center;
+    animation: fadeUp 0.5s ease both;
+  }
+  .start-screen h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .start-screen p {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 480px;
+    margin: 0 auto 24px;
+    line-height: 1.75;
+  }
+  .life-chapters {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 10px;
+    margin: 0 0 28px;
+    text-align: left;
+  }
+  .lc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .lc-emoji { font-size: 24px; flex-shrink: 0; }
+  .lc-text {}
+  .lc-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; }
+  .lc-desc  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  .start-btn {
+    padding: 16px 48px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .start-btn:hover { background: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(199,125,46,0.3); }
+
+  /* ── END ── */
+  .end-screen {
+    animation: fadeUp 0.5s ease both;
+  }
+  .end-worth-hero {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .end-worth-hero::before {
+    content:'';
+    position:absolute;
+    inset:0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(199,125,46,0.25), transparent 60%);
+  }
+  .ewh-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .ewh-amount {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(52px,10vw,88px);
+    font-weight: 900;
+    line-height: 1;
+    color: var(--gold);
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .ewh-tier {
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+    position: relative;
+  }
+  .end-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .end-cell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .ec-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .ec-value {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .ec-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .end-verdict {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .ev-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .ev-body {
+    font-size: 13px;
+    color: var(--ink2);
+    line-height: 1.75;
+  }
+
+  /* what-if bar */
+  .whatif-panel {
+    background: var(--gold-bg);
+    border: 1px solid rgba(199,125,46,0.3);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .wi-title {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .wi-rows { display: grid; gap: 8px; }
+  .wi-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .wi-label { color: var(--muted); }
+  .wi-val { font-weight: 700; color: var(--ink); }
+  .wi-row.highlight { background: var(--surface); border: 1px solid var(--border); }
+  .wi-row.highlight .wi-label { color: var(--ink); font-weight: 600; }
+
+  .replay-btn {
+    width: 100%;
+    padding: 16px;
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius);
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .replay-btn:hover { background: var(--ink); color: #fff; transform: translateY(-2px); }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)}  to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="game-header">
+    <div class="eyebrow">Money Hacks · NMT Summer STEM · Thursday</div>
+    <h1>Financial Future<br><em>Flashforward</em></h1>
+    <p>Five big life choices. Watch your net worth at age 40 shift with every decision. Then go back and see what changes.</p>
+  </div>
+
+  <!-- START -->
+  <div id="start-screen" class="start-screen">
+    <h2>Your Life. Your Numbers.</h2>
+    <p>Between 22 and 40, five categories of decisions shape your financial life more than anything else. This game makes those invisible trade-offs visible — in dollars.</p>
+    <div class="life-chapters">
+      <div class="lc-card">
+        <div class="lc-emoji">🎓</div>
+        <div class="lc-text">
+          <div class="lc-title">Chapter 1 · Education</div>
+          <div class="lc-desc">How you pay for college changes your starting line by tens of thousands.</div>
+        </div>
+      </div>
+      <div class="lc-card">
+        <div class="lc-emoji">🏠</div>
+        <div class="lc-text">
+          <div class="lc-title">Chapter 2 · Housing</div>
+          <div class="lc-desc">Rent vs. buy. Location. Roommates. The biggest monthly expense most people face.</div>
+        </div>
+      </div>
+      <div class="lc-card">
+        <div class="lc-emoji">🚗</div>
+        <div class="lc-text">
+          <div class="lc-title">Chapter 3 · Transportation</div>
+          <div class="lc-desc">The car you drive is the second most expensive decision most people make on autopilot.</div>
+        </div>
+      </div>
+      <div class="lc-card">
+        <div class="lc-emoji">📈</div>
+        <div class="lc-text">
+          <div class="lc-title">Chapter 4 · Investing</div>
+          <div class="lc-desc">Starting early vs. starting late. The gap is staggering over 18 years.</div>
+        </div>
+      </div>
+      <div class="lc-card" style="grid-column:span 2;">
+        <div class="lc-emoji">💼</div>
+        <div class="lc-text">
+          <div class="lc-title">Chapter 5 · Career & Income</div>
+          <div class="lc-desc">Negotiation, advancement, and side income. Most people leave $50,000–$500,000 on the table over a career by not negotiating.</div>
+        </div>
+      </div>
+    </div>
+    <p style="margin-bottom:28px;">You start at <strong>age 22</strong> with a net worth of <strong>$0</strong>. Every choice compounds. By the end you will see your projected net worth at <strong>age 40</strong>.</p>
+    <button class="start-btn" onclick="startGame()">BEGIN YOUR STORY →</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="game-screen" style="display:none;">
+    <!-- Net worth display -->
+    <div class="worth-card" id="worth-card">
+      <div class="worth-top">
+        <div>
+          <div class="worth-label">PROJECTED NET WORTH AT 40</div>
+          <div class="worth-amount" id="worth-display">$0</div>
+        </div>
+        <div class="worth-age">
+          <div class="age-num" id="age-display">22</div>
+          <div class="age-label">Your Age Now</div>
+        </div>
+      </div>
+      <div class="worth-timeline" id="worth-timeline">
+        <div class="wt-segment current" id="seg-0"></div>
+        <div class="wt-segment" id="seg-1"></div>
+        <div class="wt-segment" id="seg-2"></div>
+        <div class="wt-segment" id="seg-3"></div>
+        <div class="wt-segment" id="seg-4"></div>
+      </div>
+      <div class="worth-pills" id="worth-pills">
+        <div class="w-pill assets"  id="pill-assets">Assets: $0</div>
+        <div class="w-pill debt"    id="pill-debt">Debt: $0</div>
+        <div class="w-pill savings" id="pill-savings">Monthly Savings: $0</div>
+      </div>
+    </div>
+
+    <!-- Decision card -->
+    <div class="decision-card" id="decision-card">
+      <div class="dc-header">
+        <div class="dc-icon" id="dc-icon">🎓</div>
+        <div class="dc-meta">
+          <div class="dc-chapter" id="dc-chapter">Chapter 1 of 5</div>
+          <div class="dc-title" id="dc-title">Loading...</div>
+          <div class="dc-sub" id="dc-sub"></div>
+        </div>
+      </div>
+      <div class="dc-body" id="dc-body"></div>
+      <div class="dc-stakes" id="dc-stakes"></div>
+    </div>
+
+    <div class="options-grid" id="options-grid"></div>
+
+    <div class="outcome-panel" id="outcome-panel">
+      <div class="op-bar" id="op-bar"></div>
+      <div class="op-body">
+        <div class="op-top">
+          <span class="op-verdict" id="op-verdict">Smart Move</span>
+          <span class="op-delta" id="op-delta">+$120,000</span>
+          <span class="op-age-label" id="op-age-label">by age 40</span>
+        </div>
+        <div class="op-explain" id="op-explain"></div>
+        <div class="op-ripple" id="op-ripple"></div>
+        <div class="compound-callout" id="compound-callout"></div>
+      </div>
+    </div>
+
+    <button class="next-btn" id="next-btn" onclick="nextChapter()">Next Chapter →</button>
+  </div>
+
+  <!-- END -->
+  <div id="end-screen" class="end-screen" style="display:none;">
+    <div class="end-worth-hero">
+      <div class="ewh-label">YOUR NET WORTH AT AGE 40</div>
+      <div class="ewh-amount" id="end-amount">$0</div>
+      <div class="ewh-tier"  id="end-tier">On Your Way</div>
+    </div>
+
+    <div class="end-grid" id="end-grid"></div>
+
+    <div class="end-verdict" id="end-verdict"></div>
+
+    <div class="whatif-panel" id="whatif-panel">
+      <div class="wi-title">💡 What If You Had Chosen Differently?</div>
+      <div class="wi-rows" id="wi-rows"></div>
+    </div>
+
+    <button class="replay-btn" onclick="resetGame()">Play Again — Try Different Choices</button>
+  </div>
+
+</div>
+
+<script>
+const CHAPTERS = [
+  {
+    icon: '🎓',
+    chapter: 'Chapter 1 of 5 · Age 22',
+    title: 'How Did You Pay for College?',
+    sub: 'The debt you leave school with sets your financial starting line.',
+    body: 'You just graduated. How you financed your education creates very different starting points. Student loans follow you for years — but so does the earning power from the right degree. What is your situation?',
+    stakes: ['Debt Load', 'Monthly Cash Flow', 'Starting Salary'],
+    age: 22,
+    options: [
+      {
+        num:1, name:'Scholarships + community college transfer', desc:'Graduated debt-free. Associates → State University.',
+        quality:'great', netWorthDelta: 95000,
+        assets: 0, debt: 0, monthlySavings: 800,
+        explain: 'Starting with zero student debt is one of the most powerful financial advantages a young person can have. Every dollar not going to Sallie Mae goes to building wealth instead. Community college → transfer is increasingly how financially savvy students get bachelor degrees for a fraction of the cost.',
+        ripple: '<strong>Ripple effect:</strong> $0 in loan payments frees up $400–$600/month from day one. Over 10 years, that extra cash invested at 7% compounds to over $80,000 even before factoring in the eliminated interest.',
+        compound: 'Starting debt-free at 22 instead of carrying $45,000 in loans for 10 years saves approximately $17,000 in interest alone — plus the opportunity cost of that money never invested.',
+      },
+      {
+        num:2, name:'State school + some loans', desc:'$28,000 in student debt at 5.5%. Good state university degree.',
+        quality:'okay', netWorthDelta: 40000,
+        assets: 0, debt: -28000, monthlySavings: 400,
+        explain: 'Moderate student debt from a state school is the most common situation. The degree is valuable, the debt is manageable. The key is to attack it aggressively early — refinancing to a lower rate and overpaying when possible.',
+        ripple: '<strong>Ripple effect:</strong> $28,000 at 5.5% over 10 years costs about $8,800 in interest. Manageable — but that $300/month payment is money that cannot be invested for a decade.',
+        compound: null,
+      },
+      {
+        num:3, name:'Private school, full price, maximum loans', desc:'$95,000 in student debt. Prestigious name on the diploma.',
+        quality:'bad', netWorthDelta: -85000,
+        assets: 0, debt: -95000, monthlySavings: -200,
+        explain: 'Unless you are going into a field with very high starting salaries (medicine, law, finance), $95,000 in debt for a bachelor\'s degree is a difficult hole to climb out of. The monthly payments consume money that could be building wealth during the most powerful compounding years.',
+        ripple: '<strong>Ripple effect:</strong> $95,000 at 6.5% over 20 years costs approximately $69,000 in interest — meaning the education costs $164,000 total. Monthly payment: around $700. That is $700 that cannot compound for 20 years.',
+        compound: 'Investing $700/month for 20 years at 7% return would produce $393,000. That is the true opportunity cost of carrying maximum student debt.',
+      },
+    ]
+  },
+  {
+    icon: '🏠',
+    chapter: 'Chapter 2 of 5 · Age 25',
+    title: 'Where and How Do You Live?',
+    sub: 'Housing is most people\'s largest expense — and their largest wealth-builder or wealth-destroyer.',
+    body: 'You are 25. Your career is getting traction. The housing decision you make now will lock in thousands of dollars per month for years. Do you buy, rent smart, or stretch for status?',
+    stakes: ['Monthly Cash Flow', 'Equity Building', 'Opportunity Cost'],
+    age: 25,
+    options: [
+      {
+        num:1, name:'Buy a modest starter home with roommate income', desc:'3BR home, rent 2 rooms to friends. Mortgage mostly covered.',
+        quality:'great', netWorthDelta: 140000,
+        assets: 220000, debt: -180000, monthlySavings: 900,
+        explain: 'House hacking — buying a home and renting out rooms — is one of the most powerful wealth strategies available to young people. Your tenants pay most of your mortgage while you build equity. The home appreciates. You live nearly for free.',
+        ripple: '<strong>Ripple effect:</strong> If roommates cover $1,200/month of a $1,500 mortgage, you are building $180,000 in equity for $300/month out of pocket. At 3% annual appreciation, that home is worth $295,000 in 10 years.',
+        compound: 'Home equity of $115,000+ in 10 years (appreciation + principal paydown) plus $9,600/year freed from housing costs invested at 7% = extraordinary wealth acceleration.',
+      },
+      {
+        num:2, name:'Rent a reasonable apartment, live within means', desc:'$1,100/month, good neighborhood, 1BR. Save the difference.',
+        quality:'okay', netWorthDelta: 25000,
+        assets: 15000, debt: 0, monthlySavings: 500,
+        explain: 'Renting is not throwing money away — it provides flexibility, no maintenance costs, and keeps you liquid. The key is that you must actually invest the difference between renting and owning. Renting and spending the difference is wealth destruction. Renting and investing the difference can be competitive.',
+        ripple: '<strong>Ripple effect:</strong> Renting buys optionality — ability to move for a better job, avoid a maintenance disaster, stay liquid for opportunities. But without building equity, net worth growth depends entirely on consistent investing.',
+        compound: null,
+      },
+      {
+        num:3, name:'Buy an expensive home to "keep up" — stretch the budget', desc:'$450K home, $2,800/month mortgage. Maximum loan approved.',
+        quality:'bad', netWorthDelta: -60000,
+        assets: 450000, debt: -430000, monthlySavings: -400,
+        explain: 'Buying the maximum house a bank will approve is one of the most common financial mistakes. Banks approve based on income, not on your other goals. A $2,800 mortgage plus taxes, insurance, and maintenance easily becomes $3,500/month — leaving nothing to invest, no emergency fund, and one job loss from disaster.',
+        ripple: '<strong>Ripple effect:</strong> Being "house poor" means no retirement contributions, no emergency fund, and high-interest debt for any surprise expense. The house may appreciate, but the opportunity cost of zero investing for years is devastating.',
+        compound: 'Missing 10 years of maxing a 401(k) ($22,500/year) costs approximately $310,000 in retirement wealth at 7% return. A bigger house rarely makes up that gap.',
+      },
+    ]
+  },
+  {
+    icon: '🚗',
+    chapter: 'Chapter 3 of 5 · Age 27',
+    title: 'What Do You Drive?',
+    sub: 'Americans lose more wealth to car payments than almost any other single decision.',
+    body: 'You are 27. You need a reliable car. The average American spends $12,000/year on car ownership. Over a working lifetime, that number shapes retirement more than most people realize. What is your approach?',
+    stakes: ['Monthly Payment', 'Depreciation Loss', '10-Year Cost'],
+    age: 27,
+    options: [
+      {
+        num:1, name:'Buy a reliable used car, 3–4 years old, cash or short loan', desc:'$14,000 Honda Civic or Toyota Corolla. Paid off in 2 years.',
+        quality:'great', netWorthDelta: 78000,
+        assets: 14000, debt: -5000, monthlySavings: 600,
+        explain: 'A 3-year-old Honda or Toyota has already taken the biggest depreciation hit (new cars lose 20% in year one alone) but still has 150,000+ miles of reliable life. Buying used and paying it off fast is the single highest-ROI car decision most people can make.',
+        ripple: '<strong>Ripple effect:</strong> Driving a paid-off $14,000 car vs. a $500/month leased car saves $6,000/year. Over 10 years invested at 7%: $82,000 in additional wealth — from one car decision.',
+        compound: 'The $500/month you save vs. a new car payment, invested from age 27 to 65, grows to over $1.1 million at 7% average return. The car you drive is actually a retirement decision.',
+      },
+      {
+        num:2, name:'Finance a new mid-range car', desc:'$32,000 Toyota RAV4. 5-year loan at 6.5%. $620/month.',
+        quality:'okay', netWorthDelta: 5000,
+        assets: 32000, debt: -28000, monthlySavings: 200,
+        explain: 'A new reliable car with a reasonable payment is a defensible choice — especially if your credit earns a low rate. The new car loses 20% of its value in year one, but it comes with a warranty and peace of mind. The wealth cost is real but manageable if you keep it long-term.',
+        ripple: '<strong>Ripple effect:</strong> The key is keeping the car for 10+ years after it is paid off. People who buy new but trade in every 3 years pay perpetually — essentially renting the car at premium rates.',
+        compound: null,
+      },
+      {
+        num:3, name:'Lease a luxury car to impress clients and yourself', desc:'$850/month lease. BMW 3 Series. 36-month lease, then do it again.',
+        quality:'bad', netWorthDelta: -95000,
+        assets: 0, debt: 0, monthlySavings: -650,
+        explain: 'Leasing a luxury car is the most expensive way to drive short of buying and selling every two years. You build zero equity, face mileage restrictions, and pay insurance rates for a luxury vehicle. The $850/month goes entirely to the dealer — forever. And the next lease costs more.',
+        ripple: '<strong>Ripple effect:</strong> $850/month in perpetual lease payments from age 27 to 65 = $357,000 paid out. Invested instead at 7% = over $2.1 million. That is the actual price of the BMW identity.',
+        compound: '$850/month invested from age 27 to 65 at 7% return = $2,157,000. A lease decision truly is a retirement decision.',
+      },
+    ]
+  },
+  {
+    icon: '📈',
+    chapter: 'Chapter 4 of 5 · Age 30',
+    title: 'When Do You Start Investing?',
+    sub: 'Time in the market beats timing the market — but only if you actually start.',
+    body: 'You are 30. You finally have some breathing room in your budget. You can put money toward the future — but how much, and when? The math on this decision is unforgiving.',
+    stakes: ['Compound Growth', 'Retirement Security', 'Age 40 Snapshot'],
+    age: 30,
+    options: [
+      {
+        num:1, name:'Max out 401(k) + Roth IRA starting now', desc:'$22,500/yr 401(k) + $6,500/yr Roth. Aggressive but doable.',
+        quality:'great', netWorthDelta: 185000,
+        assets: 185000, debt: 0, monthlySavings: 1200,
+        explain: 'Maxing both a 401(k) and Roth IRA from age 30 is aggressive but life-changing. The 401(k) reduces your taxable income now. The Roth grows tax-free forever. By 40, with employer match, this approach could already have $300,000+ in retirement accounts.',
+        ripple: '<strong>Ripple effect:</strong> $29,000/year invested from 30 to 65 at 7% average = $4.1 million at retirement. The same contribution starting at 40 = $1.8 million. Those 10 years cost $2.3 million.',
+        compound: '$185,000 projected in accounts by age 40. Left to compound untouched from 40 to 65 at 7%, that $185K alone becomes $1.04 million — before any additional contributions.',
+      },
+      {
+        num:2, name:'Invest $400/month — what you can comfortably afford', desc:'Roth IRA contribution, broad index funds.',
+        quality:'okay', netWorthDelta: 68000,
+        assets: 68000, debt: 0, monthlySavings: 400,
+        explain: 'Consistent $400/month investing is genuinely good. Not optimal, but deeply respectable. The key is that it must be automatic and must not stop when life gets chaotic. A $400/month habit maintained for decades builds serious wealth.',
+        ripple: '<strong>Ripple effect:</strong> $400/month from age 30 to 65 at 7% = $794,000 at retirement. Starting this same habit at 40 instead = $340,000. The 10-year delay costs $454,000.',
+        compound: null,
+      },
+      {
+        num:3, name:'"I\'ll start investing when I earn more." Do nothing yet.', desc:'Spend the full paycheck. Investing can wait.',
+        quality:'bad', netWorthDelta: -120000,
+        assets: 0, debt: 0, monthlySavings: -100,
+        explain: '"When I earn more" is the most expensive sentence in personal finance. Income tends to bring lifestyle inflation, not surplus. People who wait until they feel ready often wait until 40, 45, or 50 — then panic. The math does not forgive delay.',
+        ripple: '<strong>Ripple effect:</strong> Not investing from 30–40 is not just missing gains. The money you spend instead is often on depreciating things. You enter your 40s with no investment base to compound from — the most critical decade is gone.',
+        compound: 'Waiting from 30 to 40 to start investing costs approximately $170,000 in lifetime retirement wealth — even if you invest the same amount starting at 40 for the same duration.',
+      },
+    ]
+  },
+  {
+    icon: '💼',
+    chapter: 'Chapter 5 of 5 · Age 35',
+    title: 'How Do You Approach Your Career?',
+    sub: 'Salary is the largest lever most people have — and most people never pull it.',
+    body: 'You are 35. Mid-career. The choices you make about growth, negotiation, and additional income have compounding effects on every other financial decision. What is your approach?',
+    stakes: ['Income Growth', 'Wealth Acceleration', 'Lifetime Earnings'],
+    age: 35,
+    options: [
+      {
+        num:1, name:'Negotiate aggressively + build a side income stream', desc:'Got a 22% raise by switching companies. Side hustle earns $800/month.',
+        quality:'great', netWorthDelta: 210000,
+        assets: 50000, debt: 0, monthlySavings: 1800,
+        explain: 'The single highest-leverage financial move most people never make is negotiating their salary. Switching companies typically yields 10-20% raises — staying loyal often yields 2-3% annually. Combined with even a modest side income, the impact on net worth is dramatic.',
+        ripple: '<strong>Ripple effect:</strong> A 22% salary bump at 35 does not just help now. It resets your salary baseline for every future raise, every future job negotiation, and your 401(k) match. The compounding on income increases is massive.',
+        compound: 'An extra $18,000/year from age 35 to 65, invested at 7%, compounds to $1.8 million. This is why negotiation is the highest-ROI skill in personal finance.',
+      },
+      {
+        num:2, name:'Stay loyal, accept standard raises, focus on stability', desc:'3% annual raise. Solid job. No side income.',
+        quality:'okay', netWorthDelta: 55000,
+        assets: 20000, debt: 0, monthlySavings: 700,
+        explain: 'Stability has real value — benefits, relationships, predictability. Standard 3% raises are not catastrophic, but they barely keep pace with inflation. The financial cost of loyalty is most visible in retirement: salary dictates 401(k) limits, employer matches, and savings capacity.',
+        ripple: '<strong>Ripple effect:</strong> An employee who stays and gets 3%/year vs. one who switches for 20% will have a $25,000+ salary gap after 10 years. That gap in savings capacity compounds dramatically.',
+        compound: null,
+      },
+      {
+        num:3, name:'Stagnate — no negotiation, no development, coast', desc:'Same salary for 5 years. Inflation ate 15% of your real earnings.',
+        quality:'bad', netWorthDelta: -75000,
+        assets: 0, debt: 8000, monthlySavings: -200,
+        explain: 'Salary stagnation combined with inflation is a slow-motion financial crisis. If your salary stays flat while costs rise 3%/year, you lose purchasing power every year. Skills stagnate too — making future job changes harder and emergency funds ever more critical.',
+        ripple: '<strong>Ripple effect:</strong> A flat salary for 5 years while costs rise means your savings rate shrinks without any change in spending. Small emergencies start going on credit cards. The financial margin evaporates silently.',
+        compound: 'Losing $8,000/year in real purchasing power from 35–40 (vs. keeping pace with inflation) equals $40,000 in lost savings capacity — and likely $15,000+ in lifestyle debt by 40.',
+      },
+    ]
+  },
+];
+
+let currentChapter = 0;
+let netWorth = 0;
+let totalAssets = 0;
+let totalDebt = 0;
+let monthlySavings = 0;
+let answered = false;
+let choices = [];
+let segStates = ['current','','','',''];
+
+function fmt(n) {
+  const abs = Math.abs(Math.round(n));
+  const sign = n < 0 ? '-' : '';
+  if (abs >= 1000000) return sign + '$' + (abs/1000000).toFixed(2) + 'M';
+  if (abs >= 1000)    return sign + '$' + abs.toLocaleString();
+  return sign + '$' + abs;
+}
+
+function updateWorthDisplay(animated) {
+  document.getElementById('worth-display').textContent = fmt(netWorth);
+  document.getElementById('age-display').textContent   = CHAPTERS[Math.min(currentChapter, CHAPTERS.length-1)].age;
+  document.getElementById('pill-assets').textContent   = 'Assets: ' + fmt(totalAssets);
+  document.getElementById('pill-debt').textContent     = 'Debt: ' + fmt(totalDebt);
+  document.getElementById('pill-savings').textContent  = 'Saves: ' + fmt(monthlySavings) + '/mo';
+
+  // segments
+  segStates.forEach((s, i) => {
+    const el = document.getElementById(`seg-${i}`);
+    if (el) el.className = `wt-segment ${s}`;
+  });
+}
+
+function renderChapter() {
+  answered = false;
+  const ch = CHAPTERS[currentChapter];
+
+  document.getElementById('dc-icon').textContent    = ch.icon;
+  document.getElementById('dc-chapter').textContent = ch.chapter;
+  document.getElementById('dc-title').textContent   = ch.title;
+  document.getElementById('dc-sub').textContent     = ch.sub;
+  document.getElementById('dc-body').textContent    = ch.body;
+  document.getElementById('age-display').textContent = ch.age;
+
+  const stakes = document.getElementById('dc-stakes');
+  stakes.innerHTML = '<span style="color:var(--muted);font-size:12px;">Affects:</span> ' +
+    ch.stakes.map(s => `<span class="stake-tag">${s}</span>`).join('');
+
+  // options
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  ch.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    const sign   = opt.netWorthDelta >= 0 ? '+' : '';
+    const col    = opt.netWorthDelta >= 0 ? 'var(--green)' : 'var(--red)';
+    btn.innerHTML = `
+      <div class="opt-num">${opt.num}</div>
+      <div class="opt-content">
+        <div class="opt-name">${opt.name}</div>
+        <div class="opt-desc">${opt.desc}</div>
+      </div>
+      <div class="opt-delta" style="color:${col}">${sign}${fmt(opt.netWorthDelta)}</div>
+    `;
+    btn.onclick = () => choose(i);
+    grid.appendChild(btn);
+  });
+
+  // reset panels
+  document.getElementById('outcome-panel').className = 'outcome-panel';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  // card animation
+  const card = document.getElementById('decision-card');
+  card.style.animation = 'none'; card.offsetHeight;
+  card.style.animation = 'cardIn 0.4s cubic-bezier(.34,1.56,.64,1) both';
+
+  updateWorthDisplay(false);
+}
+
+function choose(idx) {
+  if (answered) return;
+  answered = true;
+
+  const ch  = CHAPTERS[currentChapter];
+  const opt = ch.options[idx];
+
+  // update financials
+  netWorth      += opt.netWorthDelta;
+  totalAssets   += opt.assets || 0;
+  totalDebt     += opt.debt || 0;
+  monthlySavings = (monthlySavings || 0) + (opt.monthlySavings || 0);
+
+  choices.push({ chapter: ch.title, choice: opt.name, delta: opt.netWorthDelta, quality: opt.quality });
+
+  // style buttons
+  document.querySelectorAll('.opt-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === idx) btn.classList.add(`chose-${opt.quality}`);
+    else btn.classList.add('dimmed');
+  });
+
+  // update segment
+  segStates[currentChapter] = `filled-${opt.quality}`;
+  if (currentChapter + 1 < 5) segStates[currentChapter + 1] = 'current';
+  updateWorthDisplay(true);
+
+  // outcome panel
+  const panel = document.getElementById('outcome-panel');
+  panel.className = 'outcome-panel show';
+  document.getElementById('op-bar').className    = `op-bar ${opt.quality}`;
+  document.getElementById('op-verdict').className = `op-verdict ${opt.quality}`;
+  document.getElementById('op-verdict').textContent = opt.quality === 'great' ? '✦ Smart Move' : opt.quality === 'okay' ? '◎ Reasonable' : '✕ Costly Choice';
+  const sign = opt.netWorthDelta >= 0 ? '+' : '';
+  const deltaEl = document.getElementById('op-delta');
+  deltaEl.className = `op-delta ${opt.netWorthDelta >= 0 ? 'pos' : 'neg'}`;
+  deltaEl.textContent = sign + fmt(opt.netWorthDelta);
+  document.getElementById('op-age-label').textContent = `impact by age 40`;
+  document.getElementById('op-explain').textContent  = opt.explain;
+  document.getElementById('op-ripple').innerHTML     = opt.ripple;
+
+  const cc = document.getElementById('compound-callout');
+  if (opt.compound) {
+    cc.className = 'compound-callout show';
+    cc.textContent = '📐 ' + opt.compound;
+  } else {
+    cc.className = 'compound-callout';
+  }
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.className = 'next-btn show';
+  nextBtn.textContent = currentChapter + 1 >= CHAPTERS.length ? 'See My Financial Future →' : `Chapter ${currentChapter + 2}: ${CHAPTERS[currentChapter+1].title.split(' ')[0]}... →`;
+}
+
+function nextChapter() {
+  currentChapter++;
+  if (currentChapter >= CHAPTERS.length) showEnd();
+  else renderChapter();
+}
+
+function showEnd() {
+  document.getElementById('game-screen').style.display = 'none';
+  const end = document.getElementById('end-screen');
+  end.style.display = 'block';
+
+  document.getElementById('end-amount').textContent = fmt(netWorth);
+
+  let tier, tierColor;
+  if (netWorth >= 600000) { tier = 'Financially Free';    tierColor = 'var(--green)'; }
+  else if (netWorth >= 300000) { tier = 'Wealth Builder'; tierColor = 'var(--gold)'; }
+  else if (netWorth >= 100000) { tier = 'Solid Foundation';tierColor = 'var(--blue)'; }
+  else if (netWorth >= 0)      { tier = 'Starting Over';  tierColor = '#aaa'; }
+  else                         { tier = 'Rebuilding';     tierColor = 'var(--red)'; }
+
+  document.getElementById('end-tier').textContent  = tier;
+  document.getElementById('end-tier').style.color  = tierColor;
+  document.getElementById('end-amount').style.color = tierColor;
+
+  // grid
+  const grid = document.getElementById('end-grid');
+  const cells = [
+    { label:'Net Worth at 40', value: fmt(netWorth), sub: tier, color: tierColor },
+    { label:'Total Assets Built', value: fmt(Math.max(0, totalAssets)), sub:'homes, investments, savings', color:'var(--green)' },
+    { label:'Total Debt Carried', value: fmt(Math.abs(Math.min(0, totalDebt))), sub:'loans, mortgages, cards', color:'var(--red)' },
+    { label:'Monthly Savings Rate', value: fmt(Math.max(0, monthlySavings)) + '/mo', sub:'by age 35', color:'var(--gold)' },
+  ];
+  grid.innerHTML = cells.map(c => `
+    <div class="end-cell">
+      <div class="ec-label">${c.label}</div>
+      <div class="ec-value" style="color:${c.color}">${c.value}</div>
+      <div class="ec-sub">${c.sub}</div>
+    </div>
+  `).join('');
+
+  // verdict
+  let verdictTitle, verdictBody;
+  if (netWorth >= 600000) {
+    verdictTitle = 'You built real wealth.';
+    verdictBody  = `A net worth of ${fmt(netWorth)} at 40 means financial options most people never have — the ability to take career risks, weather emergencies, retire early, or help your family. The habits you built in your 20s and 30s will compound for decades. The hardest part is behind you.`;
+  } else if (netWorth >= 300000) {
+    verdictTitle = 'Solid trajectory.';
+    verdictBody  = `${fmt(netWorth)} at 40 is meaningful wealth. You have built a real foundation. A few of your choices had significant costs — but the compounding from here, if you stay disciplined, will close the gap. The next 25 years have more earning power ahead than you have behind.`;
+  } else if (netWorth >= 100000) {
+    verdictTitle = 'A foundation exists — but the choices were expensive.';
+    verdictBody  = `${fmt(netWorth)} at 40 is a starting point, not a finishing line. Several of your decisions had large opportunity costs. The good news: compound interest works from wherever you are. Fifteen years of disciplined behavior from 40 to 55 can still produce transformative results.`;
+  } else if (netWorth >= 0) {
+    verdictTitle = 'Starting over at 40 — it happens.';
+    verdictBody  = `${fmt(netWorth)} at 40 means the choices were costly. But "starting over" at 40 with good habits is dramatically better than continuing the same patterns. Many people build their most significant wealth between 40 and 65 — but only if the habits change now.`;
+  } else {
+    verdictTitle = 'Deep in the hole at 40.';
+    verdictBody  = `${fmt(netWorth)} net worth at 40 means the debt and opportunity costs accumulated significantly. This is not a permanent state — it is a starting point for what comes next. The game was designed to show where the costs are largest. Every one of these situations is recoverable with time and consistent behavior.`;
+  }
+
+  document.getElementById('end-verdict').innerHTML = `
+    <div class="ev-title">${verdictTitle}</div>
+    <div class="ev-body">${verdictBody}</div>
+  `;
+
+  // what-if: best possible vs yours
+  const bestPossible = CHAPTERS.reduce((sum, ch) => sum + Math.max(...ch.options.map(o => o.netWorthDelta)), 0);
+  const worstPossible= CHAPTERS.reduce((sum, ch) => sum + Math.min(...ch.options.map(o => o.netWorthDelta)), 0);
+
+  const wiRows = document.getElementById('wi-rows');
+  wiRows.innerHTML = `
+    <div class="wi-row"><span class="wi-label">Your net worth at 40</span><span class="wi-val" style="color:${tierColor}">${fmt(netWorth)}</span></div>
+    <div class="wi-row highlight"><span class="wi-label">Best possible (all great choices)</span><span class="wi-val" style="color:var(--green)">${fmt(bestPossible)}</span></div>
+    <div class="wi-row"><span class="wi-label">Worst possible (all bad choices)</span><span class="wi-val" style="color:var(--red)">${fmt(worstPossible)}</span></div>
+    <div class="wi-row"><span class="wi-label">Gap between your score and best</span><span class="wi-val" style="color:var(--gold)">${fmt(bestPossible - netWorth)} left on the table</span></div>
+    ${choices.map(c => {
+      const ch = CHAPTERS.find(x => x.title === c.chapter);
+      const best = ch ? Math.max(...ch.options.map(o => o.netWorthDelta)) : 0;
+      const diff = best - c.delta;
+      return diff > 0
+        ? `<div class="wi-row"><span class="wi-label">${c.chapter.split(':')[0]}... cost you</span><span class="wi-val" style="color:var(--red)">-${fmt(diff)} vs best</span></div>`
+        : '';
+    }).join('')}
+  `;
+}
+
+function startGame() {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display  = 'block';
+  renderChapter();
+}
+
+function resetGame() {
+  currentChapter = 0;
+  netWorth = 0; totalAssets = 0; totalDebt = 0; monthlySavings = 0;
+  answered = false; choices = [];
+  segStates = ['current','','','',''];
+  document.getElementById('end-screen').style.display  = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  renderChapter();
+}
+</script>
+</body>
+</html>

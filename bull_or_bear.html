@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bull or Bear? — Money Hacks</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Karla:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:         #0a0a0a;
+    --surface:    #141414;
+    --surface2:   #1e1e1e;
+    --border:     #2a2a2a;
+    --bull:       #00c853;
+    --bull-dim:   #003318;
+    --bull-mid:   #00913c;
+    --bear:       #ff3d3d;
+    --bear-dim:   #330a0a;
+    --bear-mid:   #cc1f1f;
+    --gold:       #ffd600;
+    --text:       #f0f0f0;
+    --muted:      #666;
+    --radius:     10px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Karla', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ticker tape at top */
+  .ticker-wrap {
+    width: 100%;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    height: 32px;
+    position: relative;
+  }
+  .ticker {
+    display: flex;
+    white-space: nowrap;
+    animation: ticker 30s linear infinite;
+    height: 100%;
+    align-items: center;
+  }
+  .ticker-item {
+    font-family: 'Karla', monospace;
+    font-size: 12px;
+    padding: 0 28px;
+    color: var(--muted);
+  }
+  .ticker-item .up   { color: var(--bull); }
+  .ticker-item .down { color: var(--bear); }
+  @keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .wrapper {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 16px 80px;
+  }
+
+  /* ── HEADER ── */
+  .game-header {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: fadeDown 0.5s ease both;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .game-header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 12vw, 96px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+  }
+  .game-header h1 .bull-word { color: var(--bull); }
+  .game-header h1 .bear-word { color: var(--bear); }
+  .game-header p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 12px;
+    font-weight: 300;
+  }
+
+  /* ── HUD ── */
+  .hud {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .hud-cell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .hud-cell .label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .hud-cell .value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+  }
+  .hud-cell.score-cell .value { color: var(--gold); }
+  .hud-cell.bull-cell  .value { color: var(--bull); }
+  .hud-cell.bear-cell  .value { color: var(--bear); }
+  .hud-cell.streak-cell .value { color: var(--text); }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+  .progress-pip {
+    flex: 1;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 99px;
+    transition: background 0.4s ease;
+  }
+  .progress-pip.correct { background: var(--bull); }
+  .progress-pip.wrong   { background: var(--bear); }
+  .progress-pip.current { background: var(--gold); animation: pulse 1s ease infinite alternate; }
+  @keyframes pulse { from { opacity: 0.5; } to { opacity: 1; } }
+
+  /* ── HEADLINE CARD ── */
+  .headline-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 0;
+    margin-bottom: 20px;
+    overflow: hidden;
+    animation: cardIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+    position: relative;
+  }
+  @keyframes cardIn {
+    from { opacity:0; transform:scale(0.92) translateY(20px); }
+    to   { opacity:1; transform:scale(1)    translateY(0); }
+  }
+
+  .card-source {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .source-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--bull);
+    animation: blink 1.5s ease infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .source-name {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .card-q-number {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .card-body {
+    padding: 28px 24px 24px;
+  }
+  .card-tag {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+    font-weight: 700;
+  }
+  .tag-fed      { background: rgba(88,166,255,0.15); color: #58a6ff; }
+  .tag-earnings { background: rgba(0,200,83,0.15);  color: var(--bull); }
+  .tag-macro    { background: rgba(255,214,0,0.15);  color: var(--gold); }
+  .tag-sector   { background: rgba(171,71,188,0.15); color: #ce93d8; }
+  .tag-geopolit { background: rgba(255,61,61,0.15);  color: var(--bear); }
+  .tag-crypto   { background: rgba(255,152,0,0.15);  color: #ffcc02; }
+
+  .headline-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(22px, 4.5vw, 36px);
+    line-height: 1.15;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+  }
+  .headline-context {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+    border-left: 3px solid var(--border);
+    padding-left: 14px;
+  }
+
+  /* ── BUTTONS ── */
+  .choice-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .choice-btn {
+    padding: 20px 16px;
+    border-radius: var(--radius);
+    border: 2px solid;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .choice-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .choice-btn:hover:not(:disabled)::before { opacity: 1; }
+  .choice-btn:hover:not(:disabled) { transform: translateY(-3px); }
+
+  .bull-btn {
+    background: var(--bull-dim);
+    border-color: var(--bull-mid);
+    color: var(--bull);
+  }
+  .bull-btn::before { background: radial-gradient(circle at center, rgba(0,200,83,0.15), transparent); }
+  .bull-btn:hover:not(:disabled) { border-color: var(--bull); box-shadow: 0 0 28px rgba(0,200,83,0.35); }
+
+  .bear-btn {
+    background: var(--bear-dim);
+    border-color: var(--bear-mid);
+    color: var(--bear);
+  }
+  .bear-btn::before { background: radial-gradient(circle at center, rgba(255,61,61,0.15), transparent); }
+  .bear-btn:hover:not(:disabled) { border-color: var(--bear); box-shadow: 0 0 28px rgba(255,61,61,0.35); }
+
+  .choice-btn .btn-icon { font-size: 32px; }
+  .choice-btn .btn-label { font-size: 11px; letter-spacing: 3px; font-family: 'Karla', sans-serif; font-weight: 700; }
+  .choice-btn:disabled { cursor: default; opacity: 0.5; }
+
+  /* correct / wrong states */
+  .choice-btn.correct-pick {
+    opacity: 1 !important;
+    animation: correctPulse 0.5s ease;
+  }
+  .choice-btn.wrong-pick {
+    opacity: 1 !important;
+    animation: wrongShake 0.4s ease;
+  }
+  .bull-btn.correct-pick { border-color: var(--bull); box-shadow: 0 0 32px rgba(0,200,83,0.5); }
+  .bear-btn.correct-pick { border-color: var(--bear); box-shadow: 0 0 32px rgba(255,61,61,0.5); }
+
+  @keyframes correctPulse {
+    0%,100% { transform: scale(1); }
+    50%      { transform: scale(1.05); }
+  }
+  @keyframes wrongShake {
+    0%,100% { transform: translateX(0); }
+    25%     { transform: translateX(-8px); }
+    75%     { transform: translateX(8px); }
+  }
+
+  /* ── EXPLANATION ── */
+  .explanation {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    display: none;
+    animation: fadeUp 0.3s ease both;
+  }
+  .explanation.show { display: block; }
+  .exp-verdict {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .exp-verdict-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    padding: 4px 14px;
+    border-radius: 4px;
+  }
+  .verdict-bull { background: var(--bull-dim); color: var(--bull); border: 1px solid var(--bull-mid); }
+  .verdict-bear { background: var(--bear-dim); color: var(--bear); border: 1px solid var(--bear-mid); }
+  .exp-correct-tag {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .exp-correct-tag.right { color: var(--bull); }
+  .exp-correct-tag.wrong { color: var(--bear); }
+  .exp-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+  .exp-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  .exp-rule {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text);
+    border-left: 3px solid var(--gold);
+  }
+  .exp-rule strong { color: var(--gold); }
+
+  .next-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: none;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:hover { background: var(--border); transform: translateY(-2px); }
+
+  /* ── START / END ── */
+  .start-screen, .end-screen {
+    text-align: center;
+    animation: fadeUp 0.5s ease both;
+  }
+  .start-screen h2, .end-screen h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  .start-screen p, .end-screen p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 460px;
+    margin: 0 auto 24px;
+  }
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0 28px;
+    text-align: left;
+  }
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .concept-card .cc-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .concept-card .cc-body {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .bull-card .cc-title { color: var(--bull); }
+  .bear-card .cc-title { color: var(--bear); }
+
+  .start-btn, .replay-btn {
+    padding: 16px 48px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .start-btn { background: var(--bull); color: #000; }
+  .start-btn:hover { background: #00e564; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,200,83,0.4); }
+  .replay-btn { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .replay-btn:hover { background: var(--surface2); transform: translateY(-2px); }
+
+  /* end score */
+  .end-score-ring {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    margin: 24px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid;
+    position: relative;
+  }
+  .end-score-ring .big-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 1;
+  }
+  .end-score-ring .out-of {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .end-grade-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .end-summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin: 20px 0;
+    text-align: left;
+  }
+  .sum-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .sum-row:last-child { border-bottom: none; }
+  .sum-row .sr-label { color: var(--muted); }
+  .key-lesson {
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: rgba(255,214,0,0.06);
+    border: 1px solid rgba(255,214,0,0.2);
+    border-radius: var(--radius);
+    text-align: left;
+  }
+  .key-lesson-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .key-lesson-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  @keyframes fadeDown {
+    from { opacity:0; transform:translateY(-16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Ticker tape -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span class="ticker-item">SPY <span class="up">▲ 2.1%</span></span>
+    <span class="ticker-item">AAPL <span class="up">▲ 1.4%</span></span>
+    <span class="ticker-item">TSLA <span class="down">▼ 3.2%</span></span>
+    <span class="ticker-item">NVDA <span class="up">▲ 4.8%</span></span>
+    <span class="ticker-item">BTC <span class="down">▼ 7.1%</span></span>
+    <span class="ticker-item">DJI <span class="up">▲ 0.9%</span></span>
+    <span class="ticker-item">10Y YIELD <span class="up">▲ 0.08%</span></span>
+    <span class="ticker-item">OIL <span class="down">▼ 1.5%</span></span>
+    <span class="ticker-item">GOLD <span class="up">▲ 0.6%</span></span>
+    <span class="ticker-item">META <span class="up">▲ 2.3%</span></span>
+    <span class="ticker-item">AMZN <span class="up">▲ 1.1%</span></span>
+    <span class="ticker-item">SPY <span class="up">▲ 2.1%</span></span>
+    <span class="ticker-item">AAPL <span class="up">▲ 1.4%</span></span>
+    <span class="ticker-item">TSLA <span class="down">▼ 3.2%</span></span>
+    <span class="ticker-item">NVDA <span class="up">▲ 4.8%</span></span>
+    <span class="ticker-item">BTC <span class="down">▼ 7.1%</span></span>
+    <span class="ticker-item">DJI <span class="up">▲ 0.9%</span></span>
+    <span class="ticker-item">10Y YIELD <span class="up">▲ 0.08%</span></span>
+    <span class="ticker-item">OIL <span class="down">▼ 1.5%</span></span>
+    <span class="ticker-item">GOLD <span class="up">▲ 0.6%</span></span>
+    <span class="ticker-item">META <span class="up">▲ 2.3%</span></span>
+    <span class="ticker-item">AMZN <span class="up">▲ 1.1%</span></span>
+  </div>
+</div>
+
+<div class="wrapper">
+  <div class="game-header">
+    <div class="eyebrow">Money Hacks · NMT Summer STEM · Tuesday</div>
+    <h1><span class="bull-word">BULL</span> OR <span class="bear-word">BEAR</span>?</h1>
+    <p>A news headline drops. Does the market go up or down? You have 3 seconds to decide.</p>
+  </div>
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="start-screen">
+    <h2>Know Your Market Movers</h2>
+    <p>Every day, news headlines move the stock market up or down. Investors have to react in real time. Can you predict which way the market goes? Some are obvious. Some will surprise you.</p>
+    <div class="concept-grid">
+      <div class="concept-card bull-card">
+        <div class="cc-title">🐂 Bull Market</div>
+        <div class="cc-body">Prices are rising. Investor confidence is high. Economy looks strong. "Bullish" means optimistic about the market going up.</div>
+      </div>
+      <div class="concept-card bear-card">
+        <div class="cc-title">🐻 Bear Market</div>
+        <div class="cc-body">Prices are falling 20%+ from a recent high. Fear is spreading. "Bearish" means pessimistic — expecting prices to drop.</div>
+      </div>
+      <div class="concept-card" style="border-color:#58a6ff33">
+        <div class="cc-title" style="color:#58a6ff; font-family:'Bebas Neue'; font-size:20px; letter-spacing:1px; margin-bottom:6px;">The Fed</div>
+        <div class="cc-body">The Federal Reserve controls interest rates. Raising rates usually hurts stocks. Cutting rates usually helps stocks. It's the most watched institution on Wall Street.</div>
+      </div>
+      <div class="concept-card" style="border-color:#ffd60033">
+        <div class="cc-title" style="color:#ffd600; font-family:'Bebas Neue'; font-size:20px; letter-spacing:1px; margin-bottom:6px;">Earnings</div>
+        <div class="cc-body">Every quarter, companies report profits. If they beat expectations → stock goes up. If they miss → stock drops. Expectations matter as much as reality.</div>
+      </div>
+    </div>
+    <p style="margin-bottom:20px;">You need <strong style="color:#fff">7 correct</strong> to win. First to 7 in class takes the title.</p>
+    <button class="start-btn" onclick="startGame()">START TRADING →</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" style="display:none;">
+    <div class="hud">
+      <div class="hud-cell score-cell">
+        <div class="label">Score</div>
+        <div class="value" id="hud-score">0</div>
+      </div>
+      <div class="hud-cell bull-cell">
+        <div class="label">Correct</div>
+        <div class="value" id="hud-correct">0</div>
+      </div>
+      <div class="hud-cell bear-cell">
+        <div class="label">Wrong</div>
+        <div class="value" id="hud-wrong">0</div>
+      </div>
+      <div class="hud-cell streak-cell">
+        <div class="label">Streak 🔥</div>
+        <div class="value" id="hud-streak">0</div>
+      </div>
+    </div>
+
+    <div class="progress-wrap" id="progress-wrap"></div>
+
+    <div class="headline-card" id="headline-card">
+      <div class="card-source">
+        <div class="source-dot"></div>
+        <span class="source-name" id="source-name">Market Watch</span>
+        <span class="card-q-number" id="q-number">Q1 of 12</span>
+      </div>
+      <div class="card-body">
+        <div class="card-tag" id="card-tag"></div>
+        <div class="headline-text" id="headline-text">Loading...</div>
+        <div class="headline-context" id="headline-context"></div>
+      </div>
+    </div>
+
+    <div class="choice-row">
+      <button class="choice-btn bull-btn" id="bull-btn" onclick="choose('bull')">
+        <span class="btn-icon">🐂</span>
+        <span>BULL</span>
+        <span class="btn-label">Market Goes Up</span>
+      </button>
+      <button class="choice-btn bear-btn" id="bear-btn" onclick="choose('bear')">
+        <span class="btn-icon">🐻</span>
+        <span>BEAR</span>
+        <span class="btn-label">Market Goes Down</span>
+      </button>
+    </div>
+
+    <div class="explanation" id="explanation">
+      <div class="exp-verdict">
+        <span class="exp-verdict-badge" id="verdict-badge">BULL</span>
+        <span class="exp-correct-tag" id="correct-tag">✓ CORRECT</span>
+      </div>
+      <div class="exp-title" id="exp-title"></div>
+      <div class="exp-body" id="exp-body"></div>
+      <div class="exp-rule" id="exp-rule"></div>
+    </div>
+
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">NEXT HEADLINE →</button>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="end-screen" class="end-screen" style="display:none;">
+    <div class="eyebrow">Session Closed</div>
+    <div class="end-score-ring" id="end-ring">
+      <span class="big-score" id="end-score">8</span>
+      <span class="out-of" id="end-out-of">out of 12</span>
+    </div>
+    <div class="end-grade-title" id="end-grade-title">Solid Analyst</div>
+    <p id="end-msg"></p>
+    <div class="end-summary" id="end-summary"></div>
+    <div class="key-lesson">
+      <div class="key-lesson-title">🎓 THE BIG TAKEAWAY</div>
+      <div class="key-lesson-body" id="key-lesson-body"></div>
+    </div>
+    <br>
+    <button class="replay-btn" onclick="resetGame()">PLAY AGAIN</button>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    source: "Reuters",
+    tag: "tag-fed",
+    tagLabel: "FED POLICY",
+    headline: "Fed Raises Interest Rates by 0.75% — Largest Hike Since 1994",
+    context: "The Federal Reserve announces a surprise 0.75 percentage point rate increase to fight inflation running at 9.1%. This makes borrowing money significantly more expensive for businesses and consumers.",
+    answer: "bear",
+    expTitle: "Higher rates = lower stock prices",
+    expBody: "When the Fed raises rates, borrowing becomes more expensive. Companies have to pay more interest on loans, profits shrink, and investors shift money from stocks into bonds (which now pay better). This almost always pushes stock prices down.",
+    rule: "<strong>The Rule:</strong> Fed raises rates → stocks fall. Fed cuts rates → stocks usually rise. This is the single most important relationship in investing."
+  },
+  {
+    source: "CNBC",
+    tag: "tag-earnings",
+    tagLabel: "EARNINGS",
+    headline: "Apple Reports Record $90B Revenue — Beats Analyst Estimates by 12%",
+    context: "Apple's quarterly earnings came in far above what Wall Street predicted. iPhone sales grew 18% year-over-year. The company also announced a $110 billion share buyback program.",
+    answer: "bull",
+    expTitle: "Beat estimates = stock pops",
+    expBody: "When a company earns significantly more than analysts expected, investors celebrate. The stock price rises to reflect the better-than-expected business performance. The buyback also signals confidence — the company thinks its own stock is undervalued.",
+    rule: "<strong>The Rule:</strong> Beating earnings estimates → stock rises. Missing estimates → stock falls. It's about expectations, not just the raw numbers."
+  },
+  {
+    source: "Bloomberg",
+    tag: "tag-macro",
+    tagLabel: "JOBS REPORT",
+    headline: "U.S. Unemployment Drops to 3.4% — Economy Adds 517,000 Jobs",
+    context: "The monthly jobs report shows the American economy added far more jobs than expected. The unemployment rate hits a 50-year low. Wage growth is also strong at 4.4% year-over-year.",
+    answer: "bull",
+    expTitle: "Strong jobs = strong economy = bull market",
+    expBody: "More people working means more people spending money, which means companies earn more revenue. A healthy job market signals a healthy economy, which is good for corporate profits and stock prices.",
+    rule: "<strong>The Rule:</strong> Strong jobs report → usually bullish. However, if it's TOO strong, the Fed might raise rates to cool inflation — making this a tricky one in some environments."
+  },
+  {
+    source: "Wall Street Journal",
+    tag: "tag-geopolit",
+    tagLabel: "GEOPOLITICAL",
+    headline: "Russia Invades Ukraine — Oil Prices Surge 8% Overnight",
+    context: "Russian forces launch a full-scale invasion of Ukraine. Sanctions are being imposed on Russian oil exports. Both countries are major agricultural exporters, threatening global food supply chains.",
+    answer: "bear",
+    expTitle: "War = uncertainty = markets panic",
+    expBody: "Markets hate uncertainty more than almost anything. War disrupts supply chains, raises commodity prices, and threatens global stability. Investors sell stocks and rush into 'safe haven' assets like gold and U.S. Treasury bonds when geopolitical crises erupt.",
+    rule: "<strong>The Rule:</strong> Geopolitical crises almost always cause short-term market drops. However, markets historically recover — they're resilient over the long run."
+  },
+  {
+    source: "MarketWatch",
+    tag: "tag-sector",
+    tagLabel: "SECTOR NEWS",
+    headline: "Tesla Announces New Gigafactory — Plans to Triple Production by 2026",
+    context: "Tesla CEO announces a massive new factory in Texas that will triple the company's manufacturing capacity. The move will create 40,000 new jobs. Tesla also reveals a lower-priced Model 2 to compete with traditional automakers.",
+    answer: "bull",
+    expTitle: "Growth news = bullish for individual stocks",
+    expBody: "News about a company expanding production, entering new markets, or launching new products signals future earnings growth. Investors buy stock today based on what they think the company will earn in the future.",
+    rule: "<strong>The Rule:</strong> Expansion = growth = higher future earnings = stock rises. But beware — sometimes expansion costs too much money upfront and the stock still drops."
+  },
+  {
+    source: "Financial Times",
+    tag: "tag-macro",
+    tagLabel: "INFLATION",
+    headline: "U.S. Inflation Hits 9.1% — Highest in 40 Years",
+    context: "The Consumer Price Index shows prices rising at the fastest rate since 1981. Gas is up 59%, groceries up 12%, rent up 8%. The Fed is under pressure to take drastic action to cool the economy.",
+    answer: "bear",
+    expTitle: "High inflation = market fear",
+    expBody: "Runaway inflation erodes purchasing power and forces the Fed to raise interest rates aggressively to cool the economy. Higher rates hurt stocks (see the rule above). It also squeezes company profit margins when their costs go up faster than their prices.",
+    rule: "<strong>The Rule:</strong> High inflation → Fed raises rates → stocks fall. Low, stable inflation (around 2%) is actually healthy for markets."
+  },
+  {
+    source: "CNBC",
+    tag: "tag-fed",
+    tagLabel: "FED POLICY",
+    headline: "Fed Signals Three Rate Cuts Coming in 2024 — Inflation Under Control",
+    context: "Federal Reserve Chair announces that inflation has cooled to 2.4% and the economy is landing 'softly.' The Fed projects cutting interest rates three times in the coming year. Borrowing will become cheaper.",
+    answer: "bull",
+    expTitle: "Rate cuts = market party",
+    expBody: "When the Fed cuts rates, borrowing becomes cheaper for everyone — companies, homebuyers, consumers. Cheaper money flows back into the economy and into stocks. This is one of the most powerful bull signals that exists.",
+    rule: "<strong>The Rule:</strong> Fed cuts rates → stocks almost always rise. This is why Wall Street watches Fed announcements more closely than any other single event."
+  },
+  {
+    source: "Reuters",
+    tag: "tag-earnings",
+    tagLabel: "EARNINGS",
+    headline: "Netflix Loses 200,000 Subscribers — First Loss in a Decade",
+    context: "Netflix reports it lost subscribers for the first time in 10 years. Competition from Disney+, HBO Max, and others is intensifying. The company warns of another 2 million subscriber losses next quarter.",
+    answer: "bear",
+    expTitle: "Missed expectations + negative guidance = stock crashes",
+    expBody: "Netflix lost subscribers when the market expected growth. Worse, they projected it would continue. When a company's core business metric goes negative AND management warns of more pain ahead, investors flee. Netflix stock dropped 35% the day this news broke.",
+    rule: "<strong>The Rule:</strong> Missed earnings + negative future guidance is the worst combination for a stock. One or the other is bad. Both together is brutal."
+  },
+  {
+    source: "Bloomberg",
+    tag: "tag-crypto",
+    tagLabel: "CRYPTO",
+    headline: "Bitcoin Crashes 30% in 24 Hours After China Bans Crypto Transactions",
+    context: "China's government announces it is banning all cryptocurrency transactions and mining. China was home to roughly 65% of global Bitcoin mining. The ban is effective immediately.",
+    answer: "bear",
+    expTitle: "Government bans + losing 65% of infrastructure = crash",
+    expBody: "Crypto is extremely sensitive to regulatory news. China banning both mining AND transactions eliminated a massive portion of Bitcoin's global network overnight. When the supply of miners drops and demand is banned in a huge market simultaneously, prices collapse.",
+    rule: "<strong>The Rule:</strong> Government regulation or bans are the biggest risk in crypto. Unlike stocks, crypto has no underlying earnings — it's entirely driven by sentiment and supply/demand."
+  },
+  {
+    source: "Associated Press",
+    tag: "tag-macro",
+    tagLabel: "CONSUMER",
+    headline: "Holiday Retail Sales Up 8.5% — Best Season in 17 Years",
+    context: "The National Retail Federation reports Americans spent a record $936 billion during the holiday season. Consumer confidence is at a 20-year high. Credit card spending is up across all income brackets.",
+    answer: "bull",
+    expTitle: "Consumer spending = corporate revenue = profits",
+    expBody: "70% of the U.S. economy is driven by consumer spending. When people are buying things confidently, companies earn more revenue, which means higher profits, which means higher stock prices. The holiday season is the single most important quarter for retail stocks.",
+    rule: "<strong>The Rule:</strong> Strong consumer spending data is bullish — especially for retail, tech, and consumer goods companies. It signals confidence in the economy."
+  },
+  {
+    source: "Wall Street Journal",
+    tag: "tag-sector",
+    tagLabel: "TECH SECTOR",
+    headline: "Microsoft Announces 10,000 Layoffs — Cuts Costs Amid AI Investment Push",
+    context: "Microsoft announces it is laying off 10,000 employees (about 5% of its workforce). The company says it will redirect spending toward artificial intelligence. Costs are being cut across non-AI divisions.",
+    answer: "bull",
+    expTitle: "This one surprises most people — layoffs can be bullish",
+    expBody: "It seems counterintuitive, but layoffs often cause stock prices to rise. Why? Because cutting costs directly improves profit margins. If Microsoft spends $1B less on salaries and redirects it toward high-growth AI, Wall Street often sees that as good capital allocation.",
+    rule: "<strong>The Rule:</strong> Layoffs for 'cost efficiency' often boost stock prices short-term. This is one of the most uncomfortable truths about how markets work."
+  },
+  {
+    source: "CNBC",
+    tag: "tag-macro",
+    tagLabel: "RECESSION FEAR",
+    headline: "U.S. GDP Contracts for Second Straight Quarter — Recession Fears Spike",
+    context: "The government reports the economy shrank 0.9% in Q2 following a 1.6% drop in Q1. Two consecutive quarters of negative GDP growth is the traditional definition of a recession. Consumer confidence drops sharply.",
+    answer: "bear",
+    expTitle: "Recession = shrinking economy = corporate pain",
+    expBody: "A recession means the overall economy is contracting. Companies sell less, earn less, and often lay off workers. A shrinking economy is bad for corporate profits, which is bad for stock prices. Markets often price in recession fears before the official data confirms it.",
+    rule: "<strong>The Rule:</strong> Recession fears almost always drag the market down. However, markets tend to recover 6-12 months before the actual economy does — which is why 'timing the market' is nearly impossible."
+  },
+];
+
+let currentQ = 0;
+let score = 0;
+let correct = 0;
+let wrong = 0;
+let streak = 0;
+let bestStreak = 0;
+let answered = false;
+let results = [];
+
+// shuffle
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+let questions = shuffle(QUESTIONS);
+
+function buildProgress() {
+  const wrap = document.getElementById('progress-wrap');
+  wrap.innerHTML = '';
+  questions.forEach((_, i) => {
+    const pip = document.createElement('div');
+    pip.className = 'progress-pip' + (i === 0 ? ' current' : '');
+    pip.id = `pip-${i}`;
+    wrap.appendChild(pip);
+  });
+}
+
+function startGame() {
+  questions = shuffle(QUESTIONS);
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  buildProgress();
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+
+  document.getElementById('source-name').textContent = q.source;
+  document.getElementById('q-number').textContent = `Q${currentQ + 1} of ${questions.length}`;
+
+  const tagEl = document.getElementById('card-tag');
+  tagEl.className = `card-tag ${q.tag}`;
+  tagEl.textContent = q.tagLabel;
+
+  document.getElementById('headline-text').textContent = q.headline;
+  document.getElementById('headline-context').textContent = q.context;
+
+  document.getElementById('hud-score').textContent   = score;
+  document.getElementById('hud-correct').textContent = correct;
+  document.getElementById('hud-wrong').textContent   = wrong;
+  document.getElementById('hud-streak').textContent  = streak;
+
+  const bullBtn = document.getElementById('bull-btn');
+  const bearBtn = document.getElementById('bear-btn');
+  bullBtn.disabled = false; bearBtn.disabled = false;
+  bullBtn.className = 'choice-btn bull-btn';
+  bearBtn.className = 'choice-btn bear-btn';
+
+  const exp = document.getElementById('explanation');
+  exp.className = 'explanation';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  // animate card
+  const card = document.getElementById('headline-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'cardIn 0.4s cubic-bezier(.34,1.56,.64,1) both';
+
+  // update progress
+  document.querySelectorAll('.progress-pip').forEach((p, i) => {
+    if (i < currentQ) return; // already set
+    p.className = 'progress-pip' + (i === currentQ ? ' current' : '');
+  });
+}
+
+function choose(pick) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[currentQ];
+  const isCorrect = pick === q.answer;
+
+  if (isCorrect) {
+    score += (1 + streak);  // streak bonus
+    correct++;
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+  } else {
+    wrong++;
+    streak = 0;
+  }
+
+  results.push({ q: currentQ + 1, headline: q.headline, pick, correct: isCorrect, answer: q.answer });
+
+  const bullBtn = document.getElementById('bull-btn');
+  const bearBtn = document.getElementById('bear-btn');
+  bullBtn.disabled = true;
+  bearBtn.disabled = true;
+
+  if (pick === 'bull') {
+    bullBtn.classList.add(isCorrect ? 'correct-pick' : 'wrong-pick');
+    if (!isCorrect) bearBtn.classList.add('correct-pick');
+  } else {
+    bearBtn.classList.add(isCorrect ? 'correct-pick' : 'wrong-pick');
+    if (!isCorrect) bullBtn.classList.add('correct-pick');
+  }
+
+  // update pip
+  const pip = document.getElementById(`pip-${currentQ}`);
+  if (pip) pip.className = `progress-pip ${isCorrect ? 'correct' : 'wrong'}`;
+
+  // update hud
+  document.getElementById('hud-score').textContent   = score;
+  document.getElementById('hud-correct').textContent = correct;
+  document.getElementById('hud-wrong').textContent   = wrong;
+  document.getElementById('hud-streak').textContent  = streak;
+
+  // show explanation
+  const exp = document.getElementById('explanation');
+  exp.className = 'explanation show';
+
+  const badge = document.getElementById('verdict-badge');
+  badge.textContent = q.answer.toUpperCase();
+  badge.className = `exp-verdict-badge verdict-${q.answer}`;
+
+  const tag = document.getElementById('correct-tag');
+  tag.textContent = isCorrect ? '✓ CORRECT' : '✗ INCORRECT';
+  tag.className = `exp-correct-tag ${isCorrect ? 'right' : 'wrong'}`;
+
+  document.getElementById('exp-title').textContent = q.expTitle;
+  document.getElementById('exp-body').textContent  = q.expBody;
+  document.getElementById('exp-rule').innerHTML    = q.rule;
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.className = 'next-btn show';
+  nextBtn.textContent = currentQ + 1 >= questions.length ? 'SEE RESULTS →' : 'NEXT HEADLINE →';
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showEnd();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showEnd() {
+  document.getElementById('game-screen').style.display = 'none';
+  const end = document.getElementById('end-screen');
+  end.style.display = 'block';
+
+  const total = questions.length;
+  const pct = correct / total;
+
+  const ring = document.getElementById('end-ring');
+  document.getElementById('end-score').textContent   = correct;
+  document.getElementById('end-out-of').textContent  = `out of ${total}`;
+
+  let grade, color, msg, lesson;
+  if (pct >= 0.92) {
+    grade = 'Wall Street Wizard';   color = '#ffd600';
+    msg   = `${correct}/${total} correct and a streak of ${bestStreak}. You read market signals better than most professionals. You understand that markets react to expectations, not just facts.`;
+    lesson = "The market is a voting machine in the short run and a weighing machine in the long run. What you've proven is that you can understand the short-run votes — which puts you ahead of most investors.";
+  } else if (pct >= 0.75) {
+    grade = 'Solid Analyst';       color = '#00c853';
+    msg   = `${correct}/${total} correct. You have strong intuition for how markets move. A few edge cases tripped you up — those are the ones that separate good investors from great ones.`;
+    lesson = "The trickiest scenarios (layoffs being bullish, jobs reports being bearish when inflation is high) are where most people lose money. Knowing the second-order effects is what separates analysts from retail investors.";
+  } else if (pct >= 0.58) {
+    grade = 'Learning Trader';     color = '#58a6ff';
+    msg   = `${correct}/${total} correct. You got the obvious ones right and stumbled on the counterintuitive ones — which is completely normal. The market is designed to fool the majority.`;
+    lesson = "The market's job is to fool as many people as possible. The counterintuitive answers — like layoffs being good for stocks — are where real investors make or lose money. Understanding 'why' is more important than memorizing 'what.'";
+  } else {
+    grade = 'Market Rookie';       color = '#ff3d3d';
+    msg   = `${correct}/${total} — the market humbled you today! The good news: every professional investor has been exactly where you are. Markets are genuinely hard to predict.`;
+    lesson = "Here's the real secret: even professional fund managers with teams of analysts can't consistently beat the market. That's why index funds exist. The most powerful move isn't predicting headlines — it's not reacting to them at all.";
+  }
+
+  ring.style.borderColor = color;
+  document.getElementById('end-score').style.color = color;
+  document.getElementById('end-grade-title').textContent = grade;
+  document.getElementById('end-grade-title').style.color = color;
+  document.getElementById('end-msg').textContent = msg;
+  document.getElementById('key-lesson-body').textContent = lesson;
+
+  const summary = document.getElementById('end-summary');
+  summary.innerHTML = `
+    <div class="sum-row"><span class="sr-label">Correct Answers</span><span style="color:var(--bull)">${correct} / ${total}</span></div>
+    <div class="sum-row"><span class="sr-label">Total Score (w/ streak bonuses)</span><span style="color:var(--gold)">${score}</span></div>
+    <div class="sum-row"><span class="sr-label">Best Streak</span><span>🔥 ${bestStreak}</span></div>
+    <div class="sum-row"><span class="sr-label">Trickiest category</span><span style="color:var(--muted)">Fed Policy</span></div>
+  `;
+}
+
+function resetGame() {
+  currentQ = 0; score = 0; correct = 0; wrong = 0; streak = 0; bestStreak = 0;
+  answered = false; results = [];
+  questions = shuffle(QUESTIONS);
+  document.getElementById('end-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  buildProgress();
+  renderQuestion();
+}
+</script>
+</body>
+</html>

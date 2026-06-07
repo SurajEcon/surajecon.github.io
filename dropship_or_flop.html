@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dropship or Flop? — Money Hacks</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Righteous&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:         #0f0f1a;
+    --surface:    #17172a;
+    --surface2:   #1e1e35;
+    --border:     #2d2d50;
+    --ship:       #7c3aed;
+    --ship-light: #a78bfa;
+    --ship-dim:   #2d1a5a;
+    --flop:       #dc2626;
+    --flop-light: #fca5a5;
+    --flop-dim:   #4a0f0f;
+    --gold:       #f59e0b;
+    --gold-dim:   #451a00;
+    --green:      #10b981;
+    --green-dim:  #064e35;
+    --text:       #e2e8f0;
+    --muted:      #64748b;
+    --radius:     12px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* moving gradient bg */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background: radial-gradient(ellipse 60% 50% at 20% 20%, rgba(124,58,237,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 80% 80%, rgba(220,38,38,0.08) 0%, transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .wrapper {
+    position:relative;
+    z-index:1;
+    max-width:700px;
+    margin:0 auto;
+    padding:24px 16px 80px;
+  }
+
+  /* ── HEADER ── */
+  .game-header {
+    text-align:center;
+    margin-bottom:28px;
+    animation: fadeDown 0.5s ease both;
+  }
+  .eyebrow {
+    font-size:11px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--ship-light);
+    margin-bottom:10px;
+  }
+  .game-header h1 {
+    font-family:'Righteous', cursive;
+    font-size:clamp(38px,8vw,72px);
+    line-height:1;
+    margin-bottom:6px;
+  }
+  .ship-word { color:var(--ship-light); }
+  .flop-word { color:var(--flop-light); }
+  .game-header p {
+    font-size:14px;
+    color:var(--muted);
+    font-weight:400;
+    max-width:440px;
+    margin:0 auto;
+    line-height:1.6;
+  }
+
+  /* ── HUD ── */
+  .hud {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .hud-cell {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:12px 8px;
+    text-align:center;
+  }
+  .hud-label {
+    font-size:9px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .hud-value {
+    font-family:'Righteous', cursive;
+    font-size:24px;
+  }
+  .hud-cell.score  .hud-value { color:var(--gold); }
+  .hud-cell.hits   .hud-value { color:var(--green); }
+  .hud-cell.misses .hud-value { color:var(--flop-light); }
+  .hud-cell.round  .hud-value { color:var(--ship-light); }
+
+  /* ── PROGRESS DOTS ── */
+  .dots-row {
+    display:flex;
+    gap:6px;
+    justify-content:center;
+    margin-bottom:20px;
+  }
+  .dot {
+    width:10px; height:10px;
+    border-radius:50%;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    transition:all 0.3s ease;
+  }
+  .dot.ship  { background:var(--ship); border-color:var(--ship); }
+  .dot.flop  { background:var(--flop); border-color:var(--flop); }
+  .dot.cur   { background:var(--gold); border-color:var(--gold); animation:pulse 1s ease infinite alternate; }
+  @keyframes pulse { from{opacity:0.5} to{opacity:1} }
+
+  /* ── PRODUCT CARD ── */
+  .product-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:20px;
+    animation:cardSlide 0.4s cubic-bezier(.34,1.56,.64,1) both;
+    position:relative;
+  }
+  @keyframes cardSlide {
+    from { opacity:0; transform:translateY(30px) scale(0.95); }
+    to   { opacity:1; transform:translateY(0)    scale(1); }
+  }
+
+  .product-header {
+    background: linear-gradient(135deg, var(--surface2), var(--surface));
+    border-bottom:1px solid var(--border);
+    padding:20px 24px 16px;
+    display:flex;
+    align-items:flex-start;
+    gap:18px;
+  }
+  .product-emoji {
+    font-size:52px;
+    flex-shrink:0;
+    animation:popIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+    filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  }
+  @keyframes popIn {
+    from { transform:scale(0.4) rotate(-10deg); opacity:0; }
+    to   { transform:scale(1)   rotate(0deg);   opacity:1; }
+  }
+  .product-info { flex:1; }
+  .product-category {
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--ship-light);
+    margin-bottom:6px;
+  }
+  .product-name {
+    font-family:'Righteous', cursive;
+    font-size:clamp(20px,4vw,28px);
+    margin-bottom:4px;
+  }
+  .product-tagline {
+    font-size:13px;
+    color:var(--muted);
+    font-weight:400;
+    line-height:1.5;
+  }
+  .card-num {
+    font-size:11px;
+    color:var(--muted);
+    flex-shrink:0;
+  }
+
+  /* stats grid */
+  .stats-grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:0;
+    border-bottom:1px solid var(--border);
+  }
+  .stat-cell {
+    padding:16px 20px;
+    border-right:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+  }
+  .stat-cell:nth-child(2n) { border-right:none; }
+  .stat-cell:nth-last-child(-n+2) { border-bottom:none; }
+  .stat-label {
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .stat-value {
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:4px;
+  }
+  .stat-sub {
+    font-size:11px;
+    color:var(--muted);
+  }
+  .stat-bar-wrap {
+    height:4px;
+    background:var(--border);
+    border-radius:99px;
+    margin-top:6px;
+    overflow:hidden;
+  }
+  .stat-bar {
+    height:100%;
+    border-radius:99px;
+    transition:width 0.5s ease;
+  }
+
+  /* green/yellow/red value colors */
+  .v-green { color:var(--green); }
+  .v-gold  { color:var(--gold); }
+  .v-red   { color:var(--flop-light); }
+
+  /* verdict hint */
+  .verdict-hint {
+    padding:14px 20px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .hint-icon { font-size:18px; flex-shrink:0; margin-top:2px; }
+  .hint-text {
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.6;
+  }
+
+  /* ── CHOICE BUTTONS ── */
+  .choice-row {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:20px;
+  }
+  .choice-btn {
+    border:2px solid;
+    border-radius:var(--radius);
+    padding:20px 16px;
+    font-family:'Righteous', cursive;
+    font-size:20px;
+    letter-spacing:1px;
+    cursor:pointer;
+    transition:all 0.2s ease;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    position:relative;
+    overflow:hidden;
+  }
+  .choice-btn::after {
+    content:'';
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity 0.2s;
+  }
+  .choice-btn:hover:not(:disabled)::after { opacity:1; }
+  .choice-btn:hover:not(:disabled) { transform:translateY(-3px); }
+  .choice-btn:disabled { cursor:default; opacity:0.5; }
+
+  .ship-btn {
+    background:var(--ship-dim);
+    border-color:var(--ship);
+    color:var(--ship-light);
+  }
+  .ship-btn::after { background:radial-gradient(circle, rgba(124,58,237,0.2), transparent); }
+  .ship-btn:hover:not(:disabled) { box-shadow:0 0 28px rgba(124,58,237,0.4); }
+
+  .flop-btn {
+    background:var(--flop-dim);
+    border-color:var(--flop);
+    color:var(--flop-light);
+  }
+  .flop-btn::after { background:radial-gradient(circle, rgba(220,38,38,0.2), transparent); }
+  .flop-btn:hover:not(:disabled) { box-shadow:0 0 28px rgba(220,38,38,0.4); }
+
+  .btn-sub { font-size:10px; letter-spacing:1px; font-family:'Space Grotesk',sans-serif; font-weight:500; color:inherit; opacity:0.7; }
+
+  .choice-btn.correct-pick { opacity:1 !important; animation:correctBounce 0.5s ease; }
+  .choice-btn.wrong-pick   { opacity:1 !important; animation:wrongShake 0.4s ease; }
+  .ship-btn.correct-pick { box-shadow:0 0 32px rgba(124,58,237,0.6); }
+  .flop-btn.correct-pick { box-shadow:0 0 32px rgba(220,38,38,0.6); }
+  @keyframes correctBounce {
+    0%,100%{transform:scale(1)}
+    50%    {transform:scale(1.06)}
+  }
+  @keyframes wrongShake {
+    0%,100%{transform:translateX(0)}
+    25%    {transform:translateX(-8px)}
+    75%    {transform:translateX(8px)}
+  }
+
+  /* ── EXPLANATION ── */
+  .explanation {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:16px;
+    display:none;
+    animation:fadeUp 0.3s ease both;
+  }
+  .explanation.show { display:block; }
+
+  .exp-top {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  .verdict-pill {
+    font-family:'Righteous', cursive;
+    font-size:14px;
+    letter-spacing:1px;
+    padding:5px 14px;
+    border-radius:99px;
+  }
+  .vp-ship { background:var(--ship-dim); color:var(--ship-light); border:1px solid var(--ship); }
+  .vp-flop { background:var(--flop-dim); color:var(--flop-light); border:1px solid var(--flop); }
+  .result-tag {
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  .rt-right { color:var(--green); }
+  .rt-wrong { color:var(--flop-light); }
+
+  .exp-profit-row {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .epr-cell {
+    background:var(--surface2);
+    border-radius:8px;
+    padding:10px 12px;
+    text-align:center;
+  }
+  .epr-label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+  .epr-value { font-size:18px; font-weight:700; }
+
+  .exp-body {
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.65;
+    margin-bottom:10px;
+  }
+  .rule-box {
+    background:linear-gradient(135deg, rgba(124,58,237,0.1), rgba(245,158,11,0.05));
+    border:1px solid rgba(124,58,237,0.3);
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:12px;
+    line-height:1.6;
+    color:var(--text);
+  }
+  .rule-box strong { color:var(--ship-light); }
+
+  .next-btn {
+    width:100%;
+    padding:16px;
+    background:var(--surface2);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    font-family:'Righteous', cursive;
+    font-size:18px;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:all 0.2s;
+    display:none;
+  }
+  .next-btn.show { display:block; }
+  .next-btn:hover { background:var(--border); transform:translateY(-2px); }
+
+  /* ── START / END ── */
+  .start-screen, .end-screen {
+    text-align:center;
+    animation:fadeUp 0.5s ease both;
+  }
+  .start-screen h2 {
+    font-family:'Righteous', cursive;
+    font-size:28px;
+    margin-bottom:12px;
+  }
+  .start-screen p {
+    color:var(--muted);
+    font-size:14px;
+    max-width:440px;
+    margin:0 auto 24px;
+    line-height:1.7;
+  }
+  .criteria-grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin:0 0 28px;
+    text-align:left;
+  }
+  .crit-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px;
+  }
+  .crit-title {
+    font-weight:700;
+    font-size:13px;
+    margin-bottom:4px;
+  }
+  .crit-body { font-size:12px; color:var(--muted); line-height:1.5; }
+
+  .start-btn {
+    padding:16px 48px;
+    background:var(--ship);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius);
+    font-family:'Righteous', cursive;
+    font-size:20px;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .start-btn:hover { background:var(--ship-light); color:#000; transform:translateY(-2px); box-shadow:0 8px 24px rgba(124,58,237,0.4); }
+
+  /* end */
+  .end-emoji { font-size:72px; margin:20px 0 8px; }
+  .end-title {
+    font-family:'Righteous', cursive;
+    font-size:32px;
+    margin-bottom:8px;
+  }
+  .end-score {
+    font-family:'Righteous', cursive;
+    font-size:64px;
+    color:var(--gold);
+    line-height:1;
+    margin:16px 0 8px;
+  }
+  .end-msg {
+    color:var(--muted);
+    font-size:14px;
+    max-width:440px;
+    margin:0 auto 24px;
+    line-height:1.7;
+  }
+  .rules-recap {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    text-align:left;
+    margin:0 0 24px;
+  }
+  .rules-recap h3 {
+    font-size:12px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--ship-light);
+    margin-bottom:14px;
+  }
+  .rule-line {
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:10px;
+    line-height:1.5;
+  }
+  .rule-line:last-child { margin-bottom:0; }
+  .rule-icon { flex-shrink:0; font-size:16px; }
+  .replay-btn {
+    padding:14px 40px;
+    background:transparent;
+    color:var(--ship-light);
+    border:2px solid var(--ship);
+    border-radius:var(--radius);
+    font-family:'Righteous', cursive;
+    font-size:18px;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .replay-btn:hover { background:var(--ship); color:#fff; transform:translateY(-2px); }
+
+  @keyframes fadeDown {
+    from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)}
+  }
+  @keyframes fadeUp {
+    from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)}
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="game-header">
+    <div class="eyebrow">Money Hacks · NMT Summer STEM · Wednesday</div>
+    <h1><span class="ship-word">DROPSHIP</span><br>OR <span class="flop-word">FLOP?</span></h1>
+    <p>You're a dropshipping entrepreneur. 10 products land on your desk. Which ones print money — and which ones sink your store?</p>
+  </div>
+
+  <!-- START -->
+  <div id="start-screen" class="start-screen">
+    <h2>Know What Makes a Winner</h2>
+    <p>Dropshipping = selling products online without holding inventory. You list it, someone buys it, your supplier ships it. Sounds easy — but most products fail. Can you spot the winners?</p>
+    <div class="criteria-grid">
+      <div class="crit-card">
+        <div class="crit-title">💰 Profit Margin</div>
+        <div class="crit-body">You need at least 30% margin to cover ads, returns, and fees. Under 20% and you're working for free — or losing money.</div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">🚚 Shipping Time</div>
+        <div class="crit-body">Customers expect fast delivery. Products shipping from China in 3-6 weeks will kill your reviews. Under 2 weeks is the target.</div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">🏪 Competition</div>
+        <div class="crit-body">If Amazon already sells it cheap, you can't compete. Look for products that are hard to find in stores but have real demand online.</div>
+      </div>
+      <div class="crit-card">
+        <div class="crit-title">🎯 Ad Potential</div>
+        <div class="crit-body">Can you show this product in a 15-second video that makes people stop scrolling? Visual, demonstrable products sell on social media. Boring ones don't.</div>
+      </div>
+    </div>
+    <button class="start-btn" onclick="startGame()">OPEN THE STORE →</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="game-screen" style="display:none;">
+    <div class="hud">
+      <div class="hud-cell round"><div class="hud-label">Product</div><div class="hud-value" id="hud-round">1/10</div></div>
+      <div class="hud-cell score"><div class="hud-label">Score</div><div class="hud-value" id="hud-score">0</div></div>
+      <div class="hud-cell hits"><div class="hud-label">Ships ✓</div><div class="hud-value" id="hud-hits">0</div></div>
+      <div class="hud-cell misses"><div class="hud-label">Flops ✗</div><div class="hud-value" id="hud-misses">0</div></div>
+    </div>
+
+    <div class="dots-row" id="dots-row"></div>
+
+    <div class="product-card" id="product-card">
+      <div class="product-header">
+        <div class="product-emoji" id="prod-emoji">📦</div>
+        <div class="product-info">
+          <div class="product-category" id="prod-cat">Category</div>
+          <div class="product-name" id="prod-name">Product Name</div>
+          <div class="product-tagline" id="prod-tagline">Description</div>
+        </div>
+        <div class="card-num" id="prod-num">1/10</div>
+      </div>
+
+      <div class="stats-grid" id="stats-grid"></div>
+
+      <div class="verdict-hint">
+        <div class="hint-icon">🤔</div>
+        <div class="hint-text" id="hint-text"></div>
+      </div>
+    </div>
+
+    <div class="choice-row">
+      <button class="choice-btn ship-btn" id="ship-btn" onclick="choose('ship')">
+        🚀 DROPSHIP IT
+        <span class="btn-sub">This product prints money</span>
+      </button>
+      <button class="choice-btn flop-btn" id="flop-btn" onclick="choose('flop')">
+        💀 TOTAL FLOP
+        <span class="btn-sub">Pass on this one</span>
+      </button>
+    </div>
+
+    <div class="explanation" id="explanation">
+      <div class="exp-top">
+        <span class="verdict-pill" id="verdict-pill">DROPSHIP</span>
+        <span class="result-tag" id="result-tag">✓ CORRECT</span>
+      </div>
+      <div class="exp-profit-row" id="exp-profit-row"></div>
+      <div class="exp-body" id="exp-body"></div>
+      <div class="rule-box" id="rule-box"></div>
+    </div>
+
+    <button class="next-btn" id="next-btn" onclick="nextProduct()">NEXT PRODUCT →</button>
+  </div>
+
+  <!-- END -->
+  <div id="end-screen" class="end-screen" style="display:none;">
+    <div class="end-emoji" id="end-emoji">🏆</div>
+    <div class="end-title" id="end-title">Store Mogul!</div>
+    <div class="end-score" id="end-score">8/10</div>
+    <p class="end-msg" id="end-msg"></p>
+    <div class="rules-recap">
+      <h3>🎓 The 4 Golden Rules of Dropshipping</h3>
+      <div class="rule-line"><span class="rule-icon">💰</span><span>Aim for <strong>30%+ profit margin</strong> minimum. Less than that and fees, ads, and returns will eat you alive.</span></div>
+      <div class="rule-line"><span class="rule-icon">🚚</span><span><strong>Shipping under 2 weeks</strong> is critical. Long shipping = bad reviews = dead store.</span></div>
+      <div class="rule-line"><span class="rule-icon">🏪</span><span>Avoid anything <strong>Amazon dominates</strong>. You'll lose on price every single time.</span></div>
+      <div class="rule-line"><span class="rule-icon">🎯</span><span>The best products are <strong>visually demonstrable</strong> — something you can show off in a 15-second video that makes people think "I need that."</span></div>
+    </div>
+    <button class="replay-btn" onclick="resetGame()">RESTOCK THE STORE</button>
+  </div>
+
+</div>
+
+<script>
+const PRODUCTS = [
+  {
+    emoji: '🌡️',
+    category: 'Health & Wellness',
+    name: 'Infrared Ear Thermometer',
+    tagline: 'One-second readings. Used by parents worldwide.',
+    verdict: 'ship',
+    stats: [
+      { label:'Supplier Cost', value:'$8', sub:'from AliExpress', color:'v-green', bar:20, barColor:'#10b981' },
+      { label:'Your Sell Price', value:'$34.99', sub:'average on Shopify', color:'v-gold', bar:70, barColor:'#f59e0b' },
+      { label:'Profit Margin', value:'77%', sub:'after shipping', color:'v-green', bar:77, barColor:'#10b981' },
+      { label:'Shipping Time', value:'12 days', sub:'tracked, ePacket', color:'v-gold', bar:55, barColor:'#f59e0b' },
+    ],
+    hint: 'Parents panic-buy thermometers. Demand spikes every flu season. Almost impossible to find this exact type at CVS or Walmart.',
+    expProfitRow: [
+      { label:'Buy For', value:'$8', color:'v-green' },
+      { label:'Sell For', value:'$34.99', color:'v-gold' },
+      { label:'Profit/Sale', value:'~$19', color:'v-green' },
+    ],
+    expBody: 'This is a textbook winner. High margin, problem-solving product, proven demand (parents always need thermometers), not easily found locally, and it ships in under 2 weeks. The emotional trigger is strong — parents will pay a premium to know their child\'s temperature in seconds.',
+    rule: '<strong>Winner Pattern:</strong> Solves a real, emotionally charged problem. Not easily found locally. Demonstrable in a short video. 70%+ gross margin covers ad spend comfortably.',
+  },
+  {
+    emoji: '👕',
+    category: 'Fashion / Apparel',
+    name: 'Generic White T-Shirts (Pack of 3)',
+    tagline: 'Basic cotton tees. 500+ sellers on Amazon already.',
+    verdict: 'flop',
+    stats: [
+      { label:'Supplier Cost', value:'$6', sub:'per 3-pack', color:'v-green', bar:15, barColor:'#10b981' },
+      { label:'Your Sell Price', value:'$14.99', sub:'competing with Amazon', color:'v-red', bar:30, barColor:'#dc2626' },
+      { label:'Profit Margin', value:'18%', sub:'before ad costs', color:'v-red', bar:18, barColor:'#dc2626' },
+      { label:'Shipping Time', value:'4-6 weeks', sub:'from overseas', color:'v-red', bar:90, barColor:'#dc2626' },
+    ],
+    hint: 'Amazon sells this exact product. For less. With 2-day shipping. And millions of reviews. Why would anyone buy yours?',
+    expProfitRow: [
+      { label:'Buy For', value:'$6', color:'v-green' },
+      { label:'Sell For', value:'$14.99', color:'v-red' },
+      { label:'After Ads...', value:'~$0', color:'v-red' },
+    ],
+    expBody: 'Three fatal problems: 18% margin is too thin (ads alone will eat it), shipping takes 4-6 weeks (instant bad reviews), and Amazon already dominates this product at a lower price. You\'d spend $2 on ads to make $2 in profit. This is how people lose money dropshipping.',
+    rule: '<strong>Flop Pattern:</strong> Commodity product Amazon dominates + razor-thin margins + slow shipping = guaranteed failure. Never compete on commodity products.',
+  },
+  {
+    emoji: '🐾',
+    category: 'Pet Products',
+    name: 'Self-Cleaning Cat Litter Box',
+    tagline: 'Automatic sensor scoops waste 20 min after use. No smell, no effort.',
+    verdict: 'ship',
+    stats: [
+      { label:'Supplier Cost', value:'$38', sub:'premium product', color:'v-gold', bar:35, barColor:'#f59e0b' },
+      { label:'Your Sell Price', value:'$119', sub:'seen it at $150 on TikTok', color:'v-green', bar:75, barColor:'#10b981' },
+      { label:'Profit Margin', value:'62%', sub:'after fees', color:'v-green', bar:62, barColor:'#10b981' },
+      { label:'Shipping Time', value:'10 days', sub:'tracked', color:'v-green', bar:40, barColor:'#10b981' },
+    ],
+    hint: 'Pet owners spend MORE on pets than on themselves. This product demos INCREDIBLY well on TikTok — you can literally show the cat using it and people go crazy.',
+    expProfitRow: [
+      { label:'Buy For', value:'$38', color:'v-gold' },
+      { label:'Sell For', value:'$119', color:'v-green' },
+      { label:'Profit/Sale', value:'~$62', color:'v-green' },
+    ],
+    expBody: 'The pet niche is gold for dropshipping. Pet owners are emotionally invested and spend freely. This product has a strong "wow factor" — you can demo it in 15 seconds on TikTok and people immediately understand the value. High ticket + high margin + viral potential = winner.',
+    rule: '<strong>Winner Pattern:</strong> Pet products + emotional buyers + "wow factor" demo + high ticket price. $62 profit per sale means you can spend $20-30 on ads and still make money.',
+  },
+  {
+    emoji: '⌚',
+    category: 'Electronics',
+    name: 'Knockoff "Designer" Smartwatch',
+    tagline: 'Looks like an Apple Watch. Costs $12 to make. Sold as "luxury."',
+    verdict: 'flop',
+    stats: [
+      { label:'Supplier Cost', value:'$12', sub:'feels cheap in hand', color:'v-green', bar:20, barColor:'#10b981' },
+      { label:'Your Sell Price', value:'$49', sub:'misleading photos used', color:'v-gold', bar:50, barColor:'#f59e0b' },
+      { label:'Return Rate', value:'35%+', sub:'when customers see real product', color:'v-red', bar:90, barColor:'#dc2626' },
+      { label:'Legal Risk', value:'HIGH', sub:'trademark/IP issues', color:'v-red', bar:95, barColor:'#dc2626' },
+    ],
+    hint: 'Margins look good on paper. But what happens when 35% of customers ask for refunds — and you might get a trademark lawsuit from Apple?',
+    expProfitRow: [
+      { label:'Gross Profit', value:'$37', color:'v-gold' },
+      { label:'After Returns', value:'~$18', color:'v-red' },
+      { label:'After Legal?', value:'💀', color:'v-red' },
+    ],
+    expBody: 'Selling knockoffs that mimic branded products is a legal minefield. Apple, Samsung, and other brands actively pursue IP violators. Beyond the legal risk: high return rates destroy margins when customers receive a $12 product they paid $49 for. Chargebacks, PayPal disputes, and account bans follow. Not worth it.',
+    rule: '<strong>Flop Pattern:</strong> Misleading marketing + high return rates + IP/trademark risk = store gets shut down. Always sell what you actually ship. Never mislead customers.',
+  },
+  {
+    emoji: '💆',
+    category: 'Wellness',
+    name: 'Portable Massage Gun (Mini)',
+    tagline: 'Pocket-sized percussive massager. 4 heads, 3 speeds. 2,000+ 5-star reviews.',
+    verdict: 'ship',
+    stats: [
+      { label:'Supplier Cost', value:'$22', sub:'includes charger + heads', color:'v-green', bar:30, barColor:'#10b981' },
+      { label:'Your Sell Price', value:'$79', sub:'priced below Theragun', color:'v-green', bar:60, barColor:'#10b981' },
+      { label:'Profit Margin', value:'56%', sub:'after shipping + fees', color:'v-green', bar:56, barColor:'#10b981' },
+      { label:'Shipping Time', value:'8 days', sub:'ePacket from China', color:'v-green', bar:32, barColor:'#10b981' },
+    ],
+    hint: 'Theragun sells for $299. Yours is $79. Same concept, 75% cheaper. Athletes, office workers, and everyone else wants this. And you can demo it in a video in 10 seconds.',
+    expProfitRow: [
+      { label:'Buy For', value:'$22', color:'v-green' },
+      { label:'Sell For', value:'$79', color:'v-green' },
+      { label:'Profit/Sale', value:'~$43', color:'v-green' },
+    ],
+    expBody: 'This is a dream dropshipping product. There\'s an established expensive brand (Theragun at $299) creating demand and awareness — you\'re offering the budget alternative at $79. The product demos visually in seconds, appeals to a huge audience (anyone with muscle pain), and ships fast. Classic winner.',
+    rule: '<strong>Winner Pattern:</strong> Affordable alternative to a famous expensive brand. Huge market (everyone has muscle pain). Visual demo. This is called "riding brand awareness" — Theragun does your marketing for you.',
+  },
+  {
+    emoji: '🕯️',
+    category: 'Home Decor',
+    name: 'Scented Candles (Basic Vanilla)',
+    tagline: 'Plain jar candles. No branding. Generic scents.',
+    verdict: 'flop',
+    stats: [
+      { label:'Supplier Cost', value:'$4', sub:'bulk from warehouse', color:'v-green', bar:15, barColor:'#10b981' },
+      { label:'Your Sell Price', value:'$16', sub:'vs. $8 at Target', color:'v-red', bar:35, barColor:'#dc2626' },
+      { label:'Profit Margin', value:'50%', sub:'sounds good...', color:'v-gold', bar:50, barColor:'#f59e0b' },
+      { label:'Ad Challenge', value:'Very Hard', sub:'can\'t demo the smell online', color:'v-red', bar:85, barColor:'#dc2626' },
+    ],
+    hint: 'Candles need branding to sell at a premium. Generic candles are everywhere at Target, TJ Maxx, and Amazon for cheaper. Also — how do you advertise a smell on a screen?',
+    expProfitRow: [
+      { label:'Gross Margin', value:'50%', color:'v-gold' },
+      { label:'After Ads', value:'~15%', color:'v-red' },
+      { label:'vs. Target?', value:'Losing', color:'v-red' },
+    ],
+    expBody: 'Candles need a brand story to sell at premium prices. Generic candles compete directly with Target, HomeGoods, and Amazon at $6-8 — you\'re selling for $16. The fatal flaw: you can\'t advertise scent online. Candle videos are boring. Conversion rates are terrible without a strong brand identity. This could work as a private label brand — not as a generic dropship product.',
+    rule: '<strong>Flop Pattern:</strong> Candles and similar sensory products need branding + storytelling to command premium prices online. Generic = race to the bottom on price.',
+  },
+  {
+    emoji: '💡',
+    category: 'Smart Home',
+    name: 'LED Strip Lights (Room Ambiance)',
+    tagline: 'Color-changing LED strips. App-controlled. Goes viral on room makeover TikToks.',
+    verdict: 'ship',
+    stats: [
+      { label:'Supplier Cost', value:'$7', sub:'5M strip with controller', color:'v-green', bar:18, barColor:'#10b981' },
+      { label:'Your Sell Price', value:'$29.99', sub:'bundle deal available', color:'v-green', bar:55, barColor:'#10b981' },
+      { label:'Profit Margin', value:'65%', sub:'after platform fees', color:'v-green', bar:65, barColor:'#10b981' },
+      { label:'Viral Potential', value:'🔥 HUGE', sub:'every room makeover uses them', color:'v-green', bar:90, barColor:'#10b981' },
+    ],
+    hint: 'Open TikTok. Search "room makeover." What\'s in literally every single video? These lights. Organic viral potential means you spend less on paid ads.',
+    expProfitRow: [
+      { label:'Buy For', value:'$7', color:'v-green' },
+      { label:'Sell For', value:'$29.99', color:'v-green' },
+      { label:'Profit/Sale', value:'~$18', color:'v-green' },
+    ],
+    expBody: 'LED strip lights are a proven dropshipping product with enormous TikTok organic reach. Every room makeover, gaming setup, and "apartment transformation" video features them. This creates free advertising through content creators. The product is visually stunning, cheap to source, easy to ship, and has been a top dropshipping product for years.',
+    rule: '<strong>Winner Pattern:</strong> Already going viral organically = free marketing. When a product appears in trending content naturally, your paid ad costs drop dramatically. Ride the wave.',
+  },
+  {
+    emoji: '🏋️',
+    category: 'Fitness',
+    name: 'Resistance Bands Set',
+    tagline: 'Basic rubber bands, 5 resistance levels. Saturated market.',
+    verdict: 'flop',
+    stats: [
+      { label:'Supplier Cost', value:'$5', sub:'set of 5 bands', color:'v-green', bar:12, barColor:'#10b981' },
+      { label:'Your Sell Price', value:'$19.99', sub:'Amazon sells same for $12.99', color:'v-red', bar:40, barColor:'#dc2626' },
+      { label:'Market Saturation', value:'Extreme', sub:'10,000+ sellers', color:'v-red', bar:95, barColor:'#dc2626' },
+      { label:'Differentiation', value:'Zero', sub:'identical to every competitor', color:'v-red', bar:95, barColor:'#dc2626' },
+    ],
+    hint: 'During COVID this product was gold. In 2024? Amazon has 10,000 listings for under $13. What makes YOUR listing special?',
+    expProfitRow: [
+      { label:'Your Price', value:'$19.99', color:'v-gold' },
+      { label:'Amazon Price', value:'$12.99', color:'v-red' },
+      { label:'Your Edge', value:'None', color:'v-red' },
+    ],
+    expBody: 'Resistance bands were a COVID dropshipping goldmine in 2020. By 2024, the market is completely saturated. Amazon has thousands of listings cheaper than what you\'d sell for. There\'s zero way to differentiate a rubber band. Unless you have a unique angle (fitness influencer, specific program), generic resistance bands are a guaranteed money-loser.',
+    rule: '<strong>Flop Pattern:</strong> Trendy products attract thousands of dropshippers who saturate the market and kill margins. Timing matters. Research Google Trends before committing — if a product peaked 3 years ago, you\'re too late.',
+  },
+  {
+    emoji: '🧴',
+    category: 'Beauty / Skincare',
+    name: '24K Gold Face Serum',
+    tagline: '"Luxury" skincare with gold flakes. Dramatic before/after transformations on TikTok.',
+    verdict: 'ship',
+    stats: [
+      { label:'Supplier Cost', value:'$11', sub:'looks premium, beautiful packaging', color:'v-green', bar:22, barColor:'#10b981' },
+      { label:'Your Sell Price', value:'$54.99', sub:'beauty products command premium', color:'v-green', bar:70, barColor:'#10b981' },
+      { label:'Profit Margin', value:'70%', sub:'after shipping + fees', color:'v-green', bar:70, barColor:'#10b981' },
+      { label:'Content Potential', value:'Massive', sub:'before/after videos perform', color:'v-green', bar:85, barColor:'#10b981' },
+    ],
+    hint: 'Beauty is the #1 dropshipping niche. People pay $50+ for "luxury" skincare they could get at CVS for $8 if the branding is right. Does the packaging look $55 worth?',
+    expProfitRow: [
+      { label:'Buy For', value:'$11', color:'v-green' },
+      { label:'Sell For', value:'$54.99', color:'v-green' },
+      { label:'Profit/Sale', value:'~$37', color:'v-green' },
+    ],
+    expBody: 'Beauty and skincare is the most reliable dropshipping niche because: (1) customers can\'t easily compare you to other brands, (2) "luxury" perception drives premium pricing, (3) before/after content converts incredibly well on TikTok and Instagram. The gold angle creates instant perceived premium value. Strong winner IF you build a consistent brand around it.',
+    rule: '<strong>Winner Pattern:</strong> Beauty = perception of luxury + transformation narrative + social proof. People buy results and feelings, not ingredients. A beautiful bottle sells skincare, not the formula.',
+  },
+  {
+    emoji: '📦',
+    category: 'General',
+    name: 'Posture Corrector Brace',
+    tagline: 'Adjustable back brace. Targets office workers with back pain.',
+    verdict: 'ship',
+    stats: [
+      { label:'Supplier Cost', value:'$6', sub:'adjustable, fits most sizes', color:'v-green', bar:15, barColor:'#10b981' },
+      { label:'Your Sell Price', value:'$35.99', sub:'targets pain points literally', color:'v-green', bar:60, barColor:'#10b981' },
+      { label:'Profit Margin', value:'72%', sub:'after all fees', color:'v-green', bar:72, barColor:'#10b981' },
+      { label:'Target Audience', value:'Huge', sub:'back pain affects 80% of adults', color:'v-green', bar:80, barColor:'#10b981' },
+    ],
+    hint: '80% of Americans experience back pain at some point. This product solves a REAL problem people desperately want solved. Pain = the best marketing.',
+    expProfitRow: [
+      { label:'Buy For', value:'$6', color:'v-green' },
+      { label:'Sell For', value:'$35.99', color:'v-green' },
+      { label:'Profit/Sale', value:'~$24', color:'v-green' },
+    ],
+    expBody: 'Pain-solving products are among the most reliable dropshipping winners. When someone has back pain, they\'ll try ANYTHING. The market is massive (80% of adults), the product is cheap to source, demos visually in video, and the "before/after posture" content performs strongly on social media. This is a classic problem-solution product that consistently converts.',
+    rule: '<strong>Winner Pattern:</strong> Solve a PAINFUL problem for a LARGE audience at a LOW price point with HIGH perceived value. Pain-solving products command premium prices because people prioritize relief over cost.',
+  },
+];
+
+let current = 0;
+let score = 0;
+let hits = 0;
+let misses = 0;
+let answered = false;
+let products = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildDots() {
+  const row = document.getElementById('dots-row');
+  row.innerHTML = '';
+  products.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0?' cur':'');
+    d.id = `dot-${i}`;
+    row.appendChild(d);
+  });
+}
+
+function startGame() {
+  products = shuffle(PRODUCTS);
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  buildDots();
+  renderProduct();
+}
+
+function renderProduct() {
+  answered = false;
+  const p = products[current];
+
+  document.getElementById('prod-emoji').textContent  = p.emoji;
+  document.getElementById('prod-cat').textContent    = p.category;
+  document.getElementById('prod-name').textContent   = p.name;
+  document.getElementById('prod-tagline').textContent= p.tagline;
+  document.getElementById('prod-num').textContent    = `${current+1}/${products.length}`;
+  document.getElementById('hud-round').textContent   = `${current+1}/${products.length}`;
+  document.getElementById('hud-score').textContent   = score;
+  document.getElementById('hud-hits').textContent    = hits;
+  document.getElementById('hud-misses').textContent  = misses;
+  document.getElementById('hint-text').textContent   = p.hint;
+
+  // stats
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = '';
+  p.stats.forEach(s => {
+    const cell = document.createElement('div');
+    cell.className = 'stat-cell';
+    cell.innerHTML = `
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value ${s.color}">${s.value}</div>
+      <div class="stat-sub">${s.sub}</div>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:${s.bar}%;background:${s.barColor}"></div></div>
+    `;
+    grid.appendChild(cell);
+  });
+
+  // reset btns
+  const shipBtn = document.getElementById('ship-btn');
+  const flopBtn = document.getElementById('flop-btn');
+  shipBtn.disabled = false; flopBtn.disabled = false;
+  shipBtn.className = 'choice-btn ship-btn';
+  flopBtn.className = 'choice-btn flop-btn';
+
+  // reset explanation
+  document.getElementById('explanation').className = 'explanation';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  // animate card
+  const card = document.getElementById('product-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'cardSlide 0.4s cubic-bezier(.34,1.56,.64,1) both';
+
+  // dots
+  document.querySelectorAll('.dot').forEach((d,i) => {
+    if (i < current) return;
+    d.className = 'dot' + (i===current?' cur':'');
+  });
+}
+
+function choose(pick) {
+  if (answered) return;
+  answered = true;
+  const p = products[current];
+  const isCorrect = pick === p.verdict;
+
+  if (isCorrect) { score++; hits++; }
+  else misses++;
+
+  document.getElementById('hud-score').textContent  = score;
+  document.getElementById('hud-hits').textContent   = hits;
+  document.getElementById('hud-misses').textContent = misses;
+
+  const shipBtn = document.getElementById('ship-btn');
+  const flopBtn = document.getElementById('flop-btn');
+  shipBtn.disabled = true; flopBtn.disabled = true;
+
+  if (pick === 'ship') {
+    shipBtn.classList.add(isCorrect ? 'correct-pick' : 'wrong-pick');
+    if (!isCorrect) flopBtn.classList.add('correct-pick');
+  } else {
+    flopBtn.classList.add(isCorrect ? 'correct-pick' : 'wrong-pick');
+    if (!isCorrect) shipBtn.classList.add('correct-pick');
+  }
+
+  // dot
+  const dot = document.getElementById(`dot-${current}`);
+  if (dot) dot.className = `dot ${isCorrect ? 'ship' : 'flop'}`;
+
+  // explanation
+  const exp = document.getElementById('explanation');
+  exp.className = 'explanation show';
+
+  const pill = document.getElementById('verdict-pill');
+  pill.className = `verdict-pill vp-${p.verdict}`;
+  pill.textContent = p.verdict === 'ship' ? '🚀 DROPSHIP IT' : '💀 TOTAL FLOP';
+
+  const tag = document.getElementById('result-tag');
+  tag.className = `result-tag ${isCorrect ? 'rt-right' : 'rt-wrong'}`;
+  tag.textContent = isCorrect ? '✓ CORRECT' : '✗ WRONG CALL';
+
+  const pr = document.getElementById('exp-profit-row');
+  pr.innerHTML = p.expProfitRow.map(r =>
+    `<div class="epr-cell"><div class="epr-label">${r.label}</div><div class="epr-value ${r.color}">${r.value}</div></div>`
+  ).join('');
+
+  document.getElementById('exp-body').textContent = p.expBody;
+  document.getElementById('rule-box').innerHTML   = p.rule;
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.className = 'next-btn show';
+  nextBtn.textContent = current+1 >= products.length ? 'SEE RESULTS →' : 'NEXT PRODUCT →';
+}
+
+function nextProduct() {
+  current++;
+  if (current >= products.length) showEnd();
+  else renderProduct();
+}
+
+function showEnd() {
+  document.getElementById('game-screen').style.display = 'none';
+  const end = document.getElementById('end-screen');
+  end.style.display = 'block';
+
+  const total = products.length;
+  const pct = score / total;
+
+  let emoji, title, msg;
+  if (pct >= 0.9) {
+    emoji='🏆'; title='Store Mogul!';
+    msg=`${score}/${total} correct. You have a sharp eye for dropshipping winners. You understand margins, market saturation, and what sells online. Start your store.`;
+  } else if (pct >= 0.7) {
+    emoji='🚀'; title='Solid Merchant';
+    msg=`${score}/${total} — you got the fundamentals right. A few tricky ones caught you. Keep studying margin math and market saturation before you spend on ads.`;
+  } else if (pct >= 0.5) {
+    emoji='🛒'; title='Learning the Ropes';
+    msg=`${score}/${total} — dropshipping is harder than it looks! The key traps got you: thin margins, Amazon competition, and saturated markets. Review the golden rules.`;
+  } else {
+    emoji='📦'; title='Costly Mistakes';
+    msg=`${score}/${total} — the market would have taught you these lessons with real money. Good thing you played the game first! Study the 4 golden rules before launching any store.`;
+  }
+
+  document.getElementById('end-emoji').textContent = emoji;
+  document.getElementById('end-title').textContent = title;
+  document.getElementById('end-score').textContent = `${score}/${total}`;
+  document.getElementById('end-msg').textContent   = msg;
+}
+
+function resetGame() {
+  current=0; score=0; hits=0; misses=0; answered=false;
+  products = shuffle(PRODUCTS);
+  document.getElementById('end-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  buildDots();
+  renderProduct();
+}
+</script>
+</body>
+</html>

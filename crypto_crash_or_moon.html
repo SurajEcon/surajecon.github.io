@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crash or Moon? — Money Hacks</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Oxanium:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #080b14;
+    --surface:   #0d1221;
+    --surface2:  #111827;
+    --border:    #1e2d45;
+    --moon:      #f7c948;
+    --moon-dim:  #3a2e00;
+    --moon-glow: rgba(247,201,72,0.25);
+    --crash:     #ef4444;
+    --crash-dim: #2a0a0a;
+    --crash-glow:rgba(239,68,68,0.25);
+    --cyan:      #22d3ee;
+    --cyan-dim:  #0a2a30;
+    --green:     #10b981;
+    --muted:     #4b5563;
+    --text:      #e2e8f0;
+    --radius:    10px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Oxanium', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* star field */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 25%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 85%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 90%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(2px 2px at 65% 10%, rgba(247,201,72,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 5% 50%,  rgba(34,211,238,0.3) 0%, transparent 100%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .wrapper {
+    position:relative;
+    z-index:1;
+    max-width:760px;
+    margin:0 auto;
+    padding:24px 16px 80px;
+  }
+
+  /* ── HEADER ── */
+  .game-header {
+    text-align:center;
+    margin-bottom:24px;
+    animation: fadeDown 0.5s ease both;
+  }
+  .eyebrow {
+    font-family:'Share Tech Mono', monospace;
+    font-size:11px;
+    letter-spacing:3px;
+    color:var(--cyan);
+    margin-bottom:10px;
+  }
+  .game-header h1 {
+    font-size:clamp(36px,8vw,72px);
+    font-weight:800;
+    line-height:1;
+    margin-bottom:6px;
+  }
+  .crash-word { color:var(--crash); text-shadow:0 0 20px var(--crash-glow); }
+  .moon-word  { color:var(--moon);  text-shadow:0 0 20px var(--moon-glow); }
+  .game-header p {
+    font-size:13px;
+    color:var(--muted);
+    font-weight:400;
+    max-width:460px;
+    margin:0 auto;
+    line-height:1.6;
+    font-family:'Share Tech Mono', monospace;
+  }
+
+  /* ── HUD ── */
+  .hud {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .hud-cell {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:10px 8px;
+    text-align:center;
+  }
+  .hud-label {
+    font-family:'Share Tech Mono', monospace;
+    font-size:9px;
+    letter-spacing:2px;
+    color:var(--muted);
+    margin-bottom:4px;
+    text-transform:uppercase;
+  }
+  .hud-value {
+    font-size:22px;
+    font-weight:700;
+  }
+  .hud-cell.round-c  .hud-value { color:var(--cyan); }
+  .hud-cell.score-c  .hud-value { color:var(--moon); }
+  .hud-cell.moon-c   .hud-value { color:var(--moon); }
+  .hud-cell.crash-c  .hud-value { color:var(--crash); }
+
+  /* ── COIN TABS ── */
+  .coin-tabs {
+    display:flex;
+    gap:8px;
+    margin-bottom:16px;
+    overflow-x:auto;
+    padding-bottom:4px;
+  }
+  .coin-tab {
+    flex-shrink:0;
+    padding:7px 14px;
+    border-radius:99px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    font-family:'Share Tech Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .coin-tab.active {
+    border-color:var(--cyan);
+    color:var(--cyan);
+    background:var(--cyan-dim);
+  }
+  .coin-tab .tab-change {
+    font-size:10px;
+    margin-left:4px;
+  }
+  .tab-up   { color:var(--green); }
+  .tab-down { color:var(--crash); }
+
+  /* ── CHART CARD ── */
+  .chart-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    margin-bottom:16px;
+    animation:cardIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes cardIn {
+    from{opacity:0;transform:scale(0.95) translateY(16px)}
+    to  {opacity:1;transform:scale(1)    translateY(0)}
+  }
+
+  .chart-top {
+    padding:16px 20px 12px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .coin-info {}
+  .coin-name {
+    font-size:22px;
+    font-weight:800;
+    margin-bottom:2px;
+  }
+  .coin-ticker {
+    font-family:'Share Tech Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+  }
+  .coin-context {
+    font-size:12px;
+    color:var(--muted);
+    max-width:340px;
+    line-height:1.5;
+  }
+
+  .chart-area {
+    position:relative;
+    padding:12px 16px 8px;
+  }
+  .chart-label {
+    font-family:'Share Tech Mono', monospace;
+    font-size:10px;
+    color:var(--muted);
+    margin-bottom:8px;
+    display:flex;
+    justify-content:space-between;
+  }
+  .hidden-label {
+    color:var(--moon);
+    animation:blink 1.2s ease infinite alternate;
+  }
+  @keyframes blink { from{opacity:0.4} to{opacity:1} }
+
+  canvas#chartCanvas {
+    width:100%;
+    display:block;
+    cursor:crosshair;
+  }
+
+  .chart-bottom {
+    padding:8px 20px 14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .news-chip {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:6px 12px;
+    font-size:12px;
+  }
+  .news-chip .nc-label {
+    font-family:'Share Tech Mono', monospace;
+    font-size:9px;
+    letter-spacing:2px;
+    color:var(--cyan);
+    margin-right:2px;
+  }
+  .round-label {
+    font-family:'Share Tech Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    margin-left:auto;
+  }
+
+  /* ── DRAWING INSTRUCTIONS ── */
+  .draw-instructions {
+    background:linear-gradient(135deg, var(--moon-dim), var(--surface2));
+    border:1px solid rgba(247,201,72,0.3);
+    border-radius:var(--radius);
+    padding:14px 18px;
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:13px;
+    transition:all 0.3s;
+  }
+  .draw-instructions.hidden { display:none; }
+  .di-icon { font-size:24px; flex-shrink:0; }
+  .di-text { line-height:1.5; }
+  .di-text strong { color:var(--moon); }
+
+  /* ── CHOICE BUTTONS ── */
+  .choice-row {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:16px;
+  }
+  .choice-btn {
+    padding:18px 16px;
+    border-radius:var(--radius);
+    border:2px solid;
+    font-family:'Oxanium', sans-serif;
+    font-size:22px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all 0.2s;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    position:relative;
+    overflow:hidden;
+  }
+  .choice-btn:hover:not(:disabled) { transform:translateY(-3px); }
+  .choice-btn:disabled { cursor:default; opacity:0.45; }
+
+  .moon-btn {
+    background:var(--moon-dim);
+    border-color:var(--moon);
+    color:var(--moon);
+  }
+  .moon-btn:hover:not(:disabled) { box-shadow:0 0 30px var(--moon-glow); }
+
+  .crash-btn {
+    background:var(--crash-dim);
+    border-color:var(--crash);
+    color:var(--crash);
+  }
+  .crash-btn:hover:not(:disabled) { box-shadow:0 0 30px var(--crash-glow); }
+
+  .btn-sub {
+    font-size:10px;
+    letter-spacing:1px;
+    font-weight:400;
+    font-family:'Share Tech Mono', monospace;
+    opacity:0.7;
+  }
+  .choice-btn.correct-pick { opacity:1!important; animation:correctPop 0.5s ease; }
+  .choice-btn.wrong-pick   { opacity:1!important; animation:wrongShake 0.4s ease; }
+  .moon-btn.correct-pick  { box-shadow:0 0 40px var(--moon-glow);  border-color:var(--moon); }
+  .crash-btn.correct-pick { box-shadow:0 0 40px var(--crash-glow); border-color:var(--crash); }
+  @keyframes correctPop  {0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  @keyframes wrongShake  {0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+  /* ── REVEAL + EXPLANATION ── */
+  .reveal-panel {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:14px;
+    display:none;
+    animation:fadeUp 0.35s ease both;
+  }
+  .reveal-panel.show { display:block; }
+
+  .reveal-header {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  .outcome-pill {
+    font-weight:700;
+    font-size:15px;
+    padding:5px 16px;
+    border-radius:99px;
+    letter-spacing:1px;
+  }
+  .op-moon  { background:var(--moon-dim);  color:var(--moon);  border:1px solid var(--moon); }
+  .op-crash { background:var(--crash-dim); color:var(--crash); border:1px solid var(--crash); }
+  .result-tag {
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:1px;
+    font-family:'Share Tech Mono', monospace;
+  }
+  .rt-right { color:var(--green); }
+  .rt-wrong { color:var(--crash); }
+  .actual-move {
+    margin-left:auto;
+    font-family:'Share Tech Mono', monospace;
+    font-size:18px;
+    font-weight:700;
+  }
+  .move-up   { color:var(--moon); }
+  .move-down { color:var(--crash); }
+
+  .reveal-stat-row {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .rst-cell {
+    background:var(--surface2);
+    border-radius:8px;
+    padding:10px 12px;
+    text-align:center;
+  }
+  .rst-label {
+    font-family:'Share Tech Mono', monospace;
+    font-size:9px;
+    letter-spacing:2px;
+    color:var(--muted);
+    margin-bottom:4px;
+    text-transform:uppercase;
+  }
+  .rst-value { font-size:18px; font-weight:700; }
+
+  .reveal-body {
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.65;
+    margin-bottom:12px;
+  }
+  .reveal-lesson {
+    background:linear-gradient(135deg, var(--cyan-dim), var(--surface2));
+    border:1px solid rgba(34,211,238,0.25);
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:12px;
+    line-height:1.6;
+    color:var(--text);
+    font-family:'Share Tech Mono', monospace;
+  }
+  .reveal-lesson strong { color:var(--cyan); }
+
+  .next-btn {
+    width:100%;
+    padding:15px;
+    background:var(--surface2);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    font-family:'Oxanium', sans-serif;
+    font-size:17px;
+    font-weight:600;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:all 0.2s;
+    display:none;
+  }
+  .next-btn.show { display:block; }
+  .next-btn:hover { background:var(--border); transform:translateY(-2px); }
+
+  /* ── START / END ── */
+  .start-screen, .end-screen {
+    text-align:center;
+    animation:fadeUp 0.5s ease both;
+  }
+  .start-screen h2 {
+    font-size:28px;
+    font-weight:700;
+    margin-bottom:12px;
+  }
+  .start-screen p {
+    color:var(--muted);
+    font-size:13px;
+    max-width:460px;
+    margin:0 auto 24px;
+    line-height:1.7;
+    font-family:'Share Tech Mono', monospace;
+  }
+  .myth-grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin:0 0 28px;
+    text-align:left;
+  }
+  .myth-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px;
+  }
+  .myth-title {
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:5px;
+  }
+  .myth-body {
+    font-size:11px;
+    color:var(--muted);
+    line-height:1.6;
+    font-family:'Share Tech Mono', monospace;
+  }
+
+  .start-btn {
+    padding:16px 48px;
+    background:var(--moon);
+    color:#000;
+    border:none;
+    border-radius:var(--radius);
+    font-family:'Oxanium', sans-serif;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .start-btn:hover { background:#ffe066; transform:translateY(-2px); box-shadow:0 8px 24px var(--moon-glow); }
+
+  .end-rocket { font-size:80px; margin:20px 0 8px; }
+  .end-title  { font-size:32px; font-weight:800; margin-bottom:8px; }
+  .end-score  { font-size:64px; font-weight:800; color:var(--moon); line-height:1; margin:16px 0 8px; }
+  .end-msg    { color:var(--muted); font-size:13px; max-width:460px; margin:0 auto 24px; line-height:1.7; font-family:'Share Tech Mono', monospace; }
+  .end-takeaway {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    text-align:left;
+    margin:0 0 24px;
+  }
+  .et-title {
+    font-family:'Share Tech Mono', monospace;
+    font-size:10px;
+    letter-spacing:3px;
+    color:var(--cyan);
+    margin-bottom:14px;
+    text-transform:uppercase;
+  }
+  .et-point {
+    display:flex;
+    gap:10px;
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:10px;
+    line-height:1.5;
+    font-family:'Share Tech Mono', monospace;
+  }
+  .et-point:last-child { margin-bottom:0; }
+  .et-icon { flex-shrink:0; }
+  .replay-btn {
+    padding:14px 40px;
+    background:transparent;
+    color:var(--moon);
+    border:2px solid var(--moon);
+    border-radius:var(--radius);
+    font-family:'Oxanium', sans-serif;
+    font-size:18px;
+    font-weight:700;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .replay-btn:hover { background:var(--moon); color:#000; transform:translateY(-2px); }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)}  to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="game-header">
+    <div class="eyebrow">// MONEY_HACKS · NMT_STEM · WEDNESDAY</div>
+    <h1><span class="crash-word">CRASH</span> OR <span class="moon-word">MOON?</span></h1>
+    <p>> Can you predict where crypto goes next? Draw your prediction. See reality. Learn why crypto is so hard to call.</p>
+  </div>
+
+  <!-- START -->
+  <div id="start-screen" class="start-screen">
+    <h2>The Hardest Chart to Predict</h2>
+    <p>> You'll see 8 real historical crypto charts — but the last 3 months are hidden. Draw where you think the price goes. Then see what actually happened and why.</p>
+    <div class="myth-grid">
+      <div class="myth-card">
+        <div class="myth-title" style="color:var(--moon)">📈 What is "to the Moon"?</div>
+        <div class="myth-body">Crypto slang for a coin's price rising dramatically and fast. "BTC is mooning!" means it's surging. Comes from the idea of a rocket leaving Earth's atmosphere.</div>
+      </div>
+      <div class="myth-card">
+        <div class="myth-title" style="color:var(--crash)">📉 What is a "Crash"?</div>
+        <div class="myth-body">A rapid, severe price drop — often 30-80% in days or weeks. Crypto crashes are more extreme and frequent than stock market crashes. They can wipe out years of gains overnight.</div>
+      </div>
+      <div class="myth-card">
+        <div class="myth-title" style="color:var(--cyan)">🔀 What Moves Crypto?</div>
+        <div class="myth-body">Government regulation, celebrity tweets, exchange hacks, macroeconomic fear, Bitcoin halvings, and pure speculation. There is no earnings report — only sentiment.</div>
+      </div>
+      <div class="myth-card">
+        <div class="myth-title" style="color:var(--text)">⚠️ The Hard Truth</div>
+        <div class="myth-body">Studies show most retail crypto traders lose money. The people who make money are early adopters and those who dollar-cost average and hold through crashes.</div>
+      </div>
+    </div>
+    <button class="start-btn" onclick="startGame()">READ THE CHARTS →</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="game-screen" style="display:none;">
+    <div class="hud">
+      <div class="hud-cell round-c"><div class="hud-label">Chart</div><div class="hud-value" id="hud-round">1/8</div></div>
+      <div class="hud-cell score-c"><div class="hud-label">Score</div><div class="hud-value" id="hud-score">0</div></div>
+      <div class="hud-cell moon-c"><div class="hud-label">🚀 Moons</div><div class="hud-value" id="hud-moon">0</div></div>
+      <div class="hud-cell crash-c"><div class="hud-label">💀 Crashes</div><div class="hud-value" id="hud-crash">0</div></div>
+    </div>
+
+    <div class="chart-card" id="chart-card">
+      <div class="chart-top">
+        <div class="coin-info">
+          <div class="coin-name" id="coin-name">Bitcoin</div>
+          <div class="coin-ticker" id="coin-ticker">BTC · Historical Price · Monthly Chart</div>
+        </div>
+        <div class="coin-context" id="coin-context"></div>
+      </div>
+
+      <div class="chart-area">
+        <div class="chart-label">
+          <span id="chart-label-left">Jan</span>
+          <span class="hidden-label" id="chart-label-right">??? ← HIDDEN (you predict this)</span>
+        </div>
+        <canvas id="chartCanvas" height="220"></canvas>
+      </div>
+
+      <div class="chart-bottom">
+        <div class="news-chip" id="news-chip">
+          <span class="nc-label">NEWS</span>
+          <span id="news-text">Loading context...</span>
+        </div>
+        <span class="round-label" id="round-label-bottom">Chart 1 of 8</span>
+      </div>
+    </div>
+
+    <div class="draw-instructions" id="draw-inst">
+      <div class="di-icon">✏️</div>
+      <div class="di-text">
+        <strong>Draw your prediction</strong> on the chart above — click and drag across the hidden section to sketch where you think the price goes. Then pick your call below.
+      </div>
+    </div>
+
+    <div class="choice-row">
+      <button class="choice-btn moon-btn" id="moon-btn" onclick="choose('moon')">
+        🚀 TO THE MOON
+        <span class="btn-sub">Price goes up 20%+</span>
+      </button>
+      <button class="choice-btn crash-btn" id="crash-btn" onclick="choose('crash')">
+        💀 CRASH
+        <span class="btn-sub">Price drops 20%+</span>
+      </button>
+    </div>
+
+    <div class="reveal-panel" id="reveal-panel">
+      <div class="reveal-header">
+        <span class="outcome-pill" id="outcome-pill">🚀 MOONED</span>
+        <span class="result-tag" id="result-tag">✓ CORRECT</span>
+        <span class="actual-move" id="actual-move">+84%</span>
+      </div>
+      <div class="reveal-stat-row" id="reveal-stats"></div>
+      <div class="reveal-body" id="reveal-body"></div>
+      <div class="reveal-lesson" id="reveal-lesson"></div>
+    </div>
+
+    <button class="next-btn" id="next-btn" onclick="nextChart()">NEXT CHART →</button>
+  </div>
+
+  <!-- END -->
+  <div id="end-screen" class="end-screen" style="display:none;">
+    <div class="end-rocket" id="end-rocket">🎯</div>
+    <div class="end-title" id="end-title">Crypto Analyst</div>
+    <div class="end-score" id="end-score">6/8</div>
+    <p class="end-msg" id="end-msg"></p>
+    <div class="end-takeaway">
+      <div class="et-title">// KEY LESSONS FROM THIS GAME</div>
+      <div class="et-point"><span class="et-icon">📊</span><span>Crypto has no earnings, no dividends, no fundamentals — price is 100% driven by sentiment, speculation, and supply/demand.</span></div>
+      <div class="et-point"><span class="et-icon">🎲</span><span>Even with all the context clues, you were essentially guessing. That's the point. Professional traders get this wrong constantly.</span></div>
+      <div class="et-point"><span class="et-icon">⏳</span><span>The only strategy that has reliably worked: dollar-cost averaging (DCA) — buy a fixed amount regularly regardless of price, and hold for 4+ years.</span></div>
+      <div class="et-point"><span class="et-icon">💡</span><span>Never invest more in crypto than you can afford to lose 100% of. It's a speculation, not an investment. Treat it like a casino — fun with money you won't miss.</span></div>
+    </div>
+    <button class="replay-btn" onclick="resetGame()">PLAY AGAIN</button>
+  </div>
+
+</div>
+
+<script>
+// ── CHART DATA ──
+// Each scenario: known months of price data + hidden outcome months
+const SCENARIOS = [
+  {
+    coin: 'Bitcoin',
+    ticker: 'BTC · 2020 · Monthly (approx. scaled)',
+    context: 'COVID-19 hits. Markets crash in March 2020. Bitcoin drops 50% in a single day (Black Thursday). The Fed prints trillions of dollars. Governments send stimulus checks.',
+    news: 'Fed prints $3T · Stimulus checks hitting · Institutions buying BTC as inflation hedge',
+    // known: ~9 months of data (index 0-8), hidden: 3 months
+    known:  [9200, 6500, 5800, 7100, 8700, 9300, 9100, 11300, 10800, 11500],
+    hidden: [13700, 19700, 28900],
+    verdict: 'moon',
+    actualMove: '+151%',
+    peakVal: '$28,900',
+    timeframe: 'Oct–Dec 2020',
+    body: "Stimulus money flooded into Bitcoin. Institutional investors (MicroStrategy, PayPal, Square) announced massive BTC purchases. With the Fed printing money, Bitcoin's \"digital gold\" narrative took hold. It went from $11,500 to $28,900 in 3 months — then kept going to $69,000 in 2021.",
+    lesson: '<strong>Lesson:</strong> When central banks print money, some of it flows into scarce assets like Bitcoin. But nobody timed this perfectly. Most retail investors bought near the top after seeing the rally.',
+  },
+  {
+    coin: 'Bitcoin',
+    ticker: 'BTC · 2021 Peak → 2022 Bear Market',
+    context: 'Bitcoin hits all-time high of $69,000 in November 2021. Retail FOMO is at peak. "Everyone" is talking about crypto at Thanksgiving. Headlines say $100K is inevitable.',
+    news: 'All-time high $69K hit · Mainstream media covers crypto daily · "Number go up" mentality widespread',
+    known:  [69000, 57000, 46000, 38000, 44000, 41000, 39000, 35000, 30000, 28000],
+    hidden: [20000, 17500, 16000],
+    verdict: 'crash',
+    actualMove: '-43%',
+    peakVal: '$16,000',
+    timeframe: 'Oct–Dec 2022',
+    body: "The FTX exchange collapsed in November 2022 — one of the largest frauds in financial history. $32 billion in customer funds vanished overnight. Regulatory crackdowns intensified globally. Bitcoin crashed from $28,000 to $16,000 in weeks. Anyone who bought at the $69K peak lost 77% of their money.",
+    lesson: '<strong>Lesson:</strong> "Everyone is talking about it" is often the signal to be cautious, not excited. Peak retail enthusiasm historically marks market tops, not bottoms. The FTX collapse showed that not all crypto exchanges are trustworthy.',
+  },
+  {
+    coin: 'Ethereum',
+    ticker: 'ETH · 2021 DeFi Boom',
+    context: 'DeFi (Decentralized Finance) is exploding. NFTs are everywhere. Ethereum powers both. The network is congested — transaction fees are sometimes $200+. The "Merge" (switch to proof-of-stake) is anticipated.',
+    news: 'NFT market hits $25B · DeFi total value locked: $180B · Ethereum Merge anticipated',
+    known:  [1300, 1800, 2400, 2100, 2700, 3200, 3800, 3600, 4200, 4600],
+    hidden: [4100, 3800, 3400],
+    verdict: 'crash',
+    actualMove: '-26%',
+    peakVal: '$3,400',
+    timeframe: 'Nov–Dec 2021 → Jan 2022',
+    body: "Despite the excitement, ETH peaked near $4,800 in November 2021 and began declining. NFT hype started cooling. High gas fees were pushing users to competing chains. The Fed signaled interest rate hikes coming — bad news for all risk assets. Crypto followed broader markets down in early 2022.",
+    lesson: '<strong>Lesson:</strong> Even when the technology is genuinely exciting and adoption is real, prices can still fall if the market is already priced for perfection. "Great technology" ≠ "great investment at any price."',
+  },
+  {
+    coin: 'Dogecoin',
+    ticker: 'DOGE · The Elon Musk Effect · 2021',
+    context: 'Dogecoin was created as a joke in 2013. It has no technical advantages, no unique use case, no development team. But Elon Musk has been tweeting about it repeatedly.',
+    news: 'Elon tweets "Doge" meme · Mark Cuban accepts DOGE · Reddit community pumping',
+    known:  [0.007, 0.009, 0.008, 0.05, 0.06, 0.08, 0.32, 0.25, 0.30, 0.40],
+    hidden: [0.68, 0.45, 0.30],
+    verdict: 'moon',
+    actualMove: '+70% then -56%',
+    peakVal: '$0.68 → crashed',
+    timeframe: 'April–May 2021',
+    body: "DOGE hit $0.68 on May 8, 2021 — then Elon Musk appeared on Saturday Night Live. He called Dogecoin 'a hustle' as a joke. The price immediately crashed 30% during the broadcast. This perfectly illustrates that meme coins are pure speculation — price is 100% sentiment with zero underlying value.",
+    lesson: '<strong>Lesson:</strong> When a coin\'s value is entirely based on one person\'s tweets, that is not an investment — it\'s a bet on someone\'s mood. Meme coins have made some people rich and destroyed far more people\'s savings.',
+  },
+  {
+    coin: 'Bitcoin',
+    ticker: 'BTC · 2019 Recovery',
+    context: 'The 2018 crypto winter was brutal — Bitcoin fell 84% from its peak. By early 2019 it sits at $3,500. The halving (when BTC mining rewards cut in half, reducing new supply) is coming in May 2020.',
+    news: 'Crypto winter bottom reached · Halving 14 months away · Institutional interest quietly growing',
+    known:  [3500, 3700, 4000, 5000, 5800, 8000, 7800, 9600, 10200, 9800],
+    hidden: [8500, 7200, 7100],
+    verdict: 'crash',
+    actualMove: '-28%',
+    peakVal: '$7,100',
+    timeframe: 'Aug–Oct 2019',
+    body: "After a strong recovery, Bitcoin pulled back 28% through the fall of 2019. General risk-off sentiment in global markets, regulatory uncertainty, and profit-taking by early buyers caused the drop. This shows that even in a recovery, significant corrections happen — making it nearly impossible to time entries and exits perfectly.",
+    lesson: '<strong>Lesson:</strong> Recoveries are not straight lines. Even in bull markets, 20-40% corrections are completely normal in crypto. Most people panic-sell during these dips and miss the eventual recovery.',
+  },
+  {
+    coin: 'Solana',
+    ticker: 'SOL · 2021 Breakout',
+    context: 'Solana is an Ethereum competitor claiming to be faster and cheaper. In early 2021 it\'s trading at $2. Developer activity is rising fast. Venture capital firms are pouring money into the Solana ecosystem.',
+    news: 'VC funding $314M into Solana ecosystem · Developer count growing 400% YoY · "Ethereum killer" narrative',
+    known:  [2, 3, 10, 14, 25, 30, 45, 60, 90, 120],
+    hidden: [170, 210, 250],
+    verdict: 'moon',
+    actualMove: '+108%',
+    peakVal: '$250',
+    timeframe: 'Aug–Oct 2021',
+    body: "Solana surged from $120 to $250 in 3 months — a 108% gain — as NFT projects, DeFi protocols, and developers flooded the ecosystem. The 'Ethereum killer' narrative drove massive speculation. It eventually hit $260 before collapsing 95% in the 2022 bear market, partially due to its exposure to FTX.",
+    lesson: '<strong>Lesson:</strong> Altcoins (non-Bitcoin cryptos) have bigger upside AND bigger downside than Bitcoin. SOL went up 12,000% from $2 to $260 — then crashed 95% to $10. Volatility cuts both ways.',
+  },
+  {
+    coin: 'Bitcoin',
+    ticker: 'BTC · 2022 Crash · Terra Luna Collapse',
+    context: 'The Terra/Luna ecosystem — a $40 billion stablecoin and crypto network — completely collapses in 72 hours. Billions in savings wiped out overnight. Contagion spreading to other projects.',
+    news: 'Terra Luna collapses → $40B gone in 72hrs · Three Arrows Capital bankrupt · Celsius freezes withdrawals',
+    known:  [47000, 43000, 38000, 34000, 31000, 36000, 31000, 29000, 26000, 28000],
+    hidden: [22000, 19500, 17500],
+    verdict: 'crash',
+    actualMove: '-37%',
+    peakVal: '$17,500',
+    timeframe: 'Jun–Aug 2022',
+    body: "The Terra/Luna collapse triggered a cascade of failures: hedge funds, lenders, and exchanges all interconnected. Celsius Network froze $12B in customer withdrawals. Three Arrows Capital (a major crypto hedge fund) went bankrupt. Each failure triggered more selling. Bitcoin fell from $28K to $17.5K — a place nobody thought it could reach.",
+    lesson: '<strong>Lesson:</strong> Crypto markets are deeply interconnected. One failure can trigger a cascade. The stablecoin that was supposed to be "stable" lost 99.9% of its value in 72 hours. Risk in crypto is not just price risk — it\'s counterparty risk too.',
+  },
+  {
+    coin: 'Bitcoin',
+    ticker: 'BTC · 2023 Recovery · ETF Anticipation',
+    context: 'After 2022\'s brutal bear market, Bitcoin sits at $16K. Inflation is easing. The Fed hints at pausing rate hikes. Rumors grow that the SEC may finally approve a Bitcoin spot ETF — opening the door to trillions in institutional money.',
+    news: 'BlackRock files for Bitcoin ETF · Fed pauses rate hikes · Inflation cooling to 3.2%',
+    known:  [16500, 17000, 23000, 28000, 26000, 30000, 28000, 26000, 27000, 34000],
+    hidden: [42000, 44000, 43000],
+    verdict: 'moon',
+    actualMove: '+26%',
+    peakVal: '$44,000',
+    timeframe: 'Nov–Dec 2023',
+    body: "Bitcoin surged from $34K to $44K on ETF optimism. In January 2024, the SEC approved the first Bitcoin spot ETFs — BlackRock, Fidelity, and others. Institutional money flowed in. Combined with the April 2024 halving (supply reduction), Bitcoin went on to hit a new all-time high above $73,000 by March 2024.",
+    lesson: '<strong>Lesson:</strong> Regulatory clarity (even anticipated approval) can be a powerful bullish catalyst. Institutional adoption changes the demand equation. But timing this was still very difficult — many sold too early or bought too late.',
+  },
+];
+
+let current = 0;
+let score = 0;
+let moonCount = 0;
+let crashCount = 0;
+let answered = false;
+let scenarios = [];
+let isDrawing = false;
+let userDrawPoints = [];
+let drawStartX = 0;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function startGame() {
+  scenarios = shuffle(SCENARIOS);
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  renderChart();
+}
+
+// ── CHART RENDERING ──
+function renderChart(showFull=false) {
+  answered = false;
+  userDrawPoints = [];
+  const s = scenarios[current];
+
+  document.getElementById('coin-name').textContent         = s.coin;
+  document.getElementById('coin-ticker').textContent       = s.ticker;
+  document.getElementById('coin-context').textContent      = s.context;
+  document.getElementById('news-text').textContent         = s.news;
+  document.getElementById('hud-round').textContent         = `${current+1}/${scenarios.length}`;
+  document.getElementById('hud-score').textContent         = score;
+  document.getElementById('hud-moon').textContent          = moonCount;
+  document.getElementById('hud-crash').textContent         = crashCount;
+  document.getElementById('round-label-bottom').textContent= `Chart ${current+1} of ${scenarios.length}`;
+  document.getElementById('chart-label-right').style.display = showFull ? 'none' : 'inline';
+
+  // reset btns
+  const mb = document.getElementById('moon-btn');
+  const cb = document.getElementById('crash-btn');
+  mb.disabled = false; cb.disabled = false;
+  mb.className = 'choice-btn moon-btn';
+  cb.className = 'choice-btn crash-btn';
+  document.getElementById('reveal-panel').className = 'reveal-panel';
+  document.getElementById('next-btn').className = 'next-btn';
+  document.getElementById('draw-inst').className = 'draw-instructions';
+
+  // animate card
+  const card = document.getElementById('chart-card');
+  card.style.animation='none'; card.offsetHeight;
+  card.style.animation='cardIn 0.4s cubic-bezier(.34,1.56,.64,1) both';
+
+  drawCanvas(showFull, false, []);
+  setupDrawing(showFull);
+}
+
+function getAllPrices(s) {
+  return [...s.known, ...s.hidden];
+}
+
+function drawCanvas(showFull, showUserDraw, userPoints) {
+  const canvas = document.getElementById('chartCanvas');
+  const s = scenarios[current];
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width  = rect.width * dpr;
+  canvas.height = 220 * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = 220;
+  const pad = {top:16, right:16, bottom:28, left:60};
+  const gW = W - pad.left - pad.right;
+  const gH = H - pad.top  - pad.bottom;
+
+  const allPrices = getAllPrices(s);
+  const minP = Math.min(...allPrices) * 0.92;
+  const maxP = Math.max(...allPrices) * 1.06;
+
+  const toY = p => pad.top + gH - ((p - minP)/(maxP - minP)) * gH;
+  const knownCount  = s.known.length;
+  const totalPoints = allPrices.length;
+
+  const toX = i => pad.left + (i / (totalPoints - 1)) * gW;
+
+  // bg
+  ctx.fillStyle = '#0d1221';
+  ctx.fillRect(0, 0, W, H);
+
+  // grid
+  ctx.strokeStyle = 'rgba(30,45,69,0.8)';
+  ctx.lineWidth = 0.8;
+  for(let i=0;i<=4;i++){
+    const y = pad.top + (i/4)*gH;
+    ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+gW,y); ctx.stroke();
+    const val = maxP - (i/4)*(maxP-minP);
+    ctx.fillStyle='#4b5563';
+    ctx.font=`9px "Share Tech Mono", monospace`;
+    ctx.textAlign='right';
+    const label = val>=1000 ? '$'+(val/1000).toFixed(0)+'K' : '$'+val.toFixed(3);
+    ctx.fillText(label, pad.left-4, y+3);
+  }
+
+  // hidden zone
+  const hiddenStartX = toX(knownCount - 1);
+  ctx.fillStyle = 'rgba(247,201,72,0.04)';
+  ctx.fillRect(hiddenStartX, pad.top, gW - (hiddenStartX - pad.left), gH);
+
+  // dashed divider
+  ctx.setLineDash([4,4]);
+  ctx.strokeStyle = 'rgba(247,201,72,0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(hiddenStartX, pad.top); ctx.lineTo(hiddenStartX, pad.top+gH); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // "?" label in hidden zone
+  if (!showFull) {
+    ctx.fillStyle = 'rgba(247,201,72,0.15)';
+    ctx.font = `bold 32px "Oxanium", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('?', hiddenStartX + (gW - (hiddenStartX - pad.left))/2, pad.top + gH/2 + 12);
+  }
+
+  // known line
+  ctx.beginPath();
+  s.known.forEach((p, i) => {
+    const x = toX(i), y = toY(p);
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle = '#22d3ee';
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // known area fill
+  ctx.beginPath();
+  s.known.forEach((p, i) => {
+    const x = toX(i), y = toY(p);
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.lineTo(toX(knownCount-1), pad.top+gH);
+  ctx.lineTo(pad.left, pad.top+gH);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top+gH);
+  grad.addColorStop(0,'rgba(34,211,238,0.25)');
+  grad.addColorStop(1,'rgba(34,211,238,0)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // dots on known line
+  s.known.forEach((p, i) => {
+    const x = toX(i), y = toY(p);
+    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2);
+    ctx.fillStyle = '#22d3ee'; ctx.fill();
+  });
+
+  // hidden/revealed line
+  if (showFull) {
+    const isUp = s.verdict === 'moon';
+    ctx.beginPath();
+    allPrices.slice(knownCount-1).forEach((p, i) => {
+      const x = toX(knownCount - 1 + i), y = toY(p);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle = isUp ? '#f7c948' : '#ef4444';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // revealed area
+    ctx.beginPath();
+    allPrices.slice(knownCount-1).forEach((p, i) => {
+      const x = toX(knownCount - 1 + i), y = toY(p);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.lineTo(toX(totalPoints-1), pad.top+gH);
+    ctx.lineTo(toX(knownCount-1), pad.top+gH);
+    ctx.closePath();
+    const grad2 = ctx.createLinearGradient(0, pad.top, 0, pad.top+gH);
+    const col = isUp ? '247,201,72' : '239,68,68';
+    grad2.addColorStop(0, `rgba(${col},0.3)`);
+    grad2.addColorStop(1, `rgba(${col},0)`);
+    ctx.fillStyle = grad2;
+    ctx.fill();
+
+    // dots on revealed
+    allPrices.slice(knownCount).forEach((p, i) => {
+      const x = toX(knownCount + i), y = toY(p);
+      ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI*2);
+      ctx.fillStyle = isUp ? '#f7c948' : '#ef4444'; ctx.fill();
+    });
+
+    // label final price
+    const lastP = allPrices[allPrices.length-1];
+    const lx = toX(totalPoints-1), ly = toY(lastP);
+    ctx.fillStyle = isUp ? '#f7c948' : '#ef4444';
+    ctx.font = `bold 11px "Share Tech Mono", monospace`;
+    ctx.textAlign = 'right';
+    const label = lastP >= 1000 ? '$'+(lastP/1000).toFixed(0)+'K' : '$'+lastP.toFixed(3);
+    ctx.fillText(label, lx - 4, ly - 8);
+  }
+
+  // user draw
+  if (showUserDraw && userPoints.length > 1) {
+    ctx.beginPath();
+    userPoints.forEach((pt, i) => {
+      i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y);
+    });
+    ctx.strokeStyle = 'rgba(247,201,72,0.55)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5,3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+function setupDrawing(disabled) {
+  const canvas = document.getElementById('chartCanvas');
+  canvas.onmousedown = canvas.ontouchstart = disabled ? null : startDraw;
+  canvas.onmousemove = canvas.ontouchmove  = disabled ? null : draw;
+  canvas.onmouseup   = canvas.ontouchend   = disabled ? null : endDraw;
+}
+
+function getPos(e, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const touch = e.touches ? e.touches[0] : e;
+  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+}
+
+function startDraw(e) {
+  if (answered) return;
+  e.preventDefault();
+  isDrawing = true;
+  userDrawPoints = [];
+  const pos = getPos(e, e.target);
+  userDrawPoints.push(pos);
+}
+
+function draw(e) {
+  if (!isDrawing || answered) return;
+  e.preventDefault();
+  const pos = getPos(e, e.target);
+  userDrawPoints.push(pos);
+  drawCanvas(false, true, userDrawPoints);
+}
+
+function endDraw(e) {
+  isDrawing = false;
+}
+
+function choose(pick) {
+  if (answered) return;
+  answered = true;
+  const s = scenarios[current];
+  const isCorrect = pick === s.verdict;
+
+  if (isCorrect) { score++; }
+  if (pick === 'moon') moonCount++;
+  else crashCount++;
+
+  document.getElementById('hud-score').textContent  = score;
+  document.getElementById('hud-moon').textContent   = moonCount;
+  document.getElementById('hud-crash').textContent  = crashCount;
+
+  const mb = document.getElementById('moon-btn');
+  const cb = document.getElementById('crash-btn');
+  mb.disabled = true; cb.disabled = true;
+
+  if (pick === 'moon') {
+    mb.classList.add(isCorrect ? 'correct-pick' : 'wrong-pick');
+    if (!isCorrect) cb.classList.add('correct-pick');
+  } else {
+    cb.classList.add(isCorrect ? 'correct-pick' : 'wrong-pick');
+    if (!isCorrect) mb.classList.add('correct-pick');
+  }
+
+  document.getElementById('draw-inst').className = 'draw-instructions hidden';
+
+  // reveal chart
+  drawCanvas(true, false, []);
+  setupDrawing(true);
+
+  // reveal panel
+  const panel = document.getElementById('reveal-panel');
+  panel.className = 'reveal-panel show';
+
+  const pill = document.getElementById('outcome-pill');
+  pill.className = `outcome-pill op-${s.verdict}`;
+  pill.textContent = s.verdict === 'moon' ? '🚀 MOONED' : '💀 CRASHED';
+
+  const tag = document.getElementById('result-tag');
+  tag.className = `result-tag ${isCorrect ? 'rt-right' : 'rt-wrong'}`;
+  tag.textContent = isCorrect ? '✓ CORRECT CALL' : '✗ WRONG CALL';
+
+  const moveEl = document.getElementById('actual-move');
+  moveEl.className = `actual-move ${s.verdict === 'moon' ? 'move-up' : 'move-down'}`;
+  moveEl.textContent = s.actualMove;
+
+  document.getElementById('reveal-stats').innerHTML = `
+    <div class="rst-cell">
+      <div class="rst-label">Period</div>
+      <div class="rst-value" style="font-size:14px;color:var(--cyan)">${s.timeframe}</div>
+    </div>
+    <div class="rst-cell">
+      <div class="rst-label">Actual Move</div>
+      <div class="rst-value ${s.verdict==='moon'?'move-up':'move-down'}">${s.actualMove}</div>
+    </div>
+    <div class="rst-cell">
+      <div class="rst-label">Price Reached</div>
+      <div class="rst-value" style="font-size:14px;color:var(--text)">${s.peakVal}</div>
+    </div>
+  `;
+
+  document.getElementById('reveal-body').textContent   = s.body;
+  document.getElementById('reveal-lesson').innerHTML   = s.lesson;
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.className = 'next-btn show';
+  nextBtn.textContent = current+1 >= scenarios.length ? 'SEE RESULTS →' : 'NEXT CHART →';
+}
+
+function nextChart() {
+  current++;
+  if (current >= scenarios.length) showEnd();
+  else renderChart();
+}
+
+function showEnd() {
+  document.getElementById('game-screen').style.display = 'none';
+  const end = document.getElementById('end-screen');
+  end.style.display = 'block';
+
+  const total = scenarios.length;
+  const pct = score / total;
+
+  let rocket, title, msg;
+  if (pct >= 0.875) {
+    rocket='🏆'; title='Chart Wizard';
+    msg=`${score}/${total} — exceptional. You read market context better than most traders. But remember: this is hindsight. In real time, nobody gets 7+/8 consistently.`;
+  } else if (pct >= 0.625) {
+    rocket='🚀'; title='Sharp Analyst';
+    msg=`${score}/${total} — solid. The ones that tripped you up trip professionals too. Context clues help, but crypto markets are genuinely unpredictable in the short run.`;
+  } else if (pct >= 0.375) {
+    rocket='📊'; title='Learning Trader';
+    msg=`${score}/${total} — the market humbled you. Even with full context clues, crypto direction is hard to call. This was the point of the game.`;
+  } else {
+    rocket='🎲'; title='Coin Flip Beats You';
+    msg=`${score}/${total} — a coin flip would have done better! That's actually an important lesson: nobody can consistently time crypto markets. Not even the experts.`;
+  }
+
+  document.getElementById('end-rocket').textContent = rocket;
+  document.getElementById('end-title').textContent  = title;
+  document.getElementById('end-score').textContent  = `${score}/${total}`;
+  document.getElementById('end-msg').textContent    = msg;
+}
+
+function resetGame() {
+  current=0; score=0; moonCount=0; crashCount=0; answered=false; userDrawPoints=[];
+  scenarios = shuffle(SCENARIOS);
+  document.getElementById('end-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  renderChart();
+}
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('game-screen').style.display !== 'none' && scenarios.length) {
+    drawCanvas(answered, false, []);
+  }
+});
+</script>
+</body>
+</html>

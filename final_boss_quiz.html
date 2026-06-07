@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Boss Quiz — Money Hacks</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #1a0533;
+    --surface:  #240a45;
+    --surface2: #2e1155;
+    --border:   #3d1a70;
+    --text:     #f0e6ff;
+    --muted:    #9b7fbd;
+    --gold:     #ffd700;
+    --gold-dim: #3d3000;
+    --green:    #00e676;
+    --green-dim:#003318;
+    --red:      #ff5252;
+    --red-dim:  #330a0a;
+    --blue:     #40c4ff;
+    --blue-dim: #002244;
+    --pink:     #ff80ab;
+    --radius:   10px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% -10%, rgba(138,43,226,0.35), transparent),
+      radial-gradient(ellipse 40% 30% at 10% 90%, rgba(255,215,0,0.08), transparent),
+      radial-gradient(ellipse 40% 30% at 90% 80%, rgba(64,196,255,0.08), transparent);
+    pointer-events:none;
+    z-index:0;
+  }
+  .wrapper {
+    position:relative;
+    z-index:1;
+    max-width:720px;
+    margin:0 auto;
+    padding:24px 16px 80px;
+  }
+
+  /* HEADER */
+  .hdr { text-align:center; margin-bottom:28px; animation:fadeDown 0.5s ease both; }
+  .eyebrow {
+    font-size:11px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:10px;
+    font-weight:700;
+  }
+  .hdr h1 {
+    font-family:'Archivo Black', sans-serif;
+    font-size:clamp(32px,7vw,64px);
+    line-height:1;
+    margin-bottom:6px;
+    text-shadow:0 0 40px rgba(255,215,0,0.4);
+  }
+  .hdr p { font-size:13px; color:var(--muted); max-width:440px; margin:0 auto; line-height:1.7; }
+
+  /* SCORE BAR */
+  .scorebar {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .sb-cell {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:10px 8px;
+    text-align:center;
+  }
+  .sb-label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+  .sb-val   { font-family:'Archivo Black', sans-serif; font-size:22px; }
+  .sb-cell.pts  .sb-val { color:var(--gold); }
+  .sb-cell.corr .sb-val { color:var(--green); }
+  .sb-cell.strk .sb-val { color:var(--pink); }
+  .sb-cell.qnum .sb-val { color:var(--blue); }
+
+  /* PROGRESS DOTS */
+  .dots { display:flex; gap:5px; justify-content:center; flex-wrap:wrap; margin-bottom:20px; }
+  .dot  { width:12px; height:12px; border-radius:50%; background:var(--surface2); border:1px solid var(--border); transition:all 0.3s; }
+  .dot.right  { background:var(--green); border-color:var(--green); }
+  .dot.wrong  { background:var(--red);   border-color:var(--red); }
+  .dot.cur    { background:var(--gold);  border-color:var(--gold); animation:dotPulse 1s ease infinite alternate; }
+  @keyframes dotPulse { from{transform:scale(0.8)} to{transform:scale(1.1)} }
+
+  /* CATEGORY BADGE */
+  .cat-badge {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:5px 14px;
+    border-radius:99px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+
+  /* QUESTION CARD */
+  .q-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:24px 22px 20px;
+    margin-bottom:16px;
+    animation:cardIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+    position:relative;
+    overflow:hidden;
+  }
+  @keyframes cardIn {
+    from{opacity:0;transform:translateY(20px) scale(0.97)}
+    to  {opacity:1;transform:translateY(0) scale(1)}
+  }
+  .q-card::before {
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:3px;
+  }
+  .q-difficulty {
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .diff-pips { display:flex; gap:3px; }
+  .diff-pip  { width:8px; height:8px; border-radius:50%; }
+  .q-text {
+    font-family:'Archivo Black', sans-serif;
+    font-size:clamp(17px,3vw,22px);
+    line-height:1.3;
+    margin-bottom:6px;
+  }
+  .q-context {
+    font-size:13px;
+    color:var(--muted);
+    margin-top:8px;
+    line-height:1.6;
+    padding:10px 14px;
+    background:var(--surface2);
+    border-radius:8px;
+    border-left:3px solid var(--border);
+    display:none;
+  }
+  .q-context.show { display:block; }
+
+  /* ANSWERS */
+  .answers { display:grid; gap:9px; margin-bottom:16px; }
+  .ans-btn {
+    background:var(--surface2);
+    border:1.5px solid var(--border);
+    border-radius:var(--radius);
+    padding:13px 16px;
+    text-align:left;
+    cursor:pointer;
+    transition:all 0.15s;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:'Nunito', sans-serif;
+    color:var(--text);
+    font-size:14px;
+    font-weight:500;
+  }
+  .ans-btn:hover:not(:disabled) {
+    border-color:var(--gold);
+    background:rgba(255,215,0,0.06);
+    transform:translateX(3px);
+  }
+  .ans-btn:disabled { cursor:default; }
+  .ans-letter {
+    width:28px; height:28px;
+    border-radius:7px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:var(--muted);
+    flex-shrink:0;
+    transition:all 0.2s;
+  }
+  .ans-btn.correct-ans { border-color:var(--green); background:var(--green-dim); }
+  .ans-btn.correct-ans .ans-letter { background:var(--green); color:#000; border-color:var(--green); }
+  .ans-btn.wrong-ans   { border-color:var(--red);   background:var(--red-dim); }
+  .ans-btn.wrong-ans   .ans-letter { background:var(--red);   color:#fff; border-color:var(--red); }
+  .ans-btn.dim         { opacity:0.3; }
+
+  /* EXPLANATION */
+  .explanation {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin-bottom:14px;
+    display:none;
+    animation:fadeUp 0.3s ease both;
+  }
+  .explanation.show { display:block; }
+  .exp-result {
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:10px; flex-wrap:wrap;
+  }
+  .exp-badge {
+    font-size:12px; font-weight:700; letter-spacing:1px;
+    padding:4px 12px; border-radius:99px;
+  }
+  .eb-right { background:var(--green-dim); color:var(--green); border:1px solid var(--green); }
+  .eb-wrong { background:var(--red-dim);   color:var(--red);   border:1px solid var(--red); }
+  .exp-pts  { font-family:'Archivo Black', sans-serif; font-size:18px; color:var(--gold); }
+  .exp-text { font-size:13px; color:var(--muted); line-height:1.65; }
+  .exp-rule {
+    margin-top:10px; padding:10px 14px;
+    background:var(--surface2); border-radius:8px;
+    font-size:12px; color:var(--text); line-height:1.6;
+    border-left:3px solid var(--gold);
+    display:none;
+  }
+  .exp-rule.show { display:block; }
+
+  /* STREAK TOAST */
+  .streak-toast {
+    text-align:center; margin-bottom:12px;
+    font-family:'Archivo Black', sans-serif;
+    font-size:20px; color:var(--pink);
+    animation:toastIn 0.4s cubic-bezier(.34,1.56,.64,1);
+    display:none;
+  }
+  .streak-toast.show { display:block; }
+  @keyframes toastIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+
+  /* NEXT BTN */
+  .next-btn {
+    width:100%; padding:15px;
+    background:linear-gradient(135deg, #6a0dad, #9b59b6);
+    color:#fff; border:none;
+    border-radius:var(--radius);
+    font-family:'Archivo Black', sans-serif;
+    font-size:18px; letter-spacing:1px;
+    cursor:pointer; transition:all 0.2s; display:none;
+  }
+  .next-btn.show { display:block; }
+  .next-btn:hover { filter:brightness(1.15); transform:translateY(-2px); box-shadow:0 8px 24px rgba(106,13,173,0.5); }
+
+  /* START SCREEN */
+  .start-screen { text-align:center; animation:fadeUp 0.5s ease both; }
+  .start-screen h2 { font-family:'Archivo Black', sans-serif; font-size:26px; margin-bottom:12px; }
+  .start-screen p  { color:var(--muted); font-size:14px; max-width:460px; margin:0 auto 24px; line-height:1.7; }
+  .cat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:0 0 28px; text-align:left; }
+  .cat-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:13px 15px;
+    display:flex; gap:10px; align-items:center;
+  }
+  .cc-icon { font-size:24px; flex-shrink:0; }
+  .cc-info {}
+  .cc-title { font-weight:700; font-size:13px; margin-bottom:2px; }
+  .cc-count { font-size:11px; color:var(--muted); }
+  .start-btn {
+    padding:16px 48px;
+    background:linear-gradient(135deg, #6a0dad, #9b59b6);
+    color:#fff; border:none; border-radius:var(--radius);
+    font-family:'Archivo Black', sans-serif;
+    font-size:20px; letter-spacing:1px;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .start-btn:hover { filter:brightness(1.15); transform:translateY(-2px); box-shadow:0 8px 24px rgba(106,13,173,0.5); }
+
+  /* END SCREEN */
+  .end-screen { text-align:center; animation:fadeUp 0.5s ease both; }
+  .trophy-wrap { margin:20px 0 8px; }
+  .trophy-emoji { font-size:80px; animation:trophyBounce 0.6s cubic-bezier(.34,1.56,.64,1) both; }
+  @keyframes trophyBounce { from{transform:scale(0.3) rotate(-20deg);opacity:0} to{transform:scale(1) rotate(0deg);opacity:1} }
+  .end-grade {
+    font-family:'Archivo Black', sans-serif;
+    font-size:72px; line-height:1;
+    text-shadow:0 0 30px rgba(255,215,0,0.5);
+    margin:8px 0;
+  }
+  .end-title  { font-family:'Archivo Black', sans-serif; font-size:26px; margin-bottom:8px; }
+  .end-score  { font-family:'Archivo Black', sans-serif; font-size:18px; color:var(--gold); margin-bottom:16px; }
+  .end-msg    { color:var(--muted); font-size:13px; max-width:460px; margin:0 auto 24px; line-height:1.75; }
+
+  .end-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px; }
+  .end-cell {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px 16px; text-align:center;
+  }
+  .ec-num   { font-family:'Archivo Black', sans-serif; font-size:26px; margin-bottom:4px; }
+  .ec-label { font-size:11px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+
+  .cat-breakdown {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin-bottom:20px;
+    text-align:left;
+  }
+  .cb-title {
+    font-size:10px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--gold); margin-bottom:14px; font-weight:700;
+  }
+  .cb-row {
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:10px;
+  }
+  .cb-row:last-child { margin-bottom:0; }
+  .cb-cat   { font-size:13px; font-weight:600; width:140px; flex-shrink:0; }
+  .cb-bar-wrap { flex:1; height:8px; background:var(--surface2); border-radius:99px; overflow:hidden; }
+  .cb-bar   { height:100%; border-radius:99px; transition:width 0.6s ease; }
+  .cb-frac  { font-size:12px; color:var(--muted); width:32px; text-align:right; flex-shrink:0; }
+
+  .replay-btn {
+    padding:14px 40px;
+    background:transparent; color:var(--gold);
+    border:2px solid var(--gold); border-radius:var(--radius);
+    font-family:'Archivo Black', sans-serif;
+    font-size:18px; letter-spacing:1px;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .replay-btn:hover { background:var(--gold); color:#000; transform:translateY(-2px); }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)}  to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="hdr">
+    <div class="eyebrow">Money Hacks · NMT Summer STEM · Friday</div>
+    <h1>💰 FINAL BOSS 💰</h1>
+    <p>15 questions. 5 categories. Everything from the week. Streak bonuses. One winner.</p>
+  </div>
+
+  <!-- START -->
+  <div id="start-screen" class="start-screen">
+    <h2>The Week Ends Here</h2>
+    <p>Every concept from Monday to Thursday is fair game. Points scale by difficulty. Streak bonuses multiply your score. First team to the highest score wins the play money jackpot.</p>
+    <div class="cat-grid">
+      <div class="cat-card">
+        <div class="cc-icon">💰</div>
+        <div class="cc-info">
+          <div class="cc-title">Budgeting & Spending</div>
+          <div class="cc-count">3 questions · 1–2 pts each</div>
+        </div>
+      </div>
+      <div class="cat-card">
+        <div class="cc-icon">📈</div>
+        <div class="cc-info">
+          <div class="cc-title">Investing & Markets</div>
+          <div class="cc-count">3 questions · 1–3 pts each</div>
+        </div>
+      </div>
+      <div class="cat-card">
+        <div class="cc-icon">🏪</div>
+        <div class="cc-info">
+          <div class="cc-title">Entrepreneurship</div>
+          <div class="cc-count">3 questions · 1–2 pts each</div>
+        </div>
+      </div>
+      <div class="cat-card">
+        <div class="cc-icon">💳</div>
+        <div class="cc-info">
+          <div class="cc-title">Credit & Debt</div>
+          <div class="cc-count">3 questions · 1–3 pts each</div>
+        </div>
+      </div>
+      <div class="cat-card" style="grid-column:span 2;">
+        <div class="cc-icon">🧠</div>
+        <div class="cc-info">
+          <div class="cc-title">Big Picture & Mindset</div>
+          <div class="cc-count">3 questions · 2–3 pts each · hardest category</div>
+        </div>
+      </div>
+    </div>
+    <p style="margin-bottom:12px;">Answer correctly 3+ in a row to earn streak bonus points. Every correct answer in a streak earns +1 extra point.</p>
+    <button class="start-btn" onclick="startGame()">FIGHT THE BOSS →</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="game-screen" style="display:none;">
+    <div class="scorebar">
+      <div class="sb-cell pts" ><div class="sb-label">Points</div><div class="sb-val" id="sb-pts">0</div></div>
+      <div class="sb-cell corr"><div class="sb-label">Correct</div><div class="sb-val" id="sb-corr">0</div></div>
+      <div class="sb-cell strk"><div class="sb-label">Streak 🔥</div><div class="sb-val" id="sb-strk">0</div></div>
+      <div class="sb-cell qnum"><div class="sb-label">Question</div><div class="sb-val" id="sb-qnum">1/15</div></div>
+    </div>
+
+    <div class="dots" id="dots"></div>
+    <div class="streak-toast" id="streak-toast">🔥 ON FIRE! +1 BONUS!</div>
+
+    <div class="q-card" id="q-card">
+      <div class="q-difficulty" id="q-diff"></div>
+      <div class="cat-badge" id="cat-badge"></div>
+      <div class="q-text" id="q-text">Loading...</div>
+      <div class="q-context" id="q-context"></div>
+    </div>
+
+    <div class="answers" id="answers"></div>
+
+    <div class="explanation" id="explanation">
+      <div class="exp-result">
+        <span class="exp-badge" id="exp-badge">Correct!</span>
+        <span class="exp-pts"  id="exp-pts">+2</span>
+      </div>
+      <div class="exp-text" id="exp-text"></div>
+      <div class="exp-rule" id="exp-rule"></div>
+    </div>
+
+    <button class="next-btn" id="next-btn" onclick="nextQ()">Next Question →</button>
+  </div>
+
+  <!-- END -->
+  <div id="end-screen" class="end-screen" style="display:none;">
+    <div class="trophy-wrap"><span class="trophy-emoji" id="end-trophy">🏆</span></div>
+    <div class="end-grade" id="end-grade">A</div>
+    <div class="end-title" id="end-title">Money Master!</div>
+    <div class="end-score" id="end-score">12 / 15 correct · 28 points</div>
+    <p class="end-msg" id="end-msg"></p>
+    <div class="end-grid" id="end-grid"></div>
+    <div class="cat-breakdown" id="cat-breakdown"></div>
+    <button class="replay-btn" onclick="resetGame()">REMATCH</button>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    cat:'💰 Budgeting', catColor:'#ffd700', catBg:'rgba(255,215,0,0.12)',
+    diff:1, points:1,
+    text:'What is the "50/30/20" rule in personal budgeting?',
+    context:'One of the most widely-used personal finance frameworks, popularized by Senator Elizabeth Warren.',
+    answers:['50% needs, 30% wants, 20% savings/debt','50% savings, 30% needs, 20% wants','50% investing, 30% housing, 20% food','50% income, 30% taxes, 20% spending'],
+    correct:0,
+    explain:'The 50/30/20 rule: spend 50% of after-tax income on needs (rent, food, utilities), 30% on wants (entertainment, dining out), and save or pay down debt with 20%. It is a simple framework — not perfect for everyone, but a solid starting point.',
+    rule:'The beauty of 50/30/20 is its simplicity. If your rent alone eats 50%, that is a housing problem to solve first.',
+  },
+  {
+    cat:'💰 Budgeting', catColor:'#ffd700', catBg:'rgba(255,215,0,0.12)',
+    diff:1, points:1,
+    text:'Your monthly take-home pay is $3,000. You spend $2,800. What is your savings rate?',
+    context:'Savings rate = percentage of income saved each month.',
+    answers:['About 6.7%','About 93%','About 7.5%','Exactly 10%'],
+    correct:0,
+    explain:'Savings rate = (saved ÷ income) × 100. You saved $200 out of $3,000 = 6.67%. That rounds to about 6.7%. Financial planners generally recommend saving at least 20% of take-home pay.',
+    rule:'A 6.7% savings rate is very thin. One unexpected expense could wipe it out. The goal is 20%+ to build a real financial cushion.',
+  },
+  {
+    cat:'💰 Budgeting', catColor:'#ffd700', catBg:'rgba(255,215,0,0.12)',
+    diff:2, points:2,
+    text:'Which of these is the BEST example of "lifestyle inflation"?',
+    context:'Lifestyle inflation is one of the most common reasons high earners still feel broke.',
+    answers:['Getting a raise and increasing spending proportionally','Spending more during the holidays','Buying groceries at a more expensive store','Having a gym membership'],
+    correct:0,
+    explain:'Lifestyle inflation (or "lifestyle creep") is when your spending rises with your income, leaving your savings rate unchanged despite earning more. Getting a $10,000 raise but immediately spending $10,000 more per year is the textbook case — you feel richer but build no more wealth.',
+    rule:'Every raise is a choice: improve your lifestyle now, or build wealth for later. Most financially successful people say: bank most of the raise, enjoy a little.',
+  },
+  {
+    cat:'📈 Investing', catColor:'#40c4ff', catBg:'rgba(64,196,255,0.12)',
+    diff:1, points:1,
+    text:'What does it mean when people say an index fund "tracks the S&P 500"?',
+    context:'Index funds have become the most recommended investment vehicle for everyday investors.',
+    answers:['It buys a tiny piece of the 500 largest US companies','It only buys stocks that go up in the S&P 500','It is guaranteed not to lose money','It is managed by Wall Street professionals who pick the best stocks'],
+    correct:0,
+    explain:'An S&P 500 index fund buys proportional shares of the 500 largest publicly traded US companies — Apple, Microsoft, Amazon, and 497 others. When "the market" goes up or down, you go up or down with it. No manager is picking stocks — it is automatic, which keeps costs extremely low.',
+    rule:'Index funds beat roughly 85% of actively managed funds over 20 years, after fees. Boring wins.',
+  },
+  {
+    cat:'📈 Investing', catColor:'#40c4ff', catBg:'rgba(64,196,255,0.12)',
+    diff:2, points:2,
+    text:'You invest $1,000 at age 18 at 7% annual return. Roughly how much is it worth at age 65?',
+    context:'This is the core lesson from the Compound Interest game on Tuesday.',
+    answers:['About $21,000','About $3,500','About $7,000','About $48,000'],
+    correct:0,
+    explain:'$1,000 × (1.07)^47 ≈ $21,000. This is the power of compound interest over 47 years. The money roughly doubles every 10 years at 7%. This is why starting at 18 vs 28 is not a $10,000 difference — it is a $10,000 vs $21,000 difference, and the gap is even larger for larger amounts.',
+    rule:'Rule of 72: divide 72 by the interest rate to find how many years to double. At 7% → 72/7 ≈ 10 years to double.',
+  },
+  {
+    cat:'📈 Investing', catColor:'#40c4ff', catBg:'rgba(64,196,255,0.12)',
+    diff:3, points:3,
+    text:'When the Federal Reserve RAISES interest rates, what typically happens to stock prices?',
+    context:'This was one of the Bull or Bear scenarios from Tuesday.',
+    answers:['Stock prices tend to fall','Stock prices tend to rise','Stock prices are unaffected','Only tech stocks fall'],
+    correct:0,
+    explain:'When the Fed raises rates: (1) borrowing becomes more expensive for companies, squeezing profits; (2) bonds now offer better returns, so investors shift money from stocks to bonds; (3) consumer spending slows. All three push stock prices down. This is why markets closely watch every Fed announcement.',
+    rule:'Fed raises rates → stocks fall. Fed cuts rates → stocks usually rise. This relationship is the most important macro dynamic to understand as an investor.',
+  },
+  {
+    cat:'🏪 Entrepreneurship', catColor:'#00e676', catBg:'rgba(0,230,118,0.1)',
+    diff:1, points:1,
+    text:'In dropshipping, who physically ships the product to the customer?',
+    context:'Dropshipping was covered in Wednesday\'s Dropship or Flop game.',
+    answers:['The supplier / manufacturer','You, from your home','The customer picks it up','Amazon always handles shipping'],
+    correct:0,
+    explain:'That is the core of dropshipping: you take the order and payment, then forward the order to a supplier who ships directly to your customer. You never see or touch the product. Your job is marketing, customer service, and finding winning products.',
+    rule:'Dropshipping sounds passive but is not: product research, ad management, customer service, and supplier reliability are active work. The barrier to entry is low, so competition is fierce.',
+  },
+  {
+    cat:'🏪 Entrepreneurship', catColor:'#00e676', catBg:'rgba(0,230,118,0.1)',
+    diff:2, points:2,
+    text:'You buy a product for $15 and sell it for $45. What is your gross profit margin?',
+    context:'Profit margin is the most important math in any business.',
+    answers:['66.7%','33.3%','200%','$30'],
+    correct:0,
+    explain:'Gross profit margin = (Revenue − Cost) ÷ Revenue × 100 = ($45 − $15) ÷ $45 × 100 = 66.7%. Note: $30 is your gross profit in dollars, not your margin percentage. Margin is always expressed as a percentage of the selling price, not the cost.',
+    rule:'For dropshipping, aim for 30%+ margin AFTER platform fees, shipping, and advertising costs. A 66.7% gross margin sounds great — but ads alone might cost you 20-30%, leaving much less.',
+  },
+  {
+    cat:'🏪 Entrepreneurship', catColor:'#00e676', catBg:'rgba(0,230,118,0.1)',
+    diff:2, points:2,
+    text:'What is the MAIN reason most investors are skeptical of meme coins like Dogecoin as a long-term investment?',
+    context:'From Wednesday\'s crypto discussion.',
+    answers:['They have no underlying earnings, technology advantage, or fundamental value','They are too cheap per coin','The government will ban them all','They are too hard to buy'],
+    correct:0,
+    explain:'Stocks have earnings. Bonds have interest. Real estate has rent. Meme coins have: tweets and vibes. There is no business generating revenue behind Dogecoin. Its value is 100% based on what the next person will pay. That makes it a speculation, not an investment. When sentiment shifts, there is nothing to fall back on.',
+    rule:'Before investing in anything, ask: what generates the underlying value? Stocks = company earnings. Crypto = network utility and scarcity. Meme coins = pure sentiment. Understanding this prevents most crypto disasters.',
+  },
+  {
+    cat:'💳 Credit & Debt', catColor:'#ff80ab', catBg:'rgba(255,128,171,0.12)',
+    diff:1, points:1,
+    text:'Which factor has the LARGEST impact on your credit score?',
+    context:'Five factors make up your FICO score — their weights are very different.',
+    answers:['Payment history (35%)','Credit utilization (30%)','Length of credit history (15%)','Types of credit (10%)'],
+    correct:0,
+    explain:'Payment history is 35% of your FICO score — the single largest factor. A single 30-day late payment can drop your score 50-100 points and stays on your report for 7 years. Paying on time, every time, is the foundation everything else builds on.',
+    rule:'Set up autopay for at least the minimum on every account. Missing a payment by accident is one of the most expensive mistakes you can make — and the easiest to prevent.',
+  },
+  {
+    cat:'💳 Credit & Debt', catColor:'#ff80ab', catBg:'rgba(255,128,171,0.12)',
+    diff:2, points:2,
+    text:'You have a $1,000 credit card limit and a $700 balance. What is your credit utilization rate, and is it good or bad?',
+    context:'Credit utilization is 30% of your FICO score.',
+    answers:['70% — bad, aim for under 30%','70% — good, shows you use your credit','30% — good','$300 — the amount left to spend'],
+    correct:0,
+    explain:'Credit utilization = balance ÷ limit × 100 = $700 ÷ $1,000 = 70%. That is considered high — lenders prefer to see utilization under 30%. At 70%, you are signaling financial stress even if you pay it off monthly. The fix: either pay down the balance or request a limit increase.',
+    rule:'Keep utilization under 30% across all cards. Under 10% is even better for a top score. Utilization is calculated at your statement closing date, not just at payment time.',
+  },
+  {
+    cat:'💳 Credit & Debt', catColor:'#ff80ab', catBg:'rgba(255,128,171,0.12)',
+    diff:3, points:3,
+    text:'With the Debt Avalanche method, which debt do you pay off first?',
+    context:'You have: Credit card at 24% APR ($2,000), Car loan at 7% APR ($8,000), Student loan at 5.5% APR ($18,000).',
+    answers:['Credit card — highest interest rate first','Student loan — largest balance first','Car loan — middle balance first','All equally — split your extra payment three ways'],
+    correct:0,
+    explain:'The Debt Avalanche pays the highest interest rate first while making minimums on everything else. The credit card at 24% APR is mathematically the most expensive debt — every dollar sitting on it costs 24 cents per year in interest. Eliminating it first minimizes total interest paid across all debts.',
+    rule:'Avalanche = mathematically optimal (saves the most money). Snowball = smallest balance first (psychologically motivating). Both work. The best method is whichever one you actually stick to.',
+  },
+  {
+    cat:'🧠 Big Picture', catColor:'#c77dff', catBg:'rgba(199,125,255,0.12)',
+    diff:2, points:2,
+    text:'What is an "emergency fund" and how much should it generally contain?',
+    context:'One of the most fundamental concepts in personal finance.',
+    answers:['3–6 months of living expenses in an easily accessible savings account','Exactly $1,000 in cash at home','Your maximum credit card limit','Half your annual salary in stocks'],
+    correct:0,
+    explain:'An emergency fund is 3–6 months of essential living expenses (rent, food, utilities, transportation) held in a liquid account — meaning you can access it immediately without penalty. This prevents one bad event (job loss, medical bill, car repair) from forcing you into high-interest debt.',
+    rule:'Build your emergency fund BEFORE investing. A $1,000 car repair that goes on a 24% APR card will cost you more than a month of missed index fund contributions would have earned.',
+  },
+  {
+    cat:'🧠 Big Picture', catColor:'#c77dff', catBg:'rgba(199,125,255,0.12)',
+    diff:3, points:3,
+    text:'Why do financial experts almost universally recommend getting the full employer 401(k) match before doing anything else with extra income?',
+    context:'From Thursday\'s credit simulator — the free money question.',
+    answers:['A 100% match is an instant 100% return — nothing else can compete with that','Because 401(k) money is tax-free forever','Because it is required by law','Because the stock market always goes up'],
+    correct:0,
+    explain:'If your employer matches 100% of contributions up to 4% of your salary, contributing that 4% gives you an INSTANT 100% return before the market does anything. No investment — not stocks, not real estate, not crypto — can guarantee an instant 100% return. Skipping the match is literally leaving salary on the table.',
+    rule:'Always get the full employer match. Always. It is the single highest-return financial move most employees can make and one of the most commonly skipped.',
+  },
+  {
+    cat:'🧠 Big Picture', catColor:'#c77dff', catBg:'rgba(199,125,255,0.12)',
+    diff:3, points:3,
+    text:'You are 25. You can save $200/month starting NOW, or wait until 35 and save $400/month. Assuming 7% return and retiring at 65, which strategy likely produces more wealth?',
+    context:'The final boss question — synthesizes everything from the compound interest game.',
+    answers:['Starting at 25 with $200/month','Starting at 35 with $400/month','They produce roughly the same amount','It depends on the stock market'],
+    correct:0,
+    explain:'Starting at 25: $200/month × 40 years at 7% ≈ $528,000. Starting at 35: $400/month × 30 years at 7% ≈ $486,000. Despite saving TWICE as much per month, the late starter ends up with less — because 10 extra years of compounding is worth more than doubling the contribution. Time is the most powerful variable.',
+    rule:'This is the single most important lesson in personal finance: starting early beats contributing more. The best time to start was yesterday. The second best time is right now.',
+  },
+];
+
+const DIFF_LABELS = ['','Easy','Medium','Hard'];
+const CAT_COLORS = {
+  '💰 Budgeting':       {bar:'#ffd700'},
+  '📈 Investing':       {bar:'#40c4ff'},
+  '🏪 Entrepreneurship':{bar:'#00e676'},
+  '💳 Credit & Debt':  {bar:'#ff80ab'},
+  '🧠 Big Picture':    {bar:'#c77dff'},
+};
+
+let current = 0;
+let pts = 0;
+let correct = 0;
+let streak = 0;
+let bestStreak = 0;
+let answered = false;
+let questions = [];
+let dotStates = [];
+let catResults = {};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function buildDots() {
+  const d = document.getElementById('dots');
+  d.innerHTML = '';
+  questions.forEach((_,i) => {
+    const el = document.createElement('div');
+    el.className = 'dot' + (i===0?' cur':'');
+    el.id = `dot-${i}`;
+    d.appendChild(el);
+  });
+}
+
+function updateHUD() {
+  document.getElementById('sb-pts').textContent  = pts;
+  document.getElementById('sb-corr').textContent = correct;
+  document.getElementById('sb-strk').textContent = streak;
+  document.getElementById('sb-qnum').textContent = `${current+1}/${questions.length}`;
+}
+
+function renderQ() {
+  answered = false;
+  const q = questions[current];
+
+  // difficulty pips
+  const pips = Array.from({length:3}, (_,i) =>
+    `<div class="diff-pip" style="background:${i<q.diff?'#ffd700':'rgba(255,255,255,0.15)'}"></div>`
+  ).join('');
+  document.getElementById('q-diff').innerHTML =
+    `<div class="diff-pips">${pips}</div><span>${DIFF_LABELS[q.diff]} · ${q.points} pt${q.points>1?'s':''}</span>`;
+
+  // top bar color
+  const qcard = document.getElementById('q-card');
+  qcard.style.setProperty('--bar-col', CAT_COLORS[q.cat]?.bar || '#fff');
+  qcard.querySelector('::before');
+  qcard.style.cssText += '';
+  // set before via a style tag trick - use inline on q-card
+  document.querySelector('.q-card::before') || (() => {})();
+  // just set border-top directly
+  qcard.style.borderTop = `3px solid ${CAT_COLORS[q.cat]?.bar || '#fff'}`;
+
+  // badge
+  const badge = document.getElementById('cat-badge');
+  badge.textContent = q.cat;
+  badge.style.background = q.catBg;
+  badge.style.color = q.catColor;
+  badge.style.border = `1px solid ${q.catColor}33`;
+
+  document.getElementById('q-text').textContent = q.text;
+  const ctx = document.getElementById('q-context');
+  ctx.textContent = q.context;
+  ctx.className = 'q-context' + (q.context ? ' show' : '');
+
+  // shuffle answer order
+  const indices = shuffle([0,1,2,3]);
+  const letters = ['A','B','C','D'];
+  const ans = document.getElementById('answers');
+  ans.innerHTML = '';
+  indices.forEach((origIdx, pos) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.innerHTML = `<div class="ans-letter">${letters[pos]}</div>${q.answers[origIdx]}`;
+    btn.onclick = () => choose(origIdx, btn, indices);
+    ans.appendChild(btn);
+  });
+
+  document.getElementById('explanation').className = 'explanation';
+  document.getElementById('next-btn').className = 'next-btn';
+  document.getElementById('streak-toast').className = 'streak-toast';
+
+  // card animation
+  const card = document.getElementById('q-card');
+  card.style.animation='none'; card.offsetHeight;
+  card.style.animation='cardIn 0.4s cubic-bezier(.34,1.56,.64,1) both';
+
+  // dots
+  document.querySelectorAll('.dot').forEach((d,i) => {
+    if (i < current) return;
+    d.className = 'dot' + (i===current?' cur':'');
+  });
+
+  updateHUD();
+}
+
+function choose(origIdx, clickedBtn, indices) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const isRight = origIdx === q.correct;
+
+  // track category
+  const catKey = q.cat;
+  if (!catResults[catKey]) catResults[catKey] = {right:0, total:0};
+  catResults[catKey].total++;
+
+  let earnedPts = 0;
+  if (isRight) {
+    correct++;
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+    earnedPts = q.points + (streak >= 3 ? 1 : 0);
+    pts += earnedPts;
+    catResults[catKey].right++;
+  } else {
+    streak = 0;
+  }
+
+  updateHUD();
+
+  // style all buttons
+  const allBtns = document.querySelectorAll('.ans-btn');
+  allBtns.forEach((btn, pos) => {
+    btn.disabled = true;
+    const thisOrigIdx = indices[pos];
+    if (thisOrigIdx === q.correct) {
+      btn.classList.add('correct-ans');
+    } else if (btn === clickedBtn && !isRight) {
+      btn.classList.add('wrong-ans');
+    } else {
+      btn.classList.add('dim');
+    }
+  });
+
+  // dot
+  const dot = document.getElementById(`dot-${current}`);
+  if (dot) dot.className = `dot ${isRight ? 'right' : 'wrong'}`;
+
+  // streak toast
+  if (isRight && streak >= 3) {
+    const t = document.getElementById('streak-toast');
+    t.textContent = streak >= 5 ? `🔥🔥 UNSTOPPABLE! ${streak} in a row! +1 BONUS!` : `🔥 ON FIRE! ${streak} in a row! +1 BONUS!`;
+    t.className = 'streak-toast show';
+  }
+
+  // explanation
+  const exp = document.getElementById('explanation');
+  exp.className = 'explanation show';
+  const badge = document.getElementById('exp-badge');
+  badge.className = `exp-badge ${isRight ? 'eb-right' : 'eb-wrong'}`;
+  badge.textContent = isRight ? '✓ Correct!' : '✗ Not quite';
+  document.getElementById('exp-pts').textContent = isRight ? `+${earnedPts} pt${earnedPts!==1?'s':''}` : '+0';
+  document.getElementById('exp-text').textContent = q.explain;
+  const rule = document.getElementById('exp-rule');
+  if (q.rule) {
+    rule.className = 'exp-rule show';
+    rule.textContent = '📌 ' + q.rule;
+  } else {
+    rule.className = 'exp-rule';
+  }
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.className = 'next-btn show';
+  nextBtn.textContent = current+1 >= questions.length ? 'See Final Score →' : `Next Question →`;
+}
+
+function nextQ() {
+  current++;
+  if (current >= questions.length) showEnd();
+  else renderQ();
+}
+
+function showEnd() {
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('end-screen').style.display  = 'block';
+
+  const total = questions.length;
+  const maxPts = questions.reduce((s,q) => s+q.points, 0) + total;
+  const pct = correct / total;
+
+  let trophy, grade, title, msg;
+  if (pct >= 0.93) {
+    trophy='🏆'; grade='S'; title='Money Master!';
+    msg=`${correct}/${total} correct, ${pts} points. Exceptional across every category. You absorbed everything from this week and applied it under pressure. That is exactly what financial literacy looks like.`;
+  } else if (pct >= 0.8) {
+    trophy='🥇'; grade='A'; title='Financial Genius';
+    msg=`${correct}/${total} correct, ${pts} points. Strong performance across the board. A few gaps, but your foundation is genuinely solid. The concepts you know will compound over your lifetime.`;
+  } else if (pct >= 0.67) {
+    trophy='🥈'; grade='B'; title='Sharp Thinker';
+    msg=`${correct}/${total} correct, ${pts} points. You got the core concepts and stumbled on the harder applications. That is completely normal — depth comes with time and practice.`;
+  } else if (pct >= 0.5) {
+    trophy='🥉'; grade='C'; title='Getting There';
+    msg=`${correct}/${total} correct, ${pts} points. Some strong spots and some real gaps. Review the categories where you missed most — those are the areas worth revisiting before you face these decisions in real life.`;
+  } else {
+    trophy='📚'; grade='D'; title='Study Hall';
+    msg=`${correct}/${total} correct, ${pts} points. The questions are hard! More importantly — you now know what you do not know, which is actually valuable. Every missed answer is a lesson that could save you money someday.`;
+  }
+
+  document.getElementById('end-trophy').textContent = trophy;
+  document.getElementById('end-grade').textContent  = grade;
+  document.getElementById('end-grade').style.color  = pct>=0.93?'#ffd700':pct>=0.8?'#00e676':pct>=0.67?'#40c4ff':pct>=0.5?'#ff80ab':'#c77dff';
+  document.getElementById('end-title').textContent  = title;
+  document.getElementById('end-score').textContent  = `${correct} / ${total} correct · ${pts} points`;
+  document.getElementById('end-msg').textContent    = msg;
+
+  const grid = document.getElementById('end-grid');
+  grid.innerHTML = [
+    { num: correct, label:'Correct Answers', col:'#00e676' },
+    { num: pts,     label:'Total Points',    col:'#ffd700' },
+    { num: bestStreak, label:'Best Streak 🔥', col:'#ff80ab' },
+    { num: total - correct, label:'Missed',  col:'#ff5252' },
+  ].map(c => `
+    <div class="end-cell">
+      <div class="ec-num" style="color:${c.col}">${c.num}</div>
+      <div class="ec-label">${c.label}</div>
+    </div>
+  `).join('');
+
+  const cb = document.getElementById('cat-breakdown');
+  const cats = Object.entries(catResults);
+  cb.innerHTML = `<div class="cb-title">// BREAKDOWN BY CATEGORY</div>` +
+    cats.map(([cat, res]) => {
+      const pct = res.total > 0 ? res.right/res.total : 0;
+      const barCol = CAT_COLORS[cat]?.bar || '#fff';
+      return `<div class="cb-row">
+        <div class="cb-cat">${cat}</div>
+        <div class="cb-bar-wrap">
+          <div class="cb-bar" style="width:${Math.round(pct*100)}%;background:${barCol}"></div>
+        </div>
+        <div class="cb-frac">${res.right}/${res.total}</div>
+      </div>`;
+    }).join('');
+}
+
+function startGame() {
+  questions = shuffle(QUESTIONS);
+  catResults = {};
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display  = 'block';
+  buildDots();
+  renderQ();
+}
+
+function resetGame() {
+  current=0; pts=0; correct=0; streak=0; bestStreak=0; answered=false;
+  catResults={};
+  questions = shuffle(QUESTIONS);
+  document.getElementById('end-screen').style.display  = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  buildDots();
+  renderQ();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Time Machine — Compound Interest</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #f5f0e8;
+    --surface:  #fdfaf4;
+    --ink:      #1a1208;
+    --ink2:     #3d3020;
+    --muted:    #8a7a60;
+    --border:   #d4c9b0;
+    --green:    #1a6b3a;
+    --green-bg: #e8f5ed;
+    --red:      #8b1a1a;
+    --gold:     #c17f24;
+    --gold-bg:  #fef3dc;
+    --blue:     #1a3a6b;
+    --blue-bg:  #dce8f5;
+    --radius:   12px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    /* paper texture via repeating lines */
+    background-image: repeating-linear-gradient(
+      transparent,
+      transparent 27px,
+      var(--border) 27px,
+      var(--border) 28px
+    );
+  }
+
+  /* ── HEADER ── */
+  .masthead {
+    background: var(--ink);
+    color: var(--bg);
+    text-align: center;
+    padding: 28px 20px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .masthead::before {
+    content: '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$';
+    position: absolute;
+    top: 8px; left: 0; right: 0;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.07);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .masthead::after {
+    content: '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$';
+    position: absolute;
+    bottom: 8px; left: 0; right: 0;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.07);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .masthead .kicker {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .masthead h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 7vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .masthead .subtitle {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+  }
+
+  /* ── LAYOUT ── */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 16px 80px;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  /* ── PANEL ── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 3px 3px 0 var(--border);
+  }
+  .panel-header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 12px 18px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-body { padding: 20px 18px; }
+
+  /* ── CONTROLS ── */
+  .control-group {
+    margin-bottom: 20px;
+  }
+  .control-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .control-label .lbl {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .control-label .val {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .control-label .val .unit {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--ink);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  .track-fill {
+    position: relative;
+    margin-bottom: 4px;
+  }
+
+  /* Mode toggle */
+  .mode-toggle {
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 3px;
+    margin-bottom: 20px;
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .mode-btn.active {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  /* ── RESULT DISPLAY ── */
+  .result-hero {
+    text-align: center;
+    padding: 24px 16px;
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(193,127,36,0.2) 0%, transparent 70%);
+  }
+  .result-hero .rh-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 6px;
+  }
+  .result-hero .rh-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 7vw, 56px);
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    transition: all 0.3s ease;
+  }
+  .result-hero .rh-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 6px;
+  }
+
+  /* breakdown cards */
+  .breakdown-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .breakdown-card {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .bc-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .bc-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .bc-value.invested { color: var(--blue); }
+  .bc-value.earned   { color: var(--green); }
+
+  /* ── CHART ── */
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    margin: 16px 0 8px;
+  }
+  canvas#chart { width:100%; height:100%; display:block; }
+
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+  .comp-table th {
+    text-align: left;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .comp-table td {
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr.highlight-row td { background: var(--gold-bg); }
+  .comp-table .age-col {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+    width: 50px;
+  }
+  .comp-table .total-col {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--green);
+  }
+  .comp-table .diff-col {
+    font-size: 11px;
+    color: var(--red);
+    font-style: italic;
+  }
+  .comp-table .diff-col.positive { color: var(--green); font-style: normal; }
+
+  /* ── MILESTONE BANNER ── */
+  .milestone {
+    background: var(--gold-bg);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.4s ease;
+  }
+  .milestone-icon { font-size: 20px; flex-shrink: 0; }
+  .milestone-text { color: var(--ink2); line-height: 1.5; }
+  .milestone-text strong { color: var(--gold); }
+  @keyframes slideIn {
+    from { opacity:0; transform: translateX(-10px); }
+    to   { opacity:1; transform: translateX(0); }
+  }
+
+  /* ── SCENARIO BUTTONS ── */
+  .scenario-section { margin-top: 20px; }
+  .scenario-title {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .scenario-btn {
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--ink2);
+    transition: all 0.2s;
+    line-height: 1.5;
+  }
+  .scenario-btn:hover {
+    border-color: var(--gold);
+    background: var(--gold-bg);
+    transform: translateY(-1px);
+  }
+  .scenario-btn strong { display:block; color: var(--ink); margin-bottom: 2px; }
+  .scenario-btn span { color: var(--muted); font-size: 10px; }
+
+  /* daily version */
+  .daily-toggle {
+    text-align: center;
+    margin-top: 16px;
+  }
+  .daily-toggle button {
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .daily-toggle button:hover { border-color: var(--green); color: var(--green); }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-top: 32px;
+    text-transform: uppercase;
+  }
+
+  /* number animate */
+  .num-change {
+    animation: numPop 0.3s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes numPop {
+    from { transform: scale(0.85); opacity:0.5; }
+    to   { transform: scale(1);    opacity:1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="kicker">Money Hacks · NMT Summer STEM · Tuesday</div>
+  <h1>The Time Machine</h1>
+  <div class="subtitle">Compound Interest Calculator &amp; Discovery Tool</div>
+</div>
+
+<div class="page">
+  <div class="two-col">
+
+    <!-- LEFT: CONTROLS -->
+    <div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-header">⚙ Your Inputs</div>
+        <div class="panel-body">
+
+          <!-- Mode toggle -->
+          <div class="mode-toggle">
+            <button class="mode-btn active" id="mode-lump" onclick="setMode('lump')">Lump Sum</button>
+            <button class="mode-btn" id="mode-monthly" onclick="setMode('monthly')">Monthly Savings</button>
+          </div>
+
+          <!-- Starting amount -->
+          <div class="control-group">
+            <div class="control-label">
+              <span class="lbl" id="amount-label">Starting Amount</span>
+              <span class="val">$<span id="amount-val">1000</span></span>
+            </div>
+            <input type="range" id="amount-slider" min="100" max="10000" step="100" value="1000" oninput="update()">
+          </div>
+
+          <!-- Start age -->
+          <div class="control-group">
+            <div class="control-label">
+              <span class="lbl">You Start Investing At Age</span>
+              <span class="val"><span id="age-val">18</span> <span class="unit">yrs</span></span>
+            </div>
+            <input type="range" id="age-slider" min="15" max="45" step="1" value="18" oninput="update()">
+          </div>
+
+          <!-- Return rate -->
+          <div class="control-group">
+            <div class="control-label">
+              <span class="lbl">Annual Return Rate</span>
+              <span class="val"><span id="rate-val">7</span><span class="unit">%</span></span>
+            </div>
+            <input type="range" id="rate-slider" min="1" max="15" step="0.5" value="7" oninput="update()">
+          </div>
+
+          <!-- End age -->
+          <div class="control-group">
+            <div class="control-label">
+              <span class="lbl">Retire / End At Age</span>
+              <span class="val"><span id="end-val">65</span> <span class="unit">yrs</span></span>
+            </div>
+            <input type="range" id="end-slider" min="40" max="75" step="1" value="65" oninput="update()">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Scenarios -->
+      <div class="panel">
+        <div class="panel-header">⚡ Quick Scenarios</div>
+        <div class="panel-body">
+          <div class="scenario-title">Load a preset to compare</div>
+          <div class="scenario-grid">
+            <button class="scenario-btn" onclick="loadScenario(1000,18,7,65)">
+              <strong>🎓 The Early Bird</strong>
+              <span>$1,000 · Age 18 · 7%</span>
+            </button>
+            <button class="scenario-btn" onclick="loadScenario(1000,28,7,65)">
+              <strong>⏰ The Late Starter</strong>
+              <span>$1,000 · Age 28 · 7%</span>
+            </button>
+            <button class="scenario-btn" onclick="loadScenario(5,18,7,65,'daily')">
+              <strong>☕ Skip the Coffee</strong>
+              <span>$5/day · Age 18 · 7%</span>
+            </button>
+            <button class="scenario-btn" onclick="loadScenario(200,22,10,65,'monthly')">
+              <strong>💼 First Job Investor</strong>
+              <span>$200/mo · Age 22 · 10%</span>
+            </button>
+            <button class="scenario-btn" onclick="loadScenario(100,15,8,65,'monthly')">
+              <strong>🧒 Teen Investor</strong>
+              <span>$100/mo · Age 15 · 8%</span>
+            </button>
+            <button class="scenario-btn" onclick="loadScenario(500,38,7,65)">
+              <strong>😬 Late Realizer</strong>
+              <span>$500 · Age 38 · 7%</span>
+            </button>
+          </div>
+
+          <div class="daily-toggle">
+            <button onclick="showDailyMode()">💡 What if I invest $5/day starting now?</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: RESULTS -->
+    <div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-header">📈 Your Results</div>
+        <div class="panel-body">
+
+          <div class="result-hero">
+            <div class="rh-label">Total Value at Retirement</div>
+            <div class="rh-amount" id="result-total">$0</div>
+            <div class="rh-sub" id="result-years">over 0 years</div>
+          </div>
+
+          <div class="breakdown-row">
+            <div class="breakdown-card" style="background:var(--blue-bg); border-color: #aac4e0;">
+              <div class="bc-label">You Put In</div>
+              <div class="bc-value invested" id="result-invested">$0</div>
+            </div>
+            <div class="breakdown-card" style="background:var(--green-bg); border-color: #a0d4b4;">
+              <div class="bc-label">Interest Earned</div>
+              <div class="bc-value earned" id="result-earned">$0</div>
+            </div>
+          </div>
+
+          <!-- Milestone -->
+          <div id="milestone-box"></div>
+
+          <!-- Chart -->
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Amount Invested</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Interest Earned</div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart"></canvas>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Comparison Table -->
+      <div class="panel">
+        <div class="panel-header">⏱ The Cost of Waiting</div>
+        <div class="panel-body">
+          <div style="font-size:11px; color:var(--muted); margin-bottom:12px;">
+            Same amount invested — but starting at different ages. All retiring at 65 at <span id="table-rate">7</span>%.
+          </div>
+          <table class="comp-table" id="comp-table">
+            <thead>
+              <tr>
+                <th>Start Age</th>
+                <th>Years Invested</th>
+                <th>Total at 65</th>
+                <th>vs. Age 18</th>
+              </tr>
+            </thead>
+            <tbody id="comp-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-note">
+    NMT Summer STEM · Money Hacks · Dr. Suraj Ghimire · Assumes annual compounding · For educational purposes
+  </div>
+</div>
+
+<script>
+let mode = 'lump'; // 'lump' or 'monthly'
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('mode-lump').className    = 'mode-btn' + (m === 'lump'    ? ' active' : '');
+  document.getElementById('mode-monthly').className = 'mode-btn' + (m === 'monthly' ? ' active' : '');
+
+  const amtSlider = document.getElementById('amount-slider');
+  const amtLabel  = document.getElementById('amount-label');
+  if (m === 'lump') {
+    amtSlider.min = 100; amtSlider.max = 10000; amtSlider.step = 100;
+    amtSlider.value = Math.min(Math.max(amtSlider.value, 100), 10000);
+    amtLabel.textContent = 'Starting Amount';
+  } else {
+    amtSlider.min = 10; amtSlider.max = 1000; amtSlider.step = 10;
+    amtSlider.value = Math.min(Math.max(amtSlider.value, 10), 1000);
+    amtLabel.textContent = 'Monthly Contribution';
+  }
+  update();
+}
+
+function loadScenario(amount, startAge, rate, endAge, modeOverride) {
+  if (modeOverride === 'daily') {
+    setMode('monthly');
+    document.getElementById('amount-slider').value = Math.round(amount * 30.4);
+  } else if (modeOverride === 'monthly') {
+    setMode('monthly');
+    document.getElementById('amount-slider').value = amount;
+  } else {
+    setMode('lump');
+    document.getElementById('amount-slider').value = amount;
+  }
+  document.getElementById('age-slider').value  = startAge;
+  document.getElementById('rate-slider').value = rate;
+  document.getElementById('end-slider').value  = endAge;
+  update();
+}
+
+function showDailyMode() {
+  loadScenario(5, 18, 7, 65, 'daily');
+}
+
+function fmt(n) {
+  if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '$' + Math.round(n).toLocaleString();
+  return '$' + Math.round(n);
+}
+
+function calcLump(principal, annualRate, years) {
+  return principal * Math.pow(1 + annualRate / 100, years);
+}
+
+function calcMonthly(monthly, annualRate, years) {
+  const r = annualRate / 100 / 12;
+  const n = years * 12;
+  if (r === 0) return monthly * n;
+  return monthly * (Math.pow(1 + r, n) - 1) / r;
+}
+
+// draw chart
+let chartData = null;
+function drawChart(data) {
+  const canvas = document.getElementById('chart');
+  const dpr    = window.devicePixelRatio || 1;
+  const rect   = canvas.getBoundingClientRect();
+  canvas.width  = rect.width  * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+  const pad = { top: 10, right: 10, bottom: 28, left: 54 };
+  const gW = W - pad.left - pad.right;
+  const gH = H - pad.top  - pad.bottom;
+
+  const maxVal = Math.max(...data.map(d => d.total), 1);
+
+  ctx.clearRect(0, 0, W, H);
+
+  // gridlines
+  ctx.strokeStyle = 'rgba(180,160,120,0.3)';
+  ctx.lineWidth   = 0.8;
+  const gridLines = 4;
+  for (let i = 0; i <= gridLines; i++) {
+    const y = pad.top + gH - (i / gridLines) * gH;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(pad.left + gW, y);
+    ctx.stroke();
+
+    ctx.fillStyle = '#8a7a60';
+    ctx.font = '9px DM Mono, monospace';
+    ctx.textAlign = 'right';
+    const val = (maxVal * i / gridLines);
+    ctx.fillText(val >= 1e6 ? (val/1e6).toFixed(1)+'M' : val >= 1e3 ? Math.round(val/1e3)+'K' : Math.round(val), pad.left - 6, y + 3);
+  }
+
+  const barW = Math.max(2, gW / data.length - 2);
+
+  // draw bars: invested (blue) stacked under earned (green)
+  data.forEach((d, i) => {
+    const x = pad.left + (i / data.length) * gW + 1;
+    const investedH = (d.invested / maxVal) * gH;
+    const earnedH   = ((d.total - d.invested) / maxVal) * gH;
+
+    // invested portion
+    ctx.fillStyle = '#1a3a6b';
+    ctx.fillRect(x, pad.top + gH - investedH, barW, investedH);
+
+    // earned portion
+    ctx.fillStyle = '#1a6b3a';
+    ctx.fillRect(x, pad.top + gH - investedH - earnedH, barW, earnedH);
+  });
+
+  // x-axis labels (every ~10 years)
+  ctx.fillStyle = '#8a7a60';
+  ctx.font = '9px DM Mono, monospace';
+  ctx.textAlign = 'center';
+  const startAge = parseInt(document.getElementById('age-slider').value);
+  data.forEach((d, i) => {
+    const age = startAge + i;
+    if ((age - startAge) % 10 === 0 || i === data.length - 1) {
+      const x = pad.left + (i / data.length) * gW + barW / 2 + 1;
+      ctx.fillText('Age ' + age, x, H - 8);
+    }
+  });
+}
+
+function getMilestone(total, invested, years) {
+  const multiplier = total / invested;
+  if (multiplier >= 10)  return { icon:'🏆', text:`Your money <strong>10×'d</strong> — every $1 you put in became $${multiplier.toFixed(0)}. This is the power of starting early.` };
+  if (multiplier >= 5)   return { icon:'🚀', text:`Your money <strong>5×'d</strong> — interest earned more than your principal four times over.` };
+  if (multiplier >= 3)   return { icon:'⭐', text:`Your money <strong>tripled</strong> — compound interest did more work than you did.` };
+  if (multiplier >= 2)   return { icon:'📈', text:`Your money <strong>doubled</strong> — you now have more in interest than you put in.` };
+  if (years >= 30)       return { icon:'💡', text:`Invested for <strong>${years} years</strong>. Imagine if you'd started 10 years earlier...` };
+  return null;
+}
+
+function update() {
+  const amount   = parseFloat(document.getElementById('amount-slider').value);
+  const startAge = parseInt(document.getElementById('age-slider').value);
+  const rate     = parseFloat(document.getElementById('rate-slider').value);
+  const endAge   = parseInt(document.getElementById('end-slider').value);
+  const years    = Math.max(0, endAge - startAge);
+
+  document.getElementById('amount-val').textContent = mode === 'lump' ? amount.toLocaleString() : amount.toLocaleString();
+  document.getElementById('age-val').textContent    = startAge;
+  document.getElementById('rate-val').textContent   = rate;
+  document.getElementById('end-val').textContent    = endAge;
+
+  // Calculate
+  let total, invested;
+  if (mode === 'lump') {
+    total    = calcLump(amount, rate, years);
+    invested = amount;
+  } else {
+    total    = calcMonthly(amount, rate, years);
+    invested = amount * years * 12;
+  }
+  const earned = total - invested;
+
+  // Animate numbers
+  animateNumber('result-total',    total);
+  animateNumber('result-invested', invested);
+  animateNumber('result-earned',   earned);
+
+  document.getElementById('result-years').textContent = `over ${years} year${years !== 1 ? 's' : ''} · starting age ${startAge}`;
+
+  // Milestone
+  const ms = getMilestone(total, Math.max(1, invested), years);
+  const msBox = document.getElementById('milestone-box');
+  if (ms) {
+    msBox.innerHTML = `<div class="milestone"><span class="milestone-icon">${ms.icon}</span><div class="milestone-text">${ms.text}</div></div>`;
+  } else {
+    msBox.innerHTML = '';
+  }
+
+  // Build chart data year by year
+  const chartPoints = [];
+  for (let y = 0; y <= years; y++) {
+    let t, inv;
+    if (mode === 'lump') {
+      t   = calcLump(amount, rate, y);
+      inv = amount;
+    } else {
+      t   = calcMonthly(amount, rate, y);
+      inv = amount * y * 12;
+    }
+    chartPoints.push({ total: t, invested: Math.min(inv, t) });
+  }
+  drawChart(chartPoints);
+
+  // Comparison table
+  const compAges = [15, 18, 22, 25, 28, 35];
+  document.getElementById('table-rate').textContent = rate;
+  const tbody = document.getElementById('comp-body');
+  tbody.innerHTML = '';
+  const base = mode === 'lump'
+    ? calcLump(amount, rate, 65 - 18)
+    : calcMonthly(amount, rate, 65 - 18);
+
+  compAges.forEach(a => {
+    const yrs = Math.max(0, 65 - a);
+    const t   = mode === 'lump'
+      ? calcLump(amount, rate, yrs)
+      : calcMonthly(amount, rate, yrs);
+    const diff = t - base;
+    const isHighlight = a === startAge;
+    const tr = document.createElement('tr');
+    if (isHighlight) tr.className = 'highlight-row';
+    tr.innerHTML = `
+      <td class="age-col">${a}</td>
+      <td>${yrs} yrs</td>
+      <td class="total-col">${fmt(t)}</td>
+      <td class="diff-col ${diff >= 0 ? 'positive' : ''}">${diff >= 0 ? '+' : ''}${fmt(diff)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+let animFrames = {};
+function animateNumber(id, target) {
+  const el = document.getElementById(id);
+  const current = parseFloat(el.dataset.raw || 0);
+  el.dataset.raw = target;
+  cancelAnimationFrame(animFrames[id]);
+
+  const duration = 400;
+  const start    = performance.now();
+  const from     = current;
+
+  function step(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    const val  = from + (target - from) * ease;
+    el.textContent = fmt(val);
+    if (t < 1) animFrames[id] = requestAnimationFrame(step);
+    else el.textContent = fmt(target);
+  }
+  animFrames[id] = requestAnimationFrame(step);
+}
+
+// init
+update();
+window.addEventListener('resize', () => {
+  const startAge = parseInt(document.getElementById('age-slider').value);
+  const endAge   = parseInt(document.getElementById('end-slider').value);
+  const years    = Math.max(0, endAge - startAge);
+  const amount   = parseFloat(document.getElementById('amount-slider').value);
+  const rate     = parseFloat(document.getElementById('rate-slider').value);
+  const points   = [];
+  for (let y = 0; y <= years; y++) {
+    const t   = mode === 'lump' ? calcLump(amount, rate, y) : calcMonthly(amount, rate, y);
+    const inv = mode === 'lump' ? amount : amount * y * 12;
+    points.push({ total: t, invested: Math.min(inv, t) });
+  }
+  drawChart(points);
+});
+</script>
+</body>
+</html>

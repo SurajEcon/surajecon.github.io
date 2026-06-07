@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Credit Score Simulator — Money Hacks</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Exo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0c0f14;
+    --surface:  #13181f;
+    --surface2: #1a2030;
+    --border:   #242d3d;
+    --text:     #dde4f0;
+    --muted:    #5a6a82;
+    --green:    #22c55e;
+    --green-dim:#0f2d1a;
+    --yellow:   #eab308;
+    --yellow-dim:#2d2200;
+    --orange:   #f97316;
+    --orange-dim:#2d1500;
+    --red:      #ef4444;
+    --red-dim:  #2d0f0f;
+    --blue:     #3b82f6;
+    --blue-dim: #0f1d3d;
+    --radius:   10px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* circuit board bg pattern */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .wrapper {
+    position:relative;
+    z-index:1;
+    max-width:740px;
+    margin:0 auto;
+    padding:24px 16px 80px;
+  }
+
+  /* ── HEADER ── */
+  .game-header {
+    text-align:center;
+    margin-bottom:24px;
+    animation:fadeDown 0.5s ease both;
+  }
+  .eyebrow {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:3px;
+    color:var(--blue);
+    margin-bottom:10px;
+  }
+  .game-header h1 {
+    font-size:clamp(30px,6vw,58px);
+    font-weight:800;
+    line-height:1.05;
+    margin-bottom:6px;
+  }
+  .game-header h1 span { color:var(--blue); }
+  .game-header p {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    max-width:460px;
+    margin:0 auto;
+    line-height:1.7;
+  }
+
+  /* ── SCORE GAUGE ── */
+  .gauge-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:24px 20px 20px;
+    margin-bottom:16px;
+    animation:fadeDown 0.5s 0.1s ease both;
+  }
+  .gauge-top {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .gauge-score-block {}
+  .gauge-label {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .gauge-score {
+    font-size:64px;
+    font-weight:800;
+    line-height:1;
+    transition:color 0.4s ease;
+    font-variant-numeric: tabular-nums;
+  }
+  .gauge-tier {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    margin-top:4px;
+    font-weight:600;
+  }
+  .gauge-right {
+    text-align:right;
+  }
+  .gauge-change {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:22px;
+    font-weight:600;
+    margin-bottom:6px;
+    min-height:28px;
+  }
+  .change-pos { color:var(--green); }
+  .change-neg { color:var(--red); }
+  .change-neu { color:var(--muted); }
+  .gauge-interest {
+    font-size:12px;
+    color:var(--muted);
+    text-align:right;
+  }
+  .gauge-interest span {
+    color:var(--text);
+    font-weight:700;
+  }
+
+  /* score bar */
+  .score-bar-track {
+    height:14px;
+    background:var(--surface2);
+    border-radius:99px;
+    overflow:hidden;
+    position:relative;
+    margin-bottom:6px;
+  }
+  .score-bar-fill {
+    height:100%;
+    border-radius:99px;
+    transition:width 0.6s cubic-bezier(.4,0,.2,1), background 0.4s ease;
+    position:relative;
+  }
+  .score-bar-fill::after {
+    content:'';
+    position:absolute;
+    right:0; top:0; bottom:0;
+    width:3px;
+    background:rgba(255,255,255,0.6);
+    border-radius:99px;
+  }
+  .score-labels {
+    display:flex;
+    justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9px;
+    color:var(--muted);
+    padding:0 2px;
+  }
+
+  /* tier bands */
+  .tier-bands {
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:4px;
+    margin-top:12px;
+  }
+  .tier-band {
+    border-radius:6px;
+    padding:6px 4px;
+    text-align:center;
+    border:1px solid transparent;
+    transition:all 0.3s;
+  }
+  .tier-band.active { border-color:rgba(255,255,255,0.3); transform:scale(1.03); }
+  .tb-range { font-family:'IBM Plex Mono', monospace; font-size:9px; margin-bottom:2px; }
+  .tb-label { font-size:10px; font-weight:700; }
+  .tb-1 { background:rgba(239,68,68,0.15);  color:var(--red); }
+  .tb-2 { background:rgba(249,115,22,0.15); color:var(--orange); }
+  .tb-3 { background:rgba(234,179,8,0.15);  color:var(--yellow); }
+  .tb-4 { background:rgba(34,197,94,0.15);  color:var(--green); }
+  .tb-5 { background:rgba(59,130,246,0.15); color:var(--blue); }
+
+  /* ── YEAR TIMELINE ── */
+  .timeline {
+    display:flex;
+    gap:6px;
+    margin-bottom:16px;
+    overflow-x:auto;
+    padding-bottom:4px;
+  }
+  .year-pip {
+    flex-shrink:0;
+    min-width:70px;
+    padding:8px 10px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    text-align:center;
+    transition:all 0.3s;
+  }
+  .year-pip.active { border-color:var(--blue); background:var(--blue-dim); }
+  .year-pip.done-good { border-color:var(--green); background:var(--green-dim); }
+  .year-pip.done-bad  { border-color:var(--red);   background:var(--red-dim); }
+  .year-pip.done-neu  { border-color:var(--muted); }
+  .yp-year { font-family:'IBM Plex Mono', monospace; font-size:9px; color:var(--muted); margin-bottom:2px; }
+  .yp-label { font-size:11px; font-weight:700; }
+
+  /* ── SCENARIO CARD ── */
+  .scenario-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    margin-bottom:16px;
+    animation:cardIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes cardIn {
+    from{opacity:0;transform:translateY(20px) scale(0.97)}
+    to  {opacity:1;transform:translateY(0)    scale(1)}
+  }
+  .sc-header {
+    background:var(--surface2);
+    border-bottom:1px solid var(--border);
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .sc-icon { font-size:36px; flex-shrink:0; }
+  .sc-meta {}
+  .sc-year-tag {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--blue);
+    margin-bottom:4px;
+  }
+  .sc-title {
+    font-size:18px;
+    font-weight:700;
+  }
+  .sc-body {
+    padding:18px 20px 14px;
+  }
+  .sc-situation {
+    font-size:14px;
+    color:var(--muted);
+    line-height:1.65;
+    margin-bottom:14px;
+  }
+  .sc-impact-preview {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+  }
+  .impact-tag {
+    padding:4px 10px;
+    border-radius:99px;
+    border:1px solid var(--border);
+    background:var(--surface2);
+    font-size:10px;
+  }
+
+  /* ── OPTIONS ── */
+  .options-stack {
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .option-btn {
+    background:var(--surface2);
+    border:1.5px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px 18px;
+    text-align:left;
+    cursor:pointer;
+    transition:all 0.2s;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-family:'Exo 2', sans-serif;
+    color:var(--text);
+    position:relative;
+    overflow:hidden;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color:var(--blue);
+    background:rgba(59,130,246,0.06);
+    transform:translateX(3px);
+  }
+  .option-btn:disabled { cursor:default; }
+  .opt-letter {
+    width:32px; height:32px;
+    border-radius:8px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:14px;
+    flex-shrink:0;
+    transition:all 0.2s;
+    color:var(--muted);
+  }
+  .opt-text { flex:1; }
+  .opt-name { font-weight:600; font-size:14px; margin-bottom:2px; }
+  .opt-sub  { font-size:12px; color:var(--muted); }
+  .opt-impact {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    font-weight:600;
+    flex-shrink:0;
+    min-width:48px;
+    text-align:right;
+  }
+
+  .option-btn.picked-good { border-color:var(--green); background:var(--green-dim); }
+  .option-btn.picked-good .opt-letter { background:var(--green); color:#000; border-color:var(--green); }
+  .option-btn.picked-okay { border-color:var(--yellow); background:var(--yellow-dim); }
+  .option-btn.picked-okay .opt-letter { background:var(--yellow); color:#000; border-color:var(--yellow); }
+  .option-btn.picked-bad  { border-color:var(--red);   background:var(--red-dim); }
+  .option-btn.picked-bad  .opt-letter { background:var(--red);   color:#fff; border-color:var(--red); }
+  .option-btn.unchosen    { opacity:0.35; }
+
+  /* ── FEEDBACK ── */
+  .feedback-panel {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-left:4px solid;
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin-bottom:14px;
+    display:none;
+    animation:fadeUp 0.3s ease both;
+  }
+  .feedback-panel.show { display:block; }
+  .feedback-panel.good { border-left-color:var(--green); }
+  .feedback-panel.okay { border-left-color:var(--yellow); }
+  .feedback-panel.bad  { border-left-color:var(--red); }
+
+  .fb-top {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .fb-score-delta {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:22px;
+    font-weight:600;
+  }
+  .fb-title { font-size:15px; font-weight:700; }
+  .fb-body {
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.65;
+    margin-bottom:10px;
+  }
+  .fb-real-cost {
+    background:var(--surface2);
+    border-radius:8px;
+    padding:10px 14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    line-height:1.6;
+    display:none;
+  }
+  .fb-real-cost.show { display:block; }
+  .fb-real-cost strong { color:var(--red); }
+
+  .next-btn {
+    width:100%;
+    padding:15px;
+    background:var(--blue-dim);
+    color:var(--blue);
+    border:1.5px solid var(--blue);
+    border-radius:var(--radius);
+    font-family:'Exo 2', sans-serif;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:1px;
+    cursor:pointer;
+    transition:all 0.2s;
+    display:none;
+  }
+  .next-btn.show { display:block; }
+  .next-btn:hover { background:var(--blue); color:#fff; transform:translateY(-2px); box-shadow:0 6px 20px rgba(59,130,246,0.3); }
+
+  /* ── LOAN CALCULATOR ── */
+  .loan-calc {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin-bottom:16px;
+    display:none;
+    animation:fadeUp 0.4s ease both;
+  }
+  .loan-calc.show { display:block; }
+  .lc-title {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--blue);
+    margin-bottom:14px;
+  }
+  .loan-rows {
+    display:grid;
+    gap:8px;
+  }
+  .loan-row {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 14px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    font-size:13px;
+  }
+  .lr-label { color:var(--muted); }
+  .lr-vals { display:flex; gap:20px; }
+  .lr-good { color:var(--green); font-family:'IBM Plex Mono', monospace; font-weight:600; }
+  .lr-bad  { color:var(--red);   font-family:'IBM Plex Mono', monospace; font-weight:600; }
+  .loan-row.highlight { background:rgba(239,68,68,0.06); border-color:var(--red); }
+  .lr-diff { font-size:11px; color:var(--red); font-family:'IBM Plex Mono', monospace; }
+
+  /* ── START / END ── */
+  .start-screen, .end-screen {
+    text-align:center;
+    animation:fadeUp 0.5s ease both;
+  }
+  .start-screen h2 {
+    font-size:26px;
+    font-weight:700;
+    margin-bottom:12px;
+  }
+  .start-screen p {
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--muted);
+    font-size:12px;
+    max-width:460px;
+    margin:0 auto 24px;
+    line-height:1.8;
+  }
+  .factors-grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin:0 0 28px;
+    text-align:left;
+  }
+  .factor-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px;
+  }
+  .fc-top {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .fc-bar-wrap {
+    height:4px;
+    background:var(--surface2);
+    border-radius:99px;
+    overflow:hidden;
+    margin-bottom:6px;
+  }
+  .fc-bar { height:100%; border-radius:99px; }
+  .fc-title { font-size:13px; font-weight:700; }
+  .fc-pct {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--blue);
+    margin-left:auto;
+  }
+  .fc-body { font-size:11px; color:var(--muted); line-height:1.6; font-family:'IBM Plex Mono', monospace; }
+
+  .start-btn {
+    padding:16px 48px;
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius);
+    font-family:'Exo 2', sans-serif;
+    font-size:18px;
+    font-weight:700;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .start-btn:hover { background:#60a5fa; transform:translateY(-2px); box-shadow:0 8px 24px rgba(59,130,246,0.4); }
+
+  /* end */
+  .end-score-display {
+    margin:20px auto;
+    width:180px; height:180px;
+    border-radius:50%;
+    border:4px solid;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  .esd-number { font-size:60px; font-weight:800; line-height:1; }
+  .esd-label  { font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--muted); }
+  .end-tier   { font-size:22px; font-weight:700; margin-bottom:8px; }
+  .end-msg    { font-family:'IBM Plex Mono', monospace; color:var(--muted); font-size:12px; max-width:460px; margin:0 auto 24px; line-height:1.8; }
+
+  .end-loan-summary {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    margin:0 0 20px;
+    text-align:left;
+  }
+  .els-title {
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--blue);
+    margin-bottom:14px;
+  }
+  .els-row {
+    display:flex;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px solid var(--border);
+    font-size:13px;
+  }
+  .els-row:last-child { border-bottom:none; }
+  .els-label { color:var(--muted); }
+
+  .replay-btn {
+    padding:14px 40px;
+    background:transparent;
+    color:var(--blue);
+    border:2px solid var(--blue);
+    border-radius:var(--radius);
+    font-family:'Exo 2', sans-serif;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .replay-btn:hover { background:var(--blue); color:#fff; transform:translateY(-2px); }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)}  to{opacity:1;transform:translateY(0)} }
+  @keyframes scoreFlash {
+    0%   { transform:scale(1); }
+    30%  { transform:scale(1.08); }
+    100% { transform:scale(1); }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="game-header">
+    <div class="eyebrow">// MONEY_HACKS · NMT_STEM · THURSDAY</div>
+    <h1>CREDIT SCORE<br><span>SIMULATOR</span></h1>
+    <p>> You're 18. You just got your first credit card. Over 8 years, every decision you make shapes your score — and how much you pay for EVERYTHING.</p>
+  </div>
+
+  <!-- START -->
+  <div id="start-screen" class="start-screen">
+    <h2>What Is a Credit Score?</h2>
+    <p>> A number between 300 and 850 that tells lenders how risky you are to loan money to. A higher score = lower interest rates = thousands saved over your lifetime. These five factors build it.</p>
+    <div class="factors-grid">
+      <div class="factor-card">
+        <div class="fc-top">
+          <div class="fc-title">Payment History</div>
+          <div class="fc-pct">35%</div>
+        </div>
+        <div class="fc-bar-wrap"><div class="fc-bar" style="width:35%;background:var(--red)"></div></div>
+        <div class="fc-body">The most important factor. Paying on time every month builds your score. A single missed payment can drop your score 50-100 points and stays for 7 years.</div>
+      </div>
+      <div class="factor-card">
+        <div class="fc-top">
+          <div class="fc-title">Credit Utilization</div>
+          <div class="fc-pct">30%</div>
+        </div>
+        <div class="fc-bar-wrap"><div class="fc-bar" style="width:30%;background:var(--orange)"></div></div>
+        <div class="fc-body">How much of your credit limit you use. Keep it under 30%. Using 90% of your limit signals financial stress to lenders — even if you pay it off.</div>
+      </div>
+      <div class="factor-card">
+        <div class="fc-top">
+          <div class="fc-title">Credit History Length</div>
+          <div class="fc-pct">15%</div>
+        </div>
+        <div class="fc-bar-wrap"><div class="fc-bar" style="width:15%;background:var(--yellow)"></div></div>
+        <div class="fc-body">Older accounts help your score. This is why closing your oldest credit card hurts you — even if you don't use it.</div>
+      </div>
+      <div class="factor-card">
+        <div class="fc-top">
+          <div class="fc-title">Credit Mix</div>
+          <div class="fc-pct">10%</div>
+        </div>
+        <div class="fc-bar-wrap"><div class="fc-bar" style="width:10%;background:var(--green)"></div></div>
+        <div class="fc-body">Having different types of credit (cards, loans, mortgage) shows you can manage various financial products responsibly.</div>
+      </div>
+      <div class="factor-card" style="grid-column:span 2;">
+        <div class="fc-top">
+          <div class="fc-title">New Credit (Hard Inquiries)</div>
+          <div class="fc-pct">10%</div>
+        </div>
+        <div class="fc-bar-wrap"><div class="fc-bar" style="width:10%;background:var(--blue)"></div></div>
+        <div class="fc-body">Every time you apply for a new credit card or loan, lenders do a "hard pull" on your credit. Too many inquiries in a short time signals financial desperation and drops your score slightly.</div>
+      </div>
+    </div>
+    <p style="margin-bottom:28px;">> You start at age 18 with a score of <strong style="color:var(--text)">680</strong>. Make 8 decisions over 8 years. Your score at the end determines your car loan interest rate — and how much extra you pay.</p>
+    <button class="start-btn" onclick="startGame()">START BUILDING CREDIT →</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="game-screen" style="display:none;">
+
+    <!-- Score gauge -->
+    <div class="gauge-card" id="gauge-card">
+      <div class="gauge-top">
+        <div class="gauge-score-block">
+          <div class="gauge-label">YOUR CREDIT SCORE</div>
+          <div class="gauge-score" id="gauge-score">680</div>
+          <div class="gauge-tier" id="gauge-tier">Fair</div>
+        </div>
+        <div class="gauge-right">
+          <div class="gauge-change" id="gauge-change"></div>
+          <div class="gauge-interest">
+            Car loan rate: <span id="interest-rate">8.2%</span>
+          </div>
+        </div>
+      </div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill" id="score-bar"></div>
+      </div>
+      <div class="score-labels">
+        <span>300 Poor</span>
+        <span>580 Fair</span>
+        <span>670 Good</span>
+        <span>740 V.Good</span>
+        <span>850 Exceptional</span>
+      </div>
+      <div class="tier-bands" id="tier-bands">
+        <div class="tier-band tb-1" id="tb-1"><div class="tb-range">300–579</div><div class="tb-label">Poor</div></div>
+        <div class="tier-band tb-2" id="tb-2"><div class="tb-range">580–669</div><div class="tb-label">Fair</div></div>
+        <div class="tier-band tb-3" id="tb-3"><div class="tb-range">670–739</div><div class="tb-label">Good</div></div>
+        <div class="tier-band tb-4" id="tb-4"><div class="tb-range">740–799</div><div class="tb-label">V. Good</div></div>
+        <div class="tier-band tb-5" id="tb-5"><div class="tb-range">800–850</div><div class="tb-label">Excellent</div></div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline" id="timeline"></div>
+
+    <!-- Scenario -->
+    <div class="scenario-card" id="scenario-card">
+      <div class="sc-header">
+        <div class="sc-icon" id="sc-icon">💳</div>
+        <div class="sc-meta">
+          <div class="sc-year-tag" id="sc-year-tag">YEAR 1 · AGE 18</div>
+          <div class="sc-title" id="sc-title">Loading...</div>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-situation" id="sc-situation"></div>
+        <div class="sc-impact-preview" id="sc-impact-preview"></div>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="options-stack" id="options-stack"></div>
+
+    <!-- Feedback -->
+    <div class="feedback-panel" id="feedback-panel">
+      <div class="fb-top">
+        <div class="fb-score-delta" id="fb-delta"></div>
+        <div class="fb-title" id="fb-title"></div>
+      </div>
+      <div class="fb-body" id="fb-body"></div>
+      <div class="fb-real-cost" id="fb-real-cost"></div>
+    </div>
+
+    <!-- Loan calc (shown mid-game when relevant) -->
+    <div class="loan-calc" id="loan-calc"></div>
+
+    <button class="next-btn" id="next-btn" onclick="nextScenario()">NEXT YEAR →</button>
+  </div>
+
+  <!-- END -->
+  <div id="end-screen" class="end-screen" style="display:none;">
+    <div class="gauge-label" style="text-align:center;margin-bottom:8px;">FINAL CREDIT SCORE · AGE 26</div>
+    <div class="end-score-display" id="end-ring">
+      <div class="esd-number" id="end-score-num">680</div>
+      <div class="esd-label">out of 850</div>
+    </div>
+    <div class="end-tier" id="end-tier">Good Credit</div>
+    <p class="end-msg" id="end-msg"></p>
+
+    <div class="end-loan-summary" id="end-loan-summary"></div>
+
+    <button class="replay-btn" onclick="resetGame()">PLAY AGAIN</button>
+  </div>
+
+</div>
+
+<script>
+const SCENARIOS = [
+  {
+    icon:'💳',
+    yearLabel:'YEAR 1 · AGE 18',
+    title:'Your First Credit Card',
+    situation:'You just turned 18. A bank offers you a student credit card with a $500 limit. This is your chance to start building credit history. What is your strategy?',
+    impactTags:['Payment History 35%', 'Account Age 15%'],
+    options:[
+      { letter:'A', name:'Use it for small purchases, pay full balance monthly', sub:'Groceries, gas — never carry a balance', impact:'+35', delta:35, quality:'good',
+        feedback:'Perfect start.', explain:'Paying in full every month builds a flawless payment history and keeps utilization low. This is exactly how credit cards should be used. You pay zero interest and build the most important factor.', realCost:null },
+      { letter:'B', name:'Only use it for emergencies', sub:'Keep it in a drawer, just in case', impact:'+10', delta:10, quality:'okay',
+        feedback:'Safe, but slow.', explain:'Not using a card at all is better than misusing it, but a dormant card builds credit very slowly. Lenders want to see responsible activity, not no activity.', realCost:null },
+      { letter:'C', name:'Max it out on clothes and food — pay minimums', sub:'$500 balance, $15 minimum payments', impact:'-40', delta:-40, quality:'bad',
+        feedback:'Dangerous first move.', explain:'Maxing out a $500 card immediately puts you at 100% utilization — devastating for your score. Minimum payments mean you will pay roughly $80 in interest to buy things that are already gone.', realCost:'At 24% APR, a $500 balance with minimum payments takes 3 years to pay off and costs $180 in interest — for clothes you wore once.' },
+    ]
+  },
+  {
+    icon:'📱',
+    yearLabel:'YEAR 2 · AGE 19',
+    title:'New Phone on Credit',
+    situation:'Your phone broke. You can buy a new $900 phone on a 0% financing plan (24 months, must pay off before promotional period ends or 26.99% APR kicks in), or pay cash using your emergency fund.',
+    impactTags:['Credit Mix 10%', 'Payment History 35%'],
+    options:[
+      { letter:'A', name:'Take the 0% financing plan, set auto-pay', sub:'Build credit history AND keep your cash', impact:'+25', delta:25, quality:'good',
+        feedback:'Smart use of 0% financing.', explain:'A 0% promotional offer is free money IF — and only IF — you pay it off before the promotional period ends. Setting auto-pay for the full amount ensures you do. This also adds a new type of credit (installment loan) to your mix.', realCost:null },
+      { letter:'B', name:'Pay cash from your emergency fund', sub:'No debt, but emergency fund depleted', impact:'+5', delta:5, quality:'okay',
+        feedback:'Debt-free is good — but depleting your emergency fund is risky.', explain:'Avoiding debt is admirable, but your emergency fund exists for emergencies. With no cushion, one unexpected expense forces you onto a credit card at high interest.', realCost:null },
+      { letter:'C', name:'Take the financing, only pay minimums, forget the deadline', sub:'Miss the 0% end date', impact:'-20', delta:-20, quality:'bad',
+        feedback:'The 0% trap — it got you.', explain:'Missing the promotional end date triggers backdated interest at 26.99% — meaning you owe interest on the ENTIRE original amount going back to day one. Banks design these promotions hoping customers forget.', realCost:'Missing the deadline on a $900 balance at 26.99% APR means you could owe $200+ in surprise interest charged all at once.' },
+    ]
+  },
+  {
+    icon:'🏠',
+    yearLabel:'YEAR 3 · AGE 20',
+    title:'Moving Out — First Apartment',
+    situation:'You are moving into your first apartment. The landlord does a credit check and sees your score. Meanwhile, you also need to decide about your credit card limit increase offer.',
+    impactTags:['Utilization 30%', 'Hard Inquiry 10%'],
+    options:[
+      { letter:'A', name:'Accept the limit increase, do not increase spending', sub:'$500 → $2,000 limit, same spending habits', impact:'+30', delta:30, quality:'good',
+        feedback:'Excellent move.', explain:'Accepting a credit limit increase WITHOUT increasing spending drops your utilization ratio dramatically. If you were spending $300 on a $500 card (60% utilization), now it is $300 on a $2,000 card (15% utilization). Huge score boost.', realCost:null },
+      { letter:'B', name:'Decline the increase — you do not want more temptation', sub:'Keep the $500 limit', impact:'+0', delta:0, quality:'okay',
+        feedback:'Disciplined but suboptimal.', explain:'Declining a limit increase means your utilization stays the same. There is no penalty — it is a missed opportunity to improve your score without any downside, assuming you have the discipline not to spend more.', realCost:null },
+      { letter:'C', name:'Accept the increase AND upgrade your lifestyle', sub:'Spending jumps from $300 to $1,600/month', impact:'-35', delta:-35, quality:'bad',
+        feedback:'Lifestyle inflation triggered.', explain:'Using 80% of a $2,000 limit ($1,600) is worse than using 60% of a $500 limit. The score cares about the ratio, not the dollar amount. More limit + more spending = no improvement or worse.', realCost:'$1,600/month in credit card spending at 24% APR (if not paid in full) costs $384 per month in interest — $4,600 per year.' },
+    ]
+  },
+  {
+    icon:'🎓',
+    yearLabel:'YEAR 4 · AGE 21',
+    title:'Student Loan Payment Begins',
+    situation:'Your student loan grace period ends. You owe $18,000 at 5.5% interest. Minimum payment is $195/month. You can afford $280/month. One of your friends says just to defer — pause payments.',
+    impactTags:['Payment History 35%', 'Credit Mix 10%'],
+    options:[
+      { letter:'A', name:'Pay $280/month — more than minimum', sub:'Attack the principal, save interest', impact:'+20', delta:20, quality:'good',
+        feedback:'Consistent overpayment is powerful.', explain:'Paying more than the minimum reduces principal faster, saves thousands in interest, and maintains a perfect payment record. Student loans are installment credit — managing them well diversifies your credit mix.', realCost:null },
+      { letter:'B', name:'Pay the $195 minimum, on time every month', sub:'Do not overextend your budget', impact:'+12', delta:12, quality:'okay',
+        feedback:'Responsible minimum payments still build credit.', explain:'On-time minimum payments still earn full credit score benefit on payment history. The downside is purely financial — you pay more interest over time. But if $280 stretches your budget dangerously, $195 on time beats $280 sometimes.', realCost:null },
+      { letter:'C', name:'Request a deferment — pause all payments', sub:'Buy time, deal with it later', impact:'-25', delta:-25, quality:'bad',
+        feedback:'Deferment sounds safe — it is not free.', explain:'During deferment, interest on unsubsidized loans still accrues and capitalizes (gets added to your principal). Your $18,000 could become $19,200 by the time payments resume. And if it is not an official hardship deferment, missed payments tank your score.', realCost:'Unofficial non-payment on $18,000 at 5.5% for 12 months adds $990 to your balance — AND triggers 30-day late marks on your credit report.' },
+    ]
+  },
+  {
+    icon:'🛒',
+    yearLabel:'YEAR 5 · AGE 22',
+    title:'Store Card Temptation',
+    situation:'You are at a furniture store buying a couch. The salesperson offers you 20% off if you open a store credit card today. You also just applied for a car loan last month.',
+    impactTags:['Hard Inquiries 10%', 'Account Age 15%'],
+    options:[
+      { letter:'A', name:'Decline the store card — avoid the inquiry', sub:'Pay full price, protect your credit', impact:'+8', delta:8, quality:'good',
+        feedback:'Good timing instinct.', explain:'Opening a new credit card when you recently applied for a car loan is double trouble. Multiple hard inquiries in a short window signal financial stress. The 20% discount on a $1,200 couch saves $240 once — but a lower credit score costs you far more on the car loan.', realCost:null },
+      { letter:'B', name:'Open the card, use the discount, immediately pay it off', sub:'$240 saved, close it right after', impact:'-8', delta:-8, quality:'okay',
+        feedback:'The discount barely covers the score damage.', explain:'Opening AND closing a card quickly is one of the worst things you can do. Opening it: hard inquiry. Closing it: removes available credit, raises utilization, shortens average account age. The $240 savings evaporates in rate differences.', realCost:null },
+      { letter:'C', name:'Open the card AND keep spending on it', sub:'20% off + a new $800 card balance', impact:'-30', delta:-30, quality:'bad',
+        feedback:'You got played by the salesperson.', explain:'Stores train salespeople to sell credit cards because they are extremely profitable. 28% APR on furniture store cards is among the highest in the industry. The $240 discount will cost $300+ in interest if you carry a balance for even a few months.', realCost:'Store card at 28% APR: carrying $800 balance for 6 months costs $112 in interest — you already lost the $240 discount and then some.' },
+    ]
+  },
+  {
+    icon:'🚨',
+    yearLabel:'YEAR 6 · AGE 23',
+    title:'The Late Payment Crisis',
+    situation:'You had a chaotic month — job change, moving apartments, a medical bill. You completely forget your credit card payment. It is now 31 days past due. You just noticed.',
+    impactTags:['Payment History 35%', 'Derogatory Marks'],
+    options:[
+      { letter:'A', name:'Pay immediately AND call the card company', sub:'Ask for a one-time forgiveness as a loyal customer', impact:'+5', delta:5, quality:'good',
+        feedback:'Call first — this actually works.', explain:'Many credit card companies will remove a first-time late mark as a courtesy if you call, explain the situation, and have an otherwise clean history. This is called a goodwill adjustment. Pay immediately either way — 30-day lates are reported, 60-day lates are catastrophic.', realCost:null },
+      { letter:'B', name:'Pay immediately — do not call, just fix it', sub:'Damage done, move on', impact:'-45', delta:-45, quality:'okay',
+        feedback:'Paying immediately stops the bleeding — but the mark stays.', explain:'A 30-day late payment drops scores 50-100 points and stays on your credit report for 7 years. Paying immediately prevents a 60-day late (which would be even worse) but does not erase the 30-day mark. Always call first.', realCost:'A single 30-day late payment can cost you 50-100 points. On a $25,000 car loan that bump from Good to Fair credit could cost you $3,000+ extra in interest over the loan.' },
+      { letter:'C', name:'Ignore it a bit longer — you are busy', sub:'Wait another 2 weeks to deal with it', impact:'-90', delta:-90, quality:'bad',
+        feedback:'Critical error. A 60-day late is devastating.',
+        explain:'Going from 30-day to 60-day late is one of the worst things that can happen to your score. The damage compounds. At 90 days, the account may go to collections, adding a separate derogatory mark. Every additional 30 days of non-payment is another catastrophic entry.', realCost:'A 60-day late payment can drop your score 100+ points. Going to collections means the mark stays for 7 years and appears on background checks used by landlords and some employers.' },
+    ]
+  },
+  {
+    icon:'🚗',
+    yearLabel:'YEAR 7 · AGE 24',
+    title:'Car Loan Time',
+    situation:'You need a car for your new job. You are financing $20,000. The dealer pulls your credit. Your score determines your interest rate — and how much extra you pay over 5 years.',
+    impactTags:['See The Real Cost Below'],
+    options:[
+      { letter:'A', name:'Shop 3 lenders within 14 days', sub:'Multiple inquiries count as ONE when rate shopping', impact:'+5', delta:5, quality:'good',
+        feedback:'Smart move most people do not know.', explain:'FICO treats multiple auto loan inquiries within a 14-day window as a single inquiry. Shopping around for the best rate is free money — different lenders can offer rates that differ by 3-4 percentage points on the same loan.', realCost:null },
+      { letter:'B', name:'Accept the dealer financing without shopping', sub:'Convenient — take whatever rate they offer', impact:'+0', delta:0, quality:'okay',
+        feedback:'Dealer financing is often NOT the best rate.', explain:'Dealers make money on financing. They may quote 9% when a credit union would give you 6% for the same loan. On $20,000 over 5 years, that 3% difference is over $1,600 extra paid.', realCost:'Dealer rate 9% vs. credit union 6% on $20,000 over 5 years: you pay $1,648 extra in interest. Always shop auto loans independently first.' },
+      { letter:'C', name:'Apply to 8 different lenders over 3 months', sub:'Cover all your bases — more options', impact:'-20', delta:-20, quality:'bad',
+        feedback:'Multiple inquiries spread over months each count separately.', explain:'The 14-day rate-shopping window only applies to concentrated shopping. Applying to lenders over 3 months means each application is a separate hard inquiry, lowering your score each time — and a lower score means higher rates on the very loan you are trying to get.', realCost:null },
+    ]
+  },
+  {
+    icon:'📊',
+    yearLabel:'YEAR 8 · AGE 25',
+    title:'The Credit Report Audit',
+    situation:'You pull your credit report (free at annualcreditreport.com). You find a $287 medical bill in collections you never knew about — it was sent to an old address. You also see an account that is not yours.',
+    impactTags:['Derogatory Marks', 'Identity Protection'],
+    options:[
+      { letter:'A', name:'Dispute the unknown account AND negotiate the medical debt', sub:'Handle both issues properly', impact:'+40', delta:40, quality:'good',
+        feedback:'This is exactly right — and most people never do it.', explain:'You are legally entitled to dispute any inaccurate information on your credit report. The bureau has 30 days to investigate. For the medical debt: negotiate a "pay for delete" — offer to pay in exchange for removal from your report. Medical debt under $500 was removed from FICO scores in 2023.', realCost:null },
+      { letter:'B', name:'Just pay the medical collections bill', sub:'Clear the debt, move on', impact:'+10', delta:10, quality:'okay',
+        feedback:'Paying collections is good — but you left points on the table.', explain:'Paying a collection account does NOT remove it from your credit report by default. It shows as "paid collection" which is better but still hurts. Always negotiate pay-for-delete BEFORE paying. Also — you missed disputing the fraudulent account.', realCost:null },
+      { letter:'C', name:'Ignore both — too complicated to deal with', sub:'Hopefully they go away on their own', impact:'-15', delta:-15, quality:'bad',
+        feedback:'Collections grow. Fraud spreads.', explain:'Unpaid collections accrue interest and can result in lawsuits and wage garnishment. The fraudulent account — if it is identity theft — will be used to open more accounts in your name until you dispute it. Both issues worsen with inaction.', realCost:'Identity theft can take 200+ hours and years to fully resolve. The longer fraudulent accounts stay open, the more damage accumulates across every aspect of your financial life.' },
+    ]
+  },
+];
+
+// Interest rates by score band
+function getRate(score) {
+  if (score >= 800) return { rate:'3.9%',  label:'Exceptional', color:'var(--blue)' };
+  if (score >= 740) return { rate:'4.9%',  label:'Very Good',   color:'var(--green)' };
+  if (score >= 670) return { rate:'6.5%',  label:'Good',        color:'var(--green)' };
+  if (score >= 580) return { rate:'8.9%',  label:'Fair',        color:'var(--yellow)' };
+  if (score >= 300) return { rate:'13.5%', label:'Poor',        color:'var(--red)' };
+  return { rate:'13.5%', label:'Poor', color:'var(--red)' };
+}
+
+function getTier(score) {
+  if (score >= 800) return { label:'Exceptional', color:'var(--blue)',   band:4 };
+  if (score >= 740) return { label:'Very Good',   color:'var(--green)',  band:3 };
+  if (score >= 670) return { label:'Good',        color:'var(--green)',  band:2 };
+  if (score >= 580) return { label:'Fair',        color:'var(--yellow)', band:1 };
+  return              { label:'Poor',        color:'var(--red)',    band:0 };
+}
+
+function scoreToWidth(score) {
+  return Math.min(100, Math.max(0, ((score - 300) / 550) * 100));
+}
+
+function scoreToColor(score) {
+  if (score >= 740) return 'var(--green)';
+  if (score >= 670) return 'var(--yellow)';
+  if (score >= 580) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+// Loan payment calculator
+function monthlyPayment(principal, annualRate, months) {
+  const r = annualRate / 100 / 12;
+  if (r === 0) return principal / months;
+  return principal * r * Math.pow(1+r,months) / (Math.pow(1+r,months)-1);
+}
+
+let score = 680;
+let currentScenario = 0;
+let answered = false;
+let scoreHistory = [680];
+
+function buildTimeline() {
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+  SCENARIOS.forEach((s, i) => {
+    const pip = document.createElement('div');
+    const cl = i === currentScenario ? 'active' : '';
+    pip.className = `year-pip ${cl}`;
+    pip.id = `pip-${i}`;
+    pip.innerHTML = `<div class="yp-year">YR ${i+1}</div><div class="yp-label">AGE ${18+i}</div>`;
+    tl.appendChild(pip);
+  });
+}
+
+function updateGauge(newScore, delta) {
+  const pct  = scoreToWidth(newScore);
+  const col  = scoreToColor(newScore);
+  const tier = getTier(newScore);
+  const rate = getRate(newScore);
+
+  document.getElementById('gauge-score').textContent = newScore;
+  document.getElementById('gauge-score').style.color = col;
+  document.getElementById('gauge-tier').textContent  = tier.label;
+  document.getElementById('gauge-tier').style.color  = col;
+  document.getElementById('score-bar').style.width   = pct + '%';
+  document.getElementById('score-bar').style.background = col;
+  document.getElementById('interest-rate').textContent  = rate.rate;
+
+  // tier bands
+  for (let i=0;i<5;i++) {
+    document.getElementById(`tb-${i+1}`).classList.remove('active');
+  }
+  document.getElementById(`tb-${tier.band+1}`).classList.add('active');
+
+  // change indicator
+  if (delta !== null) {
+    const chEl = document.getElementById('gauge-change');
+    if (delta > 0) {
+      chEl.textContent = `+${delta} pts`;
+      chEl.className = 'gauge-change change-pos';
+    } else if (delta < 0) {
+      chEl.textContent = `${delta} pts`;
+      chEl.className = 'gauge-change change-neg';
+    } else {
+      chEl.textContent = '±0 pts';
+      chEl.className = 'gauge-change change-neu';
+    }
+  }
+}
+
+function renderScenario() {
+  answered = false;
+  const s = SCENARIOS[currentScenario];
+
+  document.getElementById('sc-icon').textContent      = s.icon;
+  document.getElementById('sc-year-tag').textContent  = s.yearLabel;
+  document.getElementById('sc-title').textContent     = s.title;
+  document.getElementById('sc-situation').textContent = s.situation;
+
+  const preview = document.getElementById('sc-impact-preview');
+  preview.innerHTML = '<span>Affects:</span> ' + s.impactTags.map(t =>
+    `<span class="impact-tag">${t}</span>`).join('');
+
+  // options
+  const stack = document.getElementById('options-stack');
+  stack.innerHTML = '';
+  s.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    const impColor = opt.delta > 0 ? 'var(--green)' : opt.delta < 0 ? 'var(--red)' : 'var(--muted)';
+    const impSign  = opt.delta > 0 ? '+' : '';
+    btn.innerHTML = `
+      <div class="opt-letter">${opt.letter}</div>
+      <div class="opt-text">
+        <div class="opt-name">${opt.name}</div>
+        <div class="opt-sub">${opt.sub}</div>
+      </div>
+      <div class="opt-impact" style="color:${impColor}">${impSign}${opt.impact}</div>
+    `;
+    btn.onclick = () => choose(i);
+    stack.appendChild(btn);
+  });
+
+  // reset panels
+  document.getElementById('feedback-panel').className = 'feedback-panel';
+  document.getElementById('loan-calc').className = 'loan-calc';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  // card animation
+  const card = document.getElementById('scenario-card');
+  card.style.animation = 'none'; card.offsetHeight;
+  card.style.animation = 'cardIn 0.4s cubic-bezier(.34,1.56,.64,1) both';
+
+  // timeline
+  buildTimeline();
+}
+
+function choose(idx) {
+  if (answered) return;
+  answered = true;
+
+  const s   = SCENARIOS[currentScenario];
+  const opt = s.options[idx];
+  const prevScore = score;
+  score = Math.min(850, Math.max(300, score + opt.delta));
+  scoreHistory.push(score);
+
+  // style buttons
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === idx) btn.classList.add(`picked-${opt.quality}`);
+    else btn.classList.add('unchosen');
+  });
+
+  // update gauge
+  updateGauge(score, opt.delta);
+
+  // update pip
+  const pip = document.getElementById(`pip-${currentScenario}`);
+  if (pip) pip.className = `year-pip ${opt.quality === 'good' ? 'done-good' : opt.quality === 'bad' ? 'done-bad' : 'done-neu'}`;
+
+  // feedback
+  const fb = document.getElementById('feedback-panel');
+  fb.className = `feedback-panel show ${opt.quality}`;
+
+  const deltaEl = document.getElementById('fb-delta');
+  const sign = opt.delta > 0 ? '+' : '';
+  deltaEl.textContent = `${sign}${opt.delta} pts`;
+  deltaEl.style.color = opt.delta > 0 ? 'var(--green)' : opt.delta < 0 ? 'var(--red)' : 'var(--muted)';
+
+  document.getElementById('fb-title').textContent = opt.feedback;
+  document.getElementById('fb-body').textContent  = opt.explain;
+
+  const realCostEl = document.getElementById('fb-real-cost');
+  if (opt.realCost) {
+    realCostEl.className = 'fb-real-cost show';
+    realCostEl.innerHTML = `💸 <strong>Real cost:</strong> ${opt.realCost}`;
+  } else {
+    realCostEl.className = 'fb-real-cost';
+  }
+
+  // show loan calc on car loan year
+  if (currentScenario === 6) {
+    showLoanCalc();
+  }
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.className = 'next-btn show';
+  nextBtn.textContent = currentScenario + 1 >= SCENARIOS.length ? 'SEE MY CREDIT REPORT →' : 'NEXT YEAR →';
+}
+
+function showLoanCalc() {
+  const lc = document.getElementById('loan-calc');
+  lc.className = 'loan-calc show';
+
+  const principal = 20000;
+  const months    = 60;
+
+  const bands = [
+    { label:'Exceptional (800+)', rate:3.9,  tier:'Exceptional' },
+    { label:'Very Good (740–799)',rate:4.9,  tier:'Very Good' },
+    { label:'Good (670–739)',      rate:6.5,  tier:'Good' },
+    { label:'Fair (580–669)',      rate:8.9,  tier:'Fair' },
+    { label:'Poor (300–579)',      rate:13.5, tier:'Poor' },
+  ];
+
+  const currentTier = getTier(score);
+  const bestPmt  = monthlyPayment(principal, 3.9,  months);
+  const bestTotal= bestPmt * months;
+
+  lc.innerHTML = `
+    <div class="lc-title">// $20,000 CAR LOAN · 5 YEARS · YOUR SCORE: ${score}</div>
+    <div class="loan-rows">
+      ${bands.map(b => {
+        const pmt   = monthlyPayment(principal, b.rate, months);
+        const total = pmt * months;
+        const extra = total - bestTotal;
+        const isMe  = b.tier === currentTier.label;
+        return `<div class="loan-row ${isMe ? 'highlight' : ''}">
+          <span class="lr-label">${b.label}${isMe ? ' ← YOU' : ''}</span>
+          <div class="lr-vals">
+            <span class="${isMe ? 'lr-bad' : 'lr-good'}">${b.rate}% APR</span>
+            <span class="${isMe ? 'lr-bad' : 'lr-good'}">$${Math.round(pmt)}/mo</span>
+            <span class="lr-diff">${extra > 0 ? '+$'+Math.round(extra)+' vs best' : '✓ best rate'}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function nextScenario() {
+  currentScenario++;
+  if (currentScenario >= SCENARIOS.length) showEnd();
+  else renderScenario();
+}
+
+function showEnd() {
+  document.getElementById('game-screen').style.display = 'none';
+  const end = document.getElementById('end-screen');
+  end.style.display = 'block';
+
+  const tier = getTier(score);
+  const rate = getRate(score);
+
+  document.getElementById('end-score-num').textContent  = score;
+  document.getElementById('end-score-num').style.color  = tier.color;
+  document.getElementById('end-ring').style.borderColor = tier.color;
+  document.getElementById('end-tier').textContent       = tier.label + ' Credit';
+  document.getElementById('end-tier').style.color       = tier.color;
+
+  let msg;
+  if (score >= 800) msg = `Score of ${score} — exceptional. You will qualify for the best rates on mortgages, car loans, and credit cards. Lenders will compete for your business. A lifetime of good credit habits has compounding returns just like investing.`;
+  else if (score >= 740) msg = `Score of ${score} — very good. You qualify for competitive rates on most loans. A few more years of clean habits will push you into the exceptional tier and unlock even better rates.`;
+  else if (score >= 670) msg = `Score of ${score} — good credit. You qualify for most loans but not the best rates. The gap between good and exceptional credit costs real money on large loans. Clean habits from here will get you there.`;
+  else if (score >= 580) msg = `Score of ${score} — fair credit. Some lenders will decline you. Those that approve you will charge significantly higher rates. This is fixable — but takes 12-24 months of perfect payment history.`;
+  else msg = `Score of ${score} — rebuilding needed. High rates, limited approval, possible deposits required for apartments. The good news: credit scores are not permanent. 12-18 months of perfect payments and utilization discipline can recover significant ground.`;
+
+  document.getElementById('end-msg').textContent = msg;
+
+  // loan summary
+  const principal = 20000;
+  const months    = 60;
+  const myRate    = parseFloat(rate.rate);
+  const myPmt     = monthlyPayment(principal, myRate, months);
+  const myTotal   = myPmt * months;
+  const bestPmt   = monthlyPayment(principal, 3.9, months);
+  const bestTotal = bestPmt * months;
+  const extraPaid = myTotal - bestTotal;
+
+  const summary = document.getElementById('end-loan-summary');
+  summary.innerHTML = `
+    <div class="els-title">// YOUR $20,000 CAR LOAN AT SCORE ${score}</div>
+    <div class="els-row"><span class="els-label">Your APR</span><span style="color:${tier.color};font-weight:700">${rate.rate}</span></div>
+    <div class="els-row"><span class="els-label">Monthly Payment</span><span style="font-weight:700">$${Math.round(myPmt)}/month</span></div>
+    <div class="els-row"><span class="els-label">Total Paid Over 5 Years</span><span style="font-weight:700">$${Math.round(myTotal).toLocaleString()}</span></div>
+    <div class="els-row"><span class="els-label">Best Possible Rate (800+ score)</span><span style="color:var(--green);font-weight:700">3.9% · $${Math.round(bestPmt)}/mo</span></div>
+    <div class="els-row" style="background:rgba(239,68,68,0.05);border-radius:8px;padding:10px 0;">
+      <span class="els-label" style="color:var(--red)">Extra you paid vs. best score</span>
+      <span style="color:var(--red);font-weight:700;font-size:18px">${extraPaid > 0 ? '+$'+Math.round(extraPaid).toLocaleString() : '$0 — perfect!'}</span>
+    </div>
+  `;
+}
+
+function startGame() {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display  = 'block';
+  updateGauge(score, null);
+  renderScenario();
+}
+
+function resetGame() {
+  score = 680; currentScenario = 0; answered = false; scoreHistory = [680];
+  document.getElementById('end-screen').style.display  = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  document.getElementById('gauge-change').textContent  = '';
+  document.getElementById('gauge-change').className    = 'gauge-change';
+  updateGauge(score, null);
+  renderScenario();
+}
+</script>
+</body>
+</html>

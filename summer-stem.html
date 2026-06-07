@@ -148,7 +148,7 @@
   margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
 }
 .materials-grid {
-  display: grid; /* Changed back to always visible */
+  display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
 }
@@ -234,8 +234,8 @@
     </div>
   </div>
 
-  <!-- WEEK SCHEDULE -->
-  <div class="page-section" id="schedule">
+  <!-- WEEK SCHEDULE (Added no-anim to prevent invisibility glitch) -->
+  <div class="page-section no-anim" id="schedule">
     <h2 class="section-heading">Weekly Schedule</h2>
     <div class="rule-line"></div>
     <p class="schedule-note">Click on any day to expand and view the session details. <em>Lunch is at Fidel from 12:00–1:00 PM daily.</em></p>
@@ -453,8 +453,8 @@
 
   </div>
 
-  <!-- MATERIALS -->
-  <div class="page-section" id="materials" style="background: var(--cream-dark);">
+  <!-- MATERIALS (Added no-anim to prevent invisibility glitch) -->
+  <div class="page-section no-anim" id="materials" style="background: var(--cream-dark);">
     <div class="materials-header">
       <div>
         <h2 class="section-heading">Course Materials</h2>
@@ -512,11 +512,13 @@
   function closeNav() { toggle.classList.remove('open'); navLinks.classList.remove('open'); }
 
   // Scroll Animations
-  const sections = document.querySelectorAll('.page-section');
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-  }, { threshold: 0.04 });
-  sections.forEach(s => obs.observe(s));
+  const sections = document.querySelectorAll('.page-section:not(.no-anim)');
+  if (sections.length > 0) {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.04 });
+    sections.forEach(s => obs.observe(s));
+  }
 
   // Dynamic Schedule Logic
   document.addEventListener("DOMContentLoaded", () => {

@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Money Hacks — NMT Summer STEM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+
+/* BANNER */
+.course-banner {
+  background: var(--forest);
+  padding: 4rem 8vw 3.5rem;
+  position: relative; overflow: hidden;
+}
+.course-banner::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='400'%3E%3Cg fill='none' stroke='%23b8d4a0' stroke-width='0.7' opacity='0.13'%3E%3Cellipse cx='580' cy='200' rx='280' ry='118'/%3E%3Cellipse cx='580' cy='200' rx='225' ry='92'/%3E%3Cellipse cx='580' cy='200' rx='170' ry='68'/%3E%3Cellipse cx='580' cy='200' rx='115' ry='46'/%3E%3Cellipse cx='580' cy='200' rx='64' ry='26'/%3E%3Cellipse cx='70' cy='60' rx='90' ry='38'/%3E%3Cellipse cx='70' cy='60' rx='56' ry='23'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover; pointer-events: none;
+}
+.course-banner-inner { position: relative; z-index: 1; }
+.back-link {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); text-decoration: none;
+  margin-bottom: 1.5rem; transition: color 0.2s;
+}
+.back-link:hover { color: var(--sage-light); }
+.course-banner-label {
+  font-size: 0.65rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--sage-light);
+  font-weight: 500; margin-bottom: 0.6rem;
+}
+.course-banner-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 300; color: #fff; line-height: 1.1;
+  margin-bottom: 1rem;
+}
+.course-banner-title em { font-style: italic; color: var(--sage-light); }
+.course-banner-meta {
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+  font-size: 0.78rem; color: rgba(255,255,255,0.45);
+  margin-bottom: 1rem;
+}
+.cbm-item { display: flex; align-items: center; gap: 0.4rem; }
+.course-banner-desc {
+  font-size: 0.88rem; color: rgba(255,255,255,0.55);
+  max-width: 600px; line-height: 1.75;
+}
+
+/* QUICK ACCESS BAR */
+.quick-access {
+  background: var(--cream-dark);
+  border-bottom: 1px solid var(--rule);
+  padding: 0.8rem 8vw;
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+}
+.qa-label {
+  font-size: 0.63rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--text-muted);
+  white-space: nowrap;
+}
+.qa-links { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.qa-link {
+  padding: 0.28rem 0.85rem;
+  font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+  border: 1px solid var(--rule); background: #fff;
+  color: var(--text-muted); text-decoration: none;
+  transition: all 0.18s;
+}
+.qa-link:hover { border-color: var(--forest); color: var(--forest); }
+
+/* SCHEDULE */
+.schedule-section { padding: 4rem 8vw; background: var(--cream); }
+.schedule-section h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 400;
+  color: var(--navy); margin-bottom: 0.3rem;
+}
+.schedule-note {
+  font-size: 0.82rem; color: var(--text-muted);
+  margin-bottom: 2.5rem; line-height: 1.6;
+}
+
+.day-block { margin-bottom: 2rem; }
+.day-header {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  margin-bottom: 0.6rem;
+}
+.day-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 300;
+  color: var(--forest); line-height: 1;
+}
+.day-theme {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 500;
+  color: var(--navy); font-style: italic;
+}
+
+.sessions { display: flex; flex-direction: column; gap: 0.5rem; padding-left: 0; }
+.session {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 0;
+  border: 1px solid var(--rule);
+  background: #fff;
+}
+.session-time {
+  padding: 0.75rem 1rem;
+  background: var(--cream-dark);
+  border-right: 1px solid var(--rule);
+  font-size: 0.7rem; color: var(--text-muted);
+  letter-spacing: 0.05em; line-height: 1.4;
+  display: flex; align-items: center;
+}
+.session-content { padding: 0.75rem 1.1rem; }
+.session-title {
+  font-size: 0.88rem; font-weight: 500;
+  color: var(--navy); margin-bottom: 0.15rem;
+}
+.session-desc {
+  font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;
+}
+.session-game {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  margin-top: 0.4rem;
+  font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--forest); text-decoration: none;
+  border-bottom: 1px solid rgba(45,80,22,0.25);
+  padding-bottom: 1px; transition: border-color 0.2s;
+}
+.session-game:hover { border-color: var(--forest); }
+.session-game-multi { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+
+.session.highlight { border-color: var(--sage-light); }
+.session.highlight .session-time { background: var(--sage-pale); }
+.session.lunch { opacity: 0.5; }
+.session.lunch .session-title { font-weight: 300; font-style: italic; }
+
+/* MATERIALS */
+.materials-section { padding: 3.5rem 8vw; background: var(--cream-dark); }
+.materials-section h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 400;
+  color: var(--navy); margin-bottom: 1.5rem;
+}
+
+.materials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.material-card {
+  background: #fff; border: 1px solid var(--rule);
+  padding: 1.2rem 1.4rem;
+  display: flex; flex-direction: column;
+  transition: border-color 0.2s;
+}
+.material-card:hover { border-color: var(--sage-light); }
+.mc-day {
+  font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--sage); margin-bottom: 0.3rem; font-weight: 500;
+}
+.mc-name {
+  font-weight: 500; font-size: 0.88rem;
+  color: var(--navy); margin-bottom: 0.3rem; line-height: 1.35;
+}
+.mc-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; flex: 1; margin-bottom: 0.9rem; }
+.mc-link {
+  font-size: 0.67rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--forest); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  border-bottom: 1px solid rgba(45,80,22,0.25); padding-bottom: 1px;
+  align-self: flex-start; transition: border-color 0.2s;
+}
+.mc-link:hover { border-color: var(--forest); }
+.mc-link.pdf::before { content: '📄 '; }
+.mc-link.game::before { content: '🎮 '; }
+
+/* ALL GAMES quick ref */
+.games-ref { padding: 3rem 8vw; background: var(--cream); }
+.games-ref h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 400;
+  color: var(--navy); margin-bottom: 0.3rem;
+}
+.games-ref-note { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.games-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.games-table th {
+  text-align: left; font-size: 0.62rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--text-muted);
+  padding: 0.5rem 1rem; border-bottom: 1px solid var(--rule);
+  font-weight: 400;
+}
+.games-table td {
+  padding: 0.85rem 1rem; border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+}
+.games-table tr:last-child td { border-bottom: none; }
+.games-table tr:hover td { background: var(--sage-pale); }
+.game-day-badge {
+  font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 0.15rem 0.5rem; border: 1px solid var(--rule);
+  color: var(--text-muted); white-space: nowrap;
+}
+.game-play-link {
+  display: inline-block; padding: 0.3rem 0.8rem;
+  font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase;
+  border: 1px solid var(--forest); color: var(--forest);
+  text-decoration: none; transition: all 0.18s;
+}
+.game-play-link:hover { background: var(--forest); color: #fff; }
+
+@media (max-width: 640px) {
+  .day-header { grid-template-columns: 70px 1fr; }
+  .session { grid-template-columns: 85px 1fr; }
+  .materials-grid { grid-template-columns: 1fr; }
+  .games-table { font-size: 0.76rem; }
+  .games-table th, .games-table td { padding: 0.6rem 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a class="nav-home" href="index.html">
+    <div class="nav-monogram">SG</div>
+    <span class="nav-wordmark">Suraj Ghimire</span>
+  </a>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="research.html" onclick="closeNav()">Research</a></li>
+    <li><a href="teaching.html" class="active" onclick="closeNav()">Teaching</a></li>
+    <li><a href="about.html" onclick="closeNav()">About</a></li>
+    <li><a href="about.html#contact" onclick="closeNav()">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- BANNER -->
+  <div class="course-banner">
+    <div class="course-banner-inner">
+      <a class="back-link" href="teaching.html">← All Courses</a>
+      <p class="course-banner-label">NMT Summer STEM 2026 &mdash; Outreach Course</p>
+      <h1 class="course-banner-title">Money Hacks:<br><em>Engineering Your Financial Future</em></h1>
+      <div class="course-banner-meta">
+        <span class="cbm-item">📅 June 2026 &mdash; Monday through Friday</span>
+        <span class="cbm-item">⏰ Mon–Thu 9am–noon, 1–4pm &nbsp;|&nbsp; Fri 9am–noon</span>
+        <span class="cbm-item">👤 Instructor: Dr. Suraj Ghimire</span>
+        <span class="cbm-item">🎓 High school students (NMT Summer STEM)</span>
+      </div>
+      <p class="course-banner-desc">A weeklong intensive on personal finance and financial literacy for advanced high school students. Students leave with a completed Personal Financial Blueprint, a side-hustle business plan, and the vocabulary to make smarter financial decisions — starting now.</p>
+    </div>
+  </div>
+
+  <!-- QUICK ACCESS -->
+  <div class="quick-access">
+    <span class="qa-label">Jump to</span>
+    <div class="qa-links">
+      <a class="qa-link" href="#schedule">Week Schedule</a>
+      <a class="qa-link" href="#materials">Materials</a>
+      <a class="qa-link" href="#games">All Games</a>
+    </div>
+  </div>
+
+  <!-- WEEK SCHEDULE -->
+  <div class="schedule-section page-section" id="schedule">
+    <h2>Week Schedule</h2>
+    <p class="schedule-note">Mon–Thu you have 9am–noon and 1–4pm. Friday is 9am–noon only. Walk students to Fidel lunch room after each morning session.</p>
+
+    <!-- MONDAY -->
+    <div class="day-block">
+      <div class="day-header">
+        <span class="day-label">Mon</span>
+        <span class="day-theme">Money &amp; Mindset — Where does your money go?</span>
+      </div>
+      <div class="sessions">
+        <div class="session">
+          <div class="session-time">9:00–9:30</div>
+          <div class="session-content">
+            <div class="session-title">Introductions + Ice Breaker</div>
+            <div class="session-desc">"What would you do with $1 million?" — round-the-room, no wrong answers. Sets the tone.</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">9:30–10:00</div>
+          <div class="session-content">
+            <div class="session-title">Mini-Lecture: Income, Expenses, Net Worth</div>
+            <div class="session-desc">The three numbers that define your financial life. Keep it concrete — use real salaries for jobs students might want.</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">10:00–10:45</div>
+          <div class="session-content">
+            <div class="session-title">🃏 Budget Battleground (In-Person Card Game)</div>
+            <div class="session-desc">Each student draws a Life Card (job, city, salary). Allocate your monthly income across expense categories using play money. Whoever has the most left over wins. Debrief: who went broke on rent?</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">10:45–11:00</div>
+          <div class="session-content">
+            <div class="session-title">Debrief + Discussion</div>
+            <div class="session-desc">What surprised you? Which expenses were bigger than expected?</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">11:00–11:45</div>
+          <div class="session-content">
+            <div class="session-title">💻 Spend or Save? (Online Game)</div>
+            <div class="session-desc">Ten rounds of real-life decisions that compound. Students play individually on phones.</div>
+            <a class="session-game" href="spend-or-save.html" target="_blank">▶ Open Game</a>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">11:45–12:00</div>
+          <div class="session-content">
+            <div class="session-title">Introduce the Financial Blueprint</div>
+            <div class="session-desc">Hand out the printed blueprint. Students fill Section 1 this week and take it home Friday.</div>
+          </div>
+        </div>
+        <div class="session lunch">
+          <div class="session-time">12:00–1:00</div>
+          <div class="session-content">
+            <div class="session-title">Lunch — Walk students to Fidel</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">1:00–1:30</div>
+          <div class="session-content">
+            <div class="session-title">Mini-Lecture: The Psychology of Money</div>
+            <div class="session-desc">Why smart people make dumb financial decisions. Anchoring, social pressure, lifestyle creep.</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">1:30–2:30</div>
+          <div class="session-content">
+            <div class="session-title">🃏 The Keeping Up Game (In-Person Card Game)</div>
+            <div class="session-desc">Each student is a character with a peer group that keeps upgrading. Decide each round: match or save? Play money tracks balances. Who has money left at age 30?</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">2:30–3:30</div>
+          <div class="session-content">
+            <div class="session-title">Blueprint Work — Section 1</div>
+            <div class="session-desc">Students write their own estimated budget at age 22: what job, what city, what will things cost?</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">3:30–4:00</div>
+          <div class="session-content">
+            <div class="session-title">Share Out</div>
+            <div class="session-desc">Each student shares one thing that surprised them today.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TUESDAY -->
+    <div class="day-block">
+      <div class="day-header">
+        <span class="day-label">Tue</span>
+        <span class="day-theme">Make Your Money Work — Investing &amp; Markets</span>
+      </div>
+      <div class="sessions">
+        <div class="session">
+          <div class="session-time">9:00–9:15</div>
+          <div class="session-content">
+            <div class="session-title">Recap Monday</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">9:15–9:50</div>
+          <div class="session-content">
+            <div class="session-title">Mini-Lecture: How Investing Works</div>
+            <div class="session-desc">Stocks, index funds, the market. Keep it simple: you're buying a tiny piece of a company.</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">9:50–10:30</div>
+          <div class="session-content">
+            <div class="session-title">💻 The Time Machine: Compound Interest</div>
+            <div class="session-desc">Students move sliders to discover what happens when they start at 18 vs 28. The moment the number collapses is the whole lesson.</div>
+            <a class="session-game" href="compound-interest.html" target="_blank">▶ Open Calculator</a>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">10:30–11:00</div>
+          <div class="session-content">
+            <div class="session-title">📊 Launch Stock Market Simulation</div>
+            <div class="session-desc">Each student gets a fictional $10,000. Pick 3 real companies using Yahoo Finance on their phones. Record starting portfolio on the printed tracker. Check back Thursday.</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">11:00–11:45</div>
+          <div class="session-content">
+            <div class="session-title">💻 Bull or Bear?</div>
+            <div class="session-desc">News headline drops. Does the market go up or down? Competitive — first to 7 correct wins.</div>
+            <a class="session-game" href="bull-or-bear.html" target="_blank">▶ Open Game</a>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">11:45–12:00</div>
+          <div class="session-content">
+            <div class="session-title">Blueprint Section 2 Intro</div>
+          </div>
+        </div>
+        <div class="session lunch">
+          <div class="session-time">12:00–1:00</div>
+          <div class="session-content"><div class="session-title">Lunch</div></div>
+        </div>
+        <div class="session">
+          <div class="session-time">1:00–1:30</div>
+          <div class="session-content">
+            <div class="session-title">Mini-Lecture: Index Funds vs. Picking Stocks</div>
+            <div class="session-desc">Why most experts can't beat the market, and what that means for regular people.</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">1:30–2:30</div>
+          <div class="session-content">
+            <div class="session-title">🃏 Fund Manager Showdown (Card Game)</div>
+            <div class="session-desc">Two teams each get 10 company description cards (no names). Pick 5 to invest in. Reveal the real companies and their 5-year returns. Who picked better?</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">2:30–3:30</div>
+          <div class="session-content">
+            <div class="session-title">Blueprint Work — Section 2</div>
+            <div class="session-desc">Investing plan: when to start, how much per month, what to invest in.</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">3:30–4:00</div>
+          <div class="session-content">
+            <div class="session-title">Open Q&amp;A</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEDNESDAY -->
+    <div class="day-block">
+      <div class="day-header">
+        <span class="day-label">Wed</span>
+        <span class="day-theme">Build Something — Entrepreneurship, Dropshipping &amp; Crypto</span>
+      </div>
+      <div class="sessions">
+        <div class="session">
+          <div class="session-time">9:00–9:45</div>
+          <div class="session-content">
+            <div class="session-title">Mini-Lecture: How Businesses Make Money</div>
+            <div class="session-desc">Revenue, costs, profit margin. Real examples: lemonade stand → app → dropshipping store.</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">9:45–10:30</div>
+          <div class="session-content">
+            <div class="session-title">Shark Tank Lite — Round 1 Prep</div>
+            <div class="session-desc">Each student picks a side-hustle idea (tutoring, reselling, lawn care, social media). Start filling the one-page business plan template.</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">10:30–11:00</div>
+          <div class="session-content">
+            <div class="session-title">Mini-Lecture: What is Dropshipping?</div>
+            <div class="session-desc">Walk through a real example live: AliExpress → Shopify → order → fulfillment. Pros, cons, realities.</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">11:00–11:45</div>
+          <div class="session-content">
+            <div class="session-title">💻 Dropship or Flop?</div>
+            <div class="session-desc">Ten products. Is it a viable dropshipping product or a total flop? Students evaluate margin, shipping, competition, and ad potential.</div>
+            <a class="session-game" href="dropship-or-flop.html" target="_blank">▶ Open Game</a>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">11:45–12:00</div>
+          <div class="session-content">
+            <div class="session-title">Blueprint Section 3 Intro</div>
+          </div>
+        </div>
+        <div class="session lunch">
+          <div class="session-time">12:00–1:00</div>
+          <div class="session-content"><div class="session-title">Lunch</div></div>
+        </div>
+        <div class="session">
+          <div class="session-time">1:00–1:30</div>
+          <div class="session-content">
+            <div class="session-title">Mini-Lecture: What is Crypto? What is Blockchain?</div>
+            <div class="session-desc">Use the "shared Google Doc" analogy. Bitcoin, Ethereum, stablecoins. Hype vs. reality.</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">1:30–2:15</div>
+          <div class="session-content">
+            <div class="session-title">💻 Crash or Moon?</div>
+            <div class="session-desc">Real historical crypto charts with the last 3 months hidden. Draw where you think it goes, then see what actually happened — and why it was nearly impossible to predict.</div>
+            <a class="session-game" href="crypto-crash-or-moon.html" target="_blank">▶ Open Game</a>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">2:15–2:30</div>
+          <div class="session-content">
+            <div class="session-title">Honest Debrief: Crypto as Speculation vs. Investment</div>
+            <div class="session-desc">Stories of people who made and lost fortunes. What's the difference between investing and gambling?</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">2:30–3:30</div>
+          <div class="session-content">
+            <div class="session-title">Blueprint Work — Section 3 (Side Hustle Plan)</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">3:30–4:00</div>
+          <div class="session-content">
+            <div class="session-title">Preview Thursday: Shark Tank Lite pitches tomorrow afternoon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THURSDAY -->
+    <div class="day-block">
+      <div class="day-header">
+        <span class="day-label">Thu</span>
+        <span class="day-theme">Debt, Credit &amp; Pulling It Together</span>
+      </div>
+      <div class="sessions">
+        <div class="session highlight">
+          <div class="session-time">9:00–9:30</div>
+          <div class="session-content">
+            <div class="session-title">📊 Stock Portfolio Check-In</div>
+            <div class="session-desc">Students look up their stocks from Tuesday. Who's up? Who's down? Why? Introduce idea that markets are hard to predict even for professionals.</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">9:30–10:15</div>
+          <div class="session-content">
+            <div class="session-title">Mini-Lecture: Taxes, Credit Scores &amp; Debt</div>
+            <div class="session-desc">The three things nobody teaches you but everyone needs to know.</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">10:15–11:00</div>
+          <div class="session-content">
+            <div class="session-title">💻 Credit Score Simulator</div>
+            <div class="session-desc">Eight decisions across eight years. Watch your score shift in real time. At the car loan stage, students see in dollars what their current score actually costs them.</div>
+            <a class="session-game" href="credit-score-simulator.html" target="_blank">▶ Open Game</a>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">11:00–11:45</div>
+          <div class="session-content">
+            <div class="session-title">🃏 Debt Avalanche vs. Snowball (Card Game)</div>
+            <div class="session-desc">Two groups, four debt cards. One group uses avalanche method, one uses snowball. Calculate total interest paid. Which wins mathematically? Which feels better?</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">11:45–12:00</div>
+          <div class="session-content">
+            <div class="session-title">Blueprint Section 4 Intro</div>
+          </div>
+        </div>
+        <div class="session lunch">
+          <div class="session-time">12:00–1:00</div>
+          <div class="session-content"><div class="session-title">Lunch</div></div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">1:00–2:15</div>
+          <div class="session-content">
+            <div class="session-title">🎤 Shark Tank Lite — Pitches</div>
+            <div class="session-desc">Each student gives a 3-minute pitch. Others are "investors" with 5 play-money chips each. Dr. Ghimire plays skeptical shark (one tough question per pitch). Whoever raises the most funding wins.</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">2:15–3:15</div>
+          <div class="session-content">
+            <div class="session-title">Blueprint Final Polish — Sections 1–4</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">3:15–3:45</div>
+          <div class="session-content">
+            <div class="session-title">💻 Financial Future Flashforward</div>
+            <div class="session-desc">Five big life choices — education, housing, car, investing, career. Watch your projected net worth at 40 change with every decision.</div>
+            <a class="session-game" href="financial-future-flashforward.html" target="_blank">▶ Open Game</a>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">3:45–4:00</div>
+          <div class="session-content">
+            <div class="session-title">Preview Friday: Blueprint presentations tomorrow morning</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FRIDAY -->
+    <div class="day-block">
+      <div class="day-header">
+        <span class="day-label">Fri</span>
+        <span class="day-theme">Your Financial Future Starts Now</span>
+      </div>
+      <div class="sessions">
+        <div class="session highlight">
+          <div class="session-time">9:00–9:20</div>
+          <div class="session-content">
+            <div class="session-title">📊 Final Stock Check</div>
+            <div class="session-desc">Who ended the week up? Celebrate the winner. Why did some stocks move the way they did?</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">9:20–10:00</div>
+          <div class="session-content">
+            <div class="session-title">Blueprint Presentations</div>
+            <div class="session-desc">Each student shares one section (2–3 min). No grades, no pressure — just sharing what they built.</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">10:00–10:30</div>
+          <div class="session-content">
+            <div class="session-title">The 5 Moves You Can Make This Year</div>
+            <div class="session-desc">Open a savings account. Track spending for 30 days. Start one side hustle experiment. Learn one investing concept per month. At 18: open a Roth IRA.</div>
+          </div>
+        </div>
+        <div class="session highlight">
+          <div class="session-time">10:30–11:00</div>
+          <div class="session-content">
+            <div class="session-title">💻 Final Boss Quiz — Team vs. Team</div>
+            <div class="session-desc">15 questions, 5 categories, streak bonuses. Everything from the week. Play money prize for the winners.</div>
+            <a class="session-game" href="final-boss-quiz.html" target="_blank">▶ Open Quiz</a>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">11:00–11:50</div>
+          <div class="session-content">
+            <div class="session-title">Closing Circle + Certificates</div>
+            <div class="session-desc">Each student says one thing they will do differently with money. Dr. Ghimire shares briefly — growing up in Nepal, what money meant, what he wishes he'd known.</div>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-time">11:50–12:00</div>
+          <div class="session-content">
+            <div class="session-title">Photo, Goodbyes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MATERIALS -->
+  <div class="materials-section page-section" id="materials">
+    <h2>Course Materials</h2>
+    <div class="materials-grid">
+      <div class="material-card">
+        <div class="mc-day">All Week</div>
+        <div class="mc-name">Personal Financial Blueprint</div>
+        <div class="mc-desc">6-page printable workbook. Students fill one section per day and take it home Friday. Includes budget worksheet, investment plan, side-hustle template, debt strategy, and letter to future self.</div>
+        <a class="mc-link pdf" href="financial_blueprint.pdf" target="_blank">Download PDF</a>
+      </div>
+      <div class="material-card">
+        <div class="mc-day">Monday</div>
+        <div class="mc-name">Budget Battleground Life Cards</div>
+        <div class="mc-desc">8 character cards (barista, coder, nurse, teacher, mechanic, etc.) with salary, expense breakdown, and a twist. Cut apart before class. Use with play money.</div>
+        <a class="mc-link pdf" href="game_cards.pdf" target="_blank">Download Card Set</a>
+      </div>
+      <div class="material-card">
+        <div class="mc-day">Monday</div>
+        <div class="mc-name">The Keeping Up Game Cards</div>
+        <div class="mc-desc">7 character cards (Trendsetter, Athlete, Social Butterfly, etc.) with income, peer pressure rating, and a savings tracker grid students fill in each round.</div>
+        <a class="mc-link pdf" href="game_cards.pdf" target="_blank">In Card Set PDF</a>
+      </div>
+      <div class="material-card">
+        <div class="mc-day">Tuesday</div>
+        <div class="mc-name">Stock Portfolio Tracker</div>
+        <div class="mc-desc">Printed sheet for recording starting prices Tuesday and closing prices Thursday. Included in the game cards PDF.</div>
+        <a class="mc-link pdf" href="game_cards.pdf" target="_blank">In Card Set PDF</a>
+      </div>
+      <div class="material-card">
+        <div class="mc-day">Tuesday</div>
+        <div class="mc-name">Fund Manager Showdown Cards</div>
+        <div class="mc-desc">10 company description cards (no names, just descriptions and hints). Answer key pages for instructor only. Print pages 5–8 of the card set — keep pages 7–8 for yourself.</div>
+        <a class="mc-link pdf" href="game_cards.pdf" target="_blank">In Card Set PDF</a>
+      </div>
+      <div class="material-card">
+        <div class="mc-day">Wednesday</div>
+        <div class="mc-name">Side-Hustle Business Plan Template</div>
+        <div class="mc-desc">One-page template for Shark Tank Lite: business idea, target customer, pricing, costs, profit margin, marketing approach. Included in the Financial Blueprint.</div>
+        <a class="mc-link pdf" href="financial_blueprint.pdf" target="_blank">In Blueprint PDF</a>
+      </div>
+      <div class="material-card">
+        <div class="mc-day">Thursday</div>
+        <div class="mc-name">Debt Avalanche vs. Snowball Cards</div>
+        <div class="mc-desc">4 debt cards (credit card 24.99%, medical bill $0, car loan 7.9%, student loan 5.5%) plus two method instruction cards. Print page 9 of the card set.</div>
+        <a class="mc-link pdf" href="game_cards.pdf" target="_blank">In Card Set PDF</a>
+      </div>
+      <div class="material-card">
+        <div class="mc-day">Friday</div>
+        <div class="mc-name">Completion Certificates</div>
+        <div class="mc-desc">Optional printed certificates for students. Print one per student and sign before Friday.</div>
+        <a class="mc-link pdf" href="#" style="opacity:0.4;pointer-events:none">Coming Soon</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL GAMES QUICK REFERENCE -->
+  <div class="games-ref page-section" id="games">
+    <h2>All Games — Quick Reference</h2>
+    <p class="games-ref-note">Every game opens in the browser. No login, no installation. Works on phones and laptops.</p>
+
+    <table class="games-table">
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Game</th>
+          <th>Concept</th>
+          <th>Time</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="game-day-badge">Monday</span></td>
+          <td>Spend or Save?</td>
+          <td>Budgeting, opportunity cost</td>
+          <td>~20 min</td>
+          <td><a class="game-play-link" href="spend-or-save.html" target="_blank">Play →</a></td>
+        </tr>
+        <tr>
+          <td><span class="game-day-badge">Tuesday</span></td>
+          <td>The Time Machine</td>
+          <td>Compound interest, time value</td>
+          <td>~15 min</td>
+          <td><a class="game-play-link" href="compound-interest.html" target="_blank">Open →</a></td>
+        </tr>
+        <tr>
+          <td><span class="game-day-badge">Tuesday</span></td>
+          <td>Bull or Bear?</td>
+          <td>Financial markets, Fed policy</td>
+          <td>~25 min</td>
+          <td><a class="game-play-link" href="bull-or-bear.html" target="_blank">Play →</a></td>
+        </tr>
+        <tr>
+          <td><span class="game-day-badge">Wednesday</span></td>
+          <td>Dropship or Flop?</td>
+          <td>Entrepreneurship, profit margin</td>
+          <td>~25 min</td>
+          <td><a class="game-play-link" href="dropship-or-flop.html" target="_blank">Play →</a></td>
+        </tr>
+        <tr>
+          <td><span class="game-day-badge">Wednesday</span></td>
+          <td>Crash or Moon?</td>
+          <td>Crypto, speculation vs. investing</td>
+          <td>~25 min</td>
+          <td><a class="game-play-link" href="crypto-crash-or-moon.html" target="_blank">Play →</a></td>
+        </tr>
+        <tr>
+          <td><span class="game-day-badge">Thursday</span></td>
+          <td>Credit Score Simulator</td>
+          <td>Credit, debt, interest rates</td>
+          <td>~30 min</td>
+          <td><a class="game-play-link" href="credit-score-simulator.html" target="_blank">Play →</a></td>
+        </tr>
+        <tr>
+          <td><span class="game-day-badge">Thursday</span></td>
+          <td>Financial Future Flashforward</td>
+          <td>Life decisions, net worth</td>
+          <td>~30 min</td>
+          <td><a class="game-play-link" href="financial-future-flashforward.html" target="_blank">Play →</a></td>
+        </tr>
+        <tr>
+          <td><span class="game-day-badge">Friday</span></td>
+          <td>Final Boss Quiz</td>
+          <td>Week review — all topics</td>
+          <td>~30 min</td>
+          <td><a class="game-play-link" href="final-boss-quiz.html" target="_blank">Play →</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-left">Suraj Ghimire &mdash; New Mexico Tech &mdash; 2026</div>
+  <div class="footer-right">
+    <a href="research.html">Research</a>
+    <a href="teaching.html">Teaching</a>
+    <a href="about.html">About</a>
+    <a href="mailto:suraj.ghimire@nmt.edu">Email</a>
+  </div>
+</footer>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 10));
+  const toggle = document.getElementById('nav-toggle');
+  const navLinks = document.getElementById('nav-links');
+  toggle.addEventListener('click', () => { toggle.classList.toggle('open'); navLinks.classList.toggle('open'); });
+  function closeNav() { toggle.classList.remove('open'); navLinks.classList.remove('open'); }
+
+  const sections = document.querySelectorAll('.page-section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.04 });
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

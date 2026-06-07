@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Suraj Ghimire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+/* ABOUT HERO — splits photo + text */
+.about-hero {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  min-height: 500px;
+}
+.about-photo-col {
+  position: relative;
+  overflow: hidden;
+  background: var(--forest);
+}
+.about-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  filter: saturate(0.82) contrast(1.04);
+}
+.about-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 55%, rgba(28,43,26,0.55) 100%);
+}
+.about-content-col {
+  background: var(--navy);
+  padding: 5rem 5vw 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.about-content-col::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cg fill='none' stroke='%234a7c2f' stroke-width='0.7' opacity='0.14'%3E%3Cellipse cx='400' cy='250' rx='220' ry='100'/%3E%3Cellipse cx='400' cy='250' rx='175' ry='78'/%3E%3Cellipse cx='400' cy='250' rx='130' ry='57'/%3E%3Cellipse cx='400' cy='250' rx='85' ry='37'/%3E%3Cellipse cx='80' cy='80' rx='80' ry='35'/%3E%3Cellipse cx='80' cy='80' rx='50' ry='22'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
+  pointer-events: none;
+}
+.about-eyebrow {
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sage-light);
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+  position: relative; z-index: 1;
+}
+.about-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 3.5vw, 3.5rem);
+  font-weight: 300;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 0.8rem;
+  position: relative; z-index: 1;
+}
+.about-name em { font-style: italic; color: var(--sage-light); }
+.about-role {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.8rem;
+  position: relative; z-index: 1;
+}
+.about-statement {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.12rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.65;
+  max-width: 440px;
+  position: relative; z-index: 1;
+}
+.about-divider {
+  width: 32px; height: 1px;
+  background: var(--sage);
+  margin: 1.5rem 0;
+  position: relative; z-index: 1;
+}
+
+/* BODY SECTIONS */
+.about-body { padding: 5rem 8vw; max-width: 1100px; }
+.about-bio-text {
+  font-size: 0.95rem;
+  color: var(--text-mid);
+  line-height: 1.85;
+  max-width: 660px;
+  margin-bottom: 1.2rem;
+}
+.about-bio-text + .about-bio-text { margin-top: 0; }
+
+/* CV GRID */
+.cv-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  margin-top: 4rem;
+}
+.cv-block { margin-bottom: 3rem; }
+.cv-block:last-child { margin-bottom: 0; }
+.cv-block-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--navy);
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 1.2rem;
+}
+.cv-item {
+  margin-bottom: 1.2rem;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+.cv-item strong {
+  display: block;
+  color: var(--text);
+  font-weight: 400;
+  margin-bottom: 0.15rem;
+}
+.cv-item em {
+  font-style: normal;
+  color: var(--text-mid);
+}
+.cv-tools {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+/* CV DOWNLOAD */
+.cv-download-bar {
+  background: var(--sage-pale);
+  border: 1px solid var(--sage-light);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+  max-width: 660px;
+}
+.cdb-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: var(--navy);
+}
+.cdb-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+/* CONTACT */
+.contact-section {
+  background: var(--navy);
+  padding: 5rem 8vw;
+}
+.contact-section .section-heading { color: #fff; }
+.contact-section .section-rule { background: var(--sage); }
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  max-width: 560px;
+  margin-top: 2rem;
+}
+.contact-item {
+  padding: 1.2rem 1.5rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  text-decoration: none;
+  transition: border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.contact-item:hover { border-color: var(--sage); }
+.ci-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+.ci-value {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.8);
+  word-break: break-all;
+}
+.contact-note {
+  font-size: 0.84rem;
+  color: rgba(255,255,255,0.4);
+  max-width: 420px;
+  line-height: 1.7;
+  margin-top: 2rem;
+  font-style: italic;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+}
+
+@media (max-width: 860px) {
+  .about-hero { grid-template-columns: 1fr; }
+  .about-photo-col { min-height: 55vw; }
+  .about-content-col { padding: 3rem 6vw; }
+  .cv-two-col { grid-template-columns: 1fr; gap: 0; }
+  .contact-grid { grid-template-columns: 1fr; max-width: 360px; }
+}
+@media (max-width: 480px) {
+  .about-body { padding: 3rem 5vw; }
+  .contact-section { padding: 3rem 5vw; }
+}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a class="nav-home" href="index.html">
+    <div class="nav-monogram">SG</div>
+    <span class="nav-wordmark">Suraj Ghimire</span>
+  </a>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="research.html" onclick="closeNav()">Research</a></li>
+    <li><a href="teaching.html" onclick="closeNav()">Teaching</a></li>
+    <li><a href="about.html" class="active" onclick="closeNav()">About</a></li>
+    <li><a href="#contact" onclick="closeNav()">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- ABOUT HERO -->
+  <div class="about-hero">
+    <div class="about-photo-col">
+      <img class="about-photo" src="suraj.png" alt="Suraj Ghimire">
+      <div class="about-photo-overlay"></div>
+    </div>
+    <div class="about-content-col">
+      <p class="about-eyebrow">Applied Economist</p>
+      <h1 class="about-name">Suraj<br><em>Ghimire</em></h1>
+      <p class="about-role">
+        Ph.D., Economics &mdash; University of New Mexico, 2023<br>
+        Assistant Teaching Professor<br>
+        New Mexico Institute of Mining and Technology
+      </p>
+      <div class="about-divider"></div>
+      <p class="about-statement">"I grew up in a subsistence farming household in Nepal. The externalities of agricultural production are not abstract to me."</p>
+    </div>
+  </div>
+
+  <!-- BIO + CV -->
+  <div class="about-body page-section">
+
+    <div class="section-eyebrow">Biography</div>
+    <h2 class="section-heading">Background</h2>
+    <div class="section-rule"></div>
+
+    <p class="about-bio-text">
+      I am an applied economist at New Mexico Institute of Mining and Technology, where I hold an appointment in the Department of Computer Science and Engineering. My research sits at the intersection of environmental health and agricultural economics. I use atmospheric dispersion modeling, quasi-experimental methods, and spatial econometrics to estimate the social costs of pollution that markets leave unpriced.
+    </p>
+    <p class="about-bio-text">
+      My job market paper &mdash; forthcoming in the <em>Journal of Agricultural and Resource Economics</em> &mdash; estimates the health and economic damages from dairy CAFO air pollution in New Mexico. A second paper on the welfare costs of sub-threshold ozone exposure is under revise-and-resubmit at <em>Applied Economics Letters</em>. I am a Co-PI on an NSF-funded project ($250,000) applying machine learning and satellite imagery to spatial environmental risk modeling.
+    </p>
+    <p class="about-bio-text">
+      Before graduate school I worked as a data analytics consultant at Vizient, Inc., and before that as a data analyst at Facts Research and Analytics in Nepal. I hold a Ph.D. and M.A. in Economics from the University of New Mexico and an M.B.A. from Southeast Missouri State University.
+    </p>
+    <p class="about-bio-text">
+      At NMT &mdash; a Hispanic-Serving Institution serving many first-generation students &mdash; I carry a 4:4 teaching load spanning principles of economics, engineering economics, managerial accounting, and graduate data analytics. I am interested in pedagogy that makes economic reasoning concrete for engineering students, which led me to develop a suite of browser-based classroom simulations. I presented at an IHS "Energy Innovation for an Abundant Future" workshop and attended the Southern Economic Association Annual Meeting as session chair and paper presenter.
+    </p>
+
+    <!-- CV -->
+    <div class="cv-two-col">
+      <div>
+        <div class="cv-block">
+          <div class="cv-block-title">Education</div>
+          <div class="cv-item">
+            <strong>Ph.D., Economics &mdash; 2023</strong>
+            University of New Mexico, Albuquerque<br>
+            <em>Dissertation: Concentrated Animal Feeding Operations, Environmental Quality and Public Health</em><br>
+            Committee: Jingjing Wang, Andrew Goodkind, Benjamin Jones
+          </div>
+          <div class="cv-item">
+            <strong>M.A., Economics &mdash; 2019</strong>
+            University of New Mexico
+          </div>
+          <div class="cv-item">
+            <strong>M.B.A., General Management &mdash; 2017</strong>
+            Southeast Missouri State University
+          </div>
+        </div>
+
+        <div class="cv-block">
+          <div class="cv-block-title">Methods &amp; Tools</div>
+          <div class="cv-tools">
+            R &mdash; Python &mdash; Stata &mdash; SQL<br>
+            QGIS &mdash; InMAP (atmospheric dispersion)<br>
+            Monte Carlo simulation &mdash; LaTeX
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="cv-block">
+          <div class="cv-block-title">Academic Positions</div>
+          <div class="cv-item">
+            <strong>Assistant Teaching Professor &mdash; 2022&ndash;present</strong>
+            Dept. of Computer Science &amp; Engineering<br>
+            New Mexico Institute of Mining and Technology, Socorro, NM
+          </div>
+          <div class="cv-item">
+            <strong>Instructor &mdash; Spring 2022</strong>
+            Dept. of Economics, University of New Mexico
+          </div>
+        </div>
+
+        <div class="cv-block">
+          <div class="cv-block-title">Industry</div>
+          <div class="cv-item">
+            <strong>Data Analytics Consultant</strong>
+            Vizient, Inc.
+          </div>
+          <div class="cv-item">
+            <strong>Data Analyst</strong>
+            Facts Research and Analytics, Nepal
+          </div>
+        </div>
+
+        <div class="cv-block">
+          <div class="cv-block-title">Selected Honors</div>
+          <div class="cv-item">Regional Finalist (Mentor), Energy Tech University Prize, U.S. Department of Energy &mdash; 2025</div>
+          <div class="cv-item">Graduate Research Fellowship, Center for Regional Studies, UNM &mdash; 2021&ndash;22</div>
+          <div class="cv-item">Social Justice Scholarship, Northeastern Agricultural and Resource Economics Association &mdash; 2022</div>
+          <div class="cv-item">Berkeley/Sloan Summer School Diversity Fellowship, UC Berkeley &mdash; 2021</div>
+          <div class="cv-item">Graduate Summer Seminar Fellow, Institute for Humane Studies &mdash; 2022</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cv-download-bar">
+      <div>
+        <div class="cdb-text">Curriculum Vitae</div>
+        <div class="cdb-sub">Full academic CV including publications, teaching, and service</div>
+      </div>
+      <a href="Suraj_CV_April2026.pdf" class="btn btn-forest" target="_blank">Download PDF</a>
+    </div>
+
+  </div>
+
+  <!-- CONTACT -->
+  <div class="contact-section page-section" id="contact">
+    <div class="section-eyebrow" style="color:var(--sage-light)">Get in touch</div>
+    <h2 class="section-heading">Contact</h2>
+    <div class="section-rule"></div>
+
+    <div class="contact-grid">
+      <a class="contact-item" href="mailto:suraj.ghimire@nmt.edu">
+        <span class="ci-label">Email</span>
+        <span class="ci-value">suraj.ghimire@nmt.edu</span>
+      </a>
+      <a class="contact-item" href="https://www.nmt.edu" target="_blank">
+        <span class="ci-label">Institution</span>
+        <span class="ci-value">New Mexico Tech</span>
+      </a>
+      <a class="contact-item" href="Suraj_CV_April2026.pdf" target="_blank">
+        <span class="ci-label">CV</span>
+        <span class="ci-value">Download PDF</span>
+      </a>
+      <a class="contact-item" href="https://surajecon.github.io" target="_blank">
+        <span class="ci-label">Website</span>
+        <span class="ci-value">surajecon.github.io</span>
+      </a>
+    </div>
+
+    <p class="contact-note">I welcome inquiries from students, prospective collaborators, and search committees. I am happy to discuss research in progress.</p>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-left">Suraj Ghimire &mdash; New Mexico Tech</div>
+  <div class="footer-right">
+    <a href="research.html">Research</a>
+    <a href="teaching.html">Teaching</a>
+    <a href="about.html">About</a>
+    <a href="mailto:suraj.ghimire@nmt.edu">Email</a>
+  </div>
+</footer>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 10));
+  const toggle = document.getElementById('nav-toggle');
+  const navLinks = document.getElementById('nav-links');
+  toggle.addEventListener('click', () => { toggle.classList.toggle('open'); navLinks.classList.toggle('open'); });
+  function closeNav() { toggle.classList.remove('open'); navLinks.classList.remove('open'); }
+
+  const sections = document.querySelectorAll('.page-section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.05 });
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

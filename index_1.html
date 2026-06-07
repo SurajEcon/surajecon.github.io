@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suraj Ghimire | Environmental Economist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.hero {
+  min-height: calc(100vh - 56px);
+  background: var(--navy);
+  display: flex; align-items: center;
+  position: relative; overflow: hidden;
+  padding: 5rem 8vw;
+}
+.hero-topo {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Cg fill='none' stroke='%234a7c2f' stroke-width='0.8' opacity='0.18'%3E%3Cellipse cx='650' cy='300' rx='320' ry='140'/%3E%3Cellipse cx='650' cy='300' rx='265' ry='112'/%3E%3Cellipse cx='650' cy='300' rx='210' ry='85'/%3E%3Cellipse cx='650' cy='300' rx='155' ry='60'/%3E%3Cellipse cx='650' cy='300' rx='100' ry='38'/%3E%3Cellipse cx='650' cy='300' rx='52' ry='20'/%3E%3Cellipse cx='100' cy='80' rx='110' ry='48'/%3E%3Cellipse cx='100' cy='80' rx='72' ry='30'/%3E%3Cellipse cx='100' cy='80' rx='38' ry='16'/%3E%3Cellipse cx='180' cy='530' rx='145' ry='62'/%3E%3Cellipse cx='180' cy='530' rx='96' ry='40'/%3E%3Cellipse cx='180' cy='530' rx='54' ry='22'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
+}
+.hero-inner {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 5vw; align-items: center;
+  width: 100%; max-width: 1100px;
+}
+.hero-eyebrow {
+  font-size: 0.67rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--sage-light);
+  font-weight: 500; margin-bottom: 1.3rem;
+}
+.hero-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 5.5vw, 4.8rem);
+  font-weight: 300; color: #fff;
+  line-height: 1.0; margin-bottom: 0.15em;
+}
+.hero-name em { font-style: italic; color: var(--sage-light); }
+.hero-position {
+  font-size: 0.78rem; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.38); line-height: 1.9;
+  margin-top: 1.1rem; margin-bottom: 1.7rem;
+}
+.hero-divider { width: 30px; height: 1px; background: var(--sage); margin-bottom: 1.7rem; }
+.hero-statement {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.25rem, 2.1vw, 1.7rem);
+  font-weight: 400; color: rgba(255,255,255,0.88);
+  line-height: 1.55; max-width: 540px; margin-bottom: 1.5rem;
+}
+.hero-statement em { font-style: italic; color: var(--sage-light); }
+.hero-sub {
+  font-size: 0.87rem; color: rgba(255,255,255,0.42);
+  max-width: 500px; line-height: 1.8; margin-bottom: 2.2rem;
+}
+.hero-ctas { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.hero-photo-wrap {
+  flex-shrink: 0;
+  width: clamp(160px, 20vw, 270px);
+  height: clamp(160px, 20vw, 270px);
+  border-radius: 50%; overflow: hidden;
+  border: 3px solid rgba(184,212,160,0.3);
+  box-shadow: 0 0 0 10px rgba(45,80,22,0.2), 0 20px 55px rgba(0,0,0,0.45);
+}
+.hero-photo-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 12%;
+  display: block;
+}
+
+.news-strip {
+  background: var(--forest); padding: 2.5rem 8vw;
+  display: grid; grid-template-columns: 90px 1fr;
+  gap: 2.5rem; align-items: start;
+}
+.news-label {
+  font-size: 0.63rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--sage-light);
+  font-weight: 500; padding-top: 0.12rem;
+}
+.news-items { display: flex; flex-direction: column; gap: 0.7rem; }
+.news-item { display: flex; gap: 1.2rem; align-items: baseline; }
+.news-date {
+  font-size: 0.67rem; color: rgba(255,255,255,0.28);
+  white-space: nowrap; min-width: 60px;
+}
+.news-text { font-size: 0.85rem; color: rgba(255,255,255,0.68); line-height: 1.5; }
+.news-text a { color: var(--sage-light); text-decoration: none; }
+.news-text a:hover { text-decoration: underline; }
+.news-text em { font-style: italic; color: rgba(255,255,255,0.55); }
+
+.cards-section { padding: 3.5rem 8vw; background: var(--cream); }
+.cards-label {
+  font-size: 0.64rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.4rem;
+}
+.nav-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+.nav-card {
+  display: flex; flex-direction: column;
+  padding: 1.3rem 1.4rem; text-decoration: none;
+  border: 1px solid var(--rule); background: #fff;
+  transition: all 0.2s; position: relative; overflow: hidden;
+}
+.nav-card::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--sage); transform: scaleX(0);
+  transform-origin: left; transition: transform 0.22s ease;
+}
+.nav-card:hover { box-shadow: 0 4px 16px rgba(45,80,22,0.08); border-color: var(--sage-light); }
+.nav-card:hover::after { transform: scaleX(1); }
+.nc-label {
+  font-size: 0.61rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--sage);
+  margin-bottom: 0.35rem; font-weight: 500;
+}
+.nc-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.12rem; font-weight: 500;
+  color: var(--navy); margin-bottom: 0.35rem;
+}
+.nc-desc { font-size: 0.79rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 0.85rem; flex: 1; }
+.nc-arrow { font-size: 0.68rem; color: var(--sage); }
+
+.pillars { background: var(--cream-dark); padding: 3rem 8vw; }
+.pillars-label {
+  font-size: 0.63rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.6rem;
+}
+.pillars-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  border: 1px solid var(--rule); gap: 1px; background: var(--rule);
+}
+.pillar { background: #fff; padding: 1.6rem 1.7rem; }
+.pillar-icon { font-size: 1.3rem; display: block; margin-bottom: 0.7rem; }
+.pillar-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem; font-weight: 500;
+  color: var(--navy); margin-bottom: 0.4rem;
+}
+.pillar-text { font-size: 0.81rem; color: var(--text-muted); line-height: 1.7; }
+
+@media (max-width: 860px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  .hero { padding: 3.5rem 6vw; align-items: flex-start; }
+  .hero-photo-wrap { width: 140px; height: 140px; }
+  .nav-cards { grid-template-columns: 1fr; }
+  .pillars-grid { grid-template-columns: 1fr; }
+  .news-strip { grid-template-columns: 1fr; gap: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a class="nav-home" href="index.html">
+    <div class="nav-monogram">SG</div>
+    <span class="nav-wordmark">Suraj Ghimire</span>
+  </a>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="research.html" onclick="closeNav()">Research</a></li>
+    <li><a href="teaching.html" onclick="closeNav()">Teaching</a></li>
+    <li><a href="about.html" onclick="closeNav()">About</a></li>
+    <li><a href="about.html#contact" onclick="closeNav()">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+  <div class="hero">
+    <div class="hero-topo"></div>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <p class="hero-eyebrow">Environmental &amp; Resource Economist</p>
+        <h1 class="hero-name">Suraj<br><em>Ghimire</em></h1>
+        <p class="hero-position">Ph.D., Economics &mdash; University of New Mexico<br>Assistant Teaching Professor, New Mexico Tech</p>
+        <div class="hero-divider"></div>
+        <p class="hero-statement">Markets are good at pricing what people trade.<br>They are bad at pricing <em>what they damage.</em><br>I try to close that gap.</p>
+        <p class="hero-sub">I am an applied environmental economist working on air quality, energy transitions, and the costs of environmental harm that go uncounted in market prices. My tools are econometrics, dispersion modeling, and spatial analysis. My questions are about efficiency, fairness, and what good environmental policy actually requires.</p>
+        <div class="hero-ctas">
+          <a href="research.html" class="btn btn-forest">Research →</a>
+          <a href="about.html" class="btn btn-light">About me</a>
+        </div>
+      </div>
+      <div class="hero-photo-wrap">
+        <img src="suraj.png" alt="Suraj Ghimire">
+      </div>
+    </div>
+  </div>
+
+  <div class="news-strip">
+    <div class="news-label">Recent</div>
+    <div class="news-items">
+      <div class="news-item">
+        <span class="news-date">Apr 2026</span>
+        <span class="news-text">Paper accepted — forthcoming in the <em>Journal of Agricultural and Resource Economics</em>: health and economic damages from dairy CAFO air pollution in New Mexico.</span>
+      </div>
+      <div class="news-item">
+        <span class="news-date">2025</span>
+        <span class="news-text">Co-PI, NSF Award No. 2520791 ($250,000) — applying machine learning and satellite imagery to spatial environmental risk modeling.</span>
+      </div>
+      <div class="news-item">
+        <span class="news-date">2025</span>
+        <span class="news-text">Published in <em>Energies</em>: economic viability and resilience of dairy manure bioenergy under market and policy shocks.</span>
+      </div>
+      <div class="news-item">
+        <span class="news-date">Jun 2026</span>
+        <span class="news-text">Teaching <a href="summer-stem.html">Money Hacks</a> — financial literacy for high school students in NMT's Summer STEM program.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards-section">
+    <div class="cards-label">Explore</div>
+    <div class="nav-cards">
+      <a class="nav-card" href="research.html">
+        <span class="nc-label">Research</span>
+        <span class="nc-title">Environmental &amp; Resource Economics</span>
+        <span class="nc-desc">Air quality, agricultural externalities, energy policy, environmental justice. Forthcoming in JARE, under review at Applied Economics Letters, Co-PI on $250K NSF grant.</span>
+        <span class="nc-arrow">View papers &amp; grants →</span>
+      </a>
+      <a class="nav-card" href="teaching.html">
+        <span class="nc-label">Teaching</span>
+        <span class="nc-title">Courses &amp; Classroom Games</span>
+        <span class="nc-desc">Principles of macro and micro, engineering economics, data analytics at NMT — plus a growing library of browser-based simulations for classroom use.</span>
+        <span class="nc-arrow">See courses &amp; games →</span>
+      </a>
+      <a class="nav-card" href="about.html">
+        <span class="nc-label">About</span>
+        <span class="nc-title">CV &amp; Background</span>
+        <span class="nc-desc">Education, positions, industry experience, and honors. Grew up in rural Nepal; arrived at environmental economics the long way around.</span>
+        <span class="nc-arrow">Read more →</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="pillars">
+    <div class="pillars-label">Research Areas</div>
+    <div class="pillars-grid">
+      <div class="pillar">
+        <span class="pillar-icon">💨</span>
+        <div class="pillar-title">Air Pollution &amp; Health</div>
+        <p class="pillar-text">What does pollution actually cost the people who breathe it? I estimate health damages using atmospheric dispersion models and epidemiological dose-response functions, translating physical exposure into welfare losses.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">⚖️</span>
+        <div class="pillar-title">Environmental Justice</div>
+        <p class="pillar-text">Environmental costs are not distributed randomly. I examine whether income and racial disparities shape who bears unpriced pollution burdens — and what that means for policy evaluation.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">⚡</span>
+        <div class="pillar-title">Energy &amp; Climate Policy</div>
+        <p class="pillar-text">When are clean energy investments privately viable, and when do the public benefits exceed private returns? I evaluate energy transitions with attention to which communities and policy designs actually deliver.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left">Suraj Ghimire &mdash; New Mexico Tech &mdash; 2026</div>
+  <div class="footer-right">
+    <a href="research.html">Research</a>
+    <a href="teaching.html">Teaching</a>
+    <a href="about.html">About</a>
+    <a href="mailto:suraj.ghimire@nmt.edu">Email</a>
+  </div>
+</footer>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 10));
+  const toggle = document.getElementById('nav-toggle');
+  const navLinks = document.getElementById('nav-links');
+  toggle.addEventListener('click', () => { toggle.classList.toggle('open'); navLinks.classList.toggle('open'); });
+  function closeNav() { toggle.classList.remove('open'); navLinks.classList.remove('open'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teaching — Suraj Ghimire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+/* PAGE BANNER */
+.page-banner {
+  background: var(--forest);
+  padding: 5rem 8vw 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.page-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='400'%3E%3Cg fill='none' stroke='%23b8d4a0' stroke-width='0.7' opacity='0.12'%3E%3Cellipse cx='600' cy='200' rx='280' ry='120'/%3E%3Cellipse cx='600' cy='200' rx='220' ry='92'/%3E%3Cellipse cx='600' cy='200' rx='160' ry='66'/%3E%3Cellipse cx='600' cy='200' rx='105' ry='43'/%3E%3Cellipse cx='600' cy='200' rx='58' ry='24'/%3E%3Cellipse cx='80' cy='60' rx='100' ry='42'/%3E%3Cellipse cx='80' cy='60' rx='65' ry='26'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
+  pointer-events: none;
+}
+.page-banner-inner { position: relative; z-index: 1; }
+.page-banner-eyebrow {
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sage-light);
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+}
+.page-banner-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-weight: 300;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 1.2rem;
+}
+.page-banner-title em { font-style: italic; color: var(--sage-light); }
+.page-banner-sub {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.55);
+  max-width: 540px;
+  line-height: 1.75;
+}
+
+/* COURSES */
+.courses-section { padding: 4rem 8vw 3rem; background: var(--cream); }
+.courses-section h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--navy);
+  margin-bottom: 0.4rem;
+}
+.courses-intro {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  max-width: 560px;
+  line-height: 1.7;
+}
+
+/* Course rows — accordion style */
+.course-group { margin-bottom: 2.5rem; }
+.course-group-label {
+  font-size: 0.64rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sage);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.course-group-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+.course-row {
+  border: 1px solid var(--rule);
+  background: #fff;
+  margin-bottom: 0.5rem;
+  transition: border-color 0.2s;
+}
+.course-row:hover { border-color: var(--sage-light); }
+.course-row-header {
+  padding: 1rem 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+.course-row-header::-webkit-details-marker { display: none; }
+.course-row-left { display: flex; align-items: center; gap: 1rem; flex: 1; }
+.course-name-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--navy);
+}
+.course-row-arrow {
+  font-size: 0.7rem;
+  color: var(--muted);
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+details[open] .course-row-arrow { transform: rotate(180deg); }
+.course-row-body {
+  padding: 0 1.3rem 1.2rem;
+  border-top: 1px solid var(--rule);
+  margin-top: 0;
+}
+.course-desc {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 560px;
+  padding-top: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* inline game chips inside course */
+.course-games {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.course-game-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem 1rem;
+  background: var(--sage-pale);
+  border: 1px solid rgba(122,158,95,0.25);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.course-game-chip:hover { border-color: var(--sage); background: #e4f0d8; }
+.cgc-emoji { font-size: 1.1rem; flex-shrink: 0; }
+.cgc-info { flex: 1; }
+.cgc-name {
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 1px;
+}
+.cgc-tag {
+  font-size: 0.7rem;
+  color: var(--sage);
+  letter-spacing: 0.05em;
+}
+.cgc-arrow { font-size: 0.7rem; color: var(--sage); flex-shrink: 0; }
+.cgc-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* GAMES LIBRARY */
+.games-section { padding: 4rem 8vw; background: var(--cream-dark); }
+.games-section h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--navy);
+  margin-bottom: 0.3rem;
+}
+.games-intro {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  max-width: 580px;
+  line-height: 1.7;
+  margin-bottom: 1.8rem;
+}
+
+.filter-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.filter-btn {
+  padding: 0.3rem 0.9rem;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Jost', sans-serif;
+}
+.filter-btn:hover,
+.filter-btn.active { border-color: var(--forest); color: var(--forest); background: rgba(45,80,22,0.05); }
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.2rem;
+}
+
+.game-card {
+  background: #fff;
+  border: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.game-card:hover { border-color: var(--sage); box-shadow: 0 3px 14px rgba(74,124,47,0.09); }
+.game-card.placeholder { opacity: 0.55; }
+
+.gc-top {
+  padding: 1.2rem 1.3rem 1rem;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+}
+.gc-emoji { font-size: 1.6rem; flex-shrink: 0; line-height: 1; }
+.gc-header {}
+.gc-course {
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 0.2rem;
+}
+.gc-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--navy);
+  line-height: 1.3;
+}
+.gc-body { padding: 0.9rem 1.3rem 1.2rem; flex: 1; display: flex; flex-direction: column; }
+.gc-desc {
+  font-size: 0.81rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  flex: 1;
+  margin-bottom: 0.9rem;
+}
+.gc-meta {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+.gc-tag {
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--rule);
+  color: var(--text-muted);
+}
+.gc-link {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid var(--forest);
+  color: var(--forest);
+  transition: all 0.2s;
+  align-self: flex-start;
+}
+.gc-link:hover { background: var(--forest); color: #fff; }
+.gc-link.disabled {
+  border-color: var(--rule);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.gc-badge {
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.18rem 0.5rem;
+  border: 1px solid rgba(122,158,95,0.4);
+  color: var(--sage);
+  align-self: flex-start;
+  margin-bottom: 0.6rem;
+}
+
+@media (max-width: 640px) {
+  .courses-section, .games-section { padding: 3rem 5vw; }
+  .games-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a class="nav-home" href="index.html">
+    <div class="nav-monogram">SG</div>
+    <span class="nav-wordmark">Suraj Ghimire</span>
+  </a>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="research.html" onclick="closeNav()">Research</a></li>
+    <li><a href="teaching.html" class="active" onclick="closeNav()">Teaching</a></li>
+    <li><a href="about.html" onclick="closeNav()">About</a></li>
+    <li><a href="about.html#contact" onclick="closeNav()">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- BANNER -->
+  <div class="page-banner">
+    <div class="page-banner-inner">
+      <p class="page-banner-eyebrow">New Mexico Tech &mdash; Department of CS &amp; Engineering</p>
+      <h1 class="page-banner-title">Teaching economics<br>to <em>engineers</em></h1>
+      <p class="page-banner-sub">I carry a 4:4 teaching load at a Hispanic-Serving Institution in Socorro, NM. My goal is to make economic reasoning concrete &mdash; through real data, applied problems, and browser-based games students can play in class.</p>
+    </div>
+  </div>
+
+  <!-- COURSES -->
+  <div class="courses-section">
+    <h2>Courses</h2>
+    <p class="courses-intro">Click a course to see a description and any associated classroom games.</p>
+
+    <div class="course-group">
+      <div class="course-group-label">Undergraduate</div>
+
+      <details class="course-row">
+        <summary class="course-row-header">
+          <div class="course-row-left">
+            <span class="course-name-text">Principles of Microeconomics</span>
+          </div>
+          <span class="course-row-arrow">▾</span>
+        </summary>
+        <div class="course-row-body">
+          <p class="course-desc">Core undergraduate microeconomics: supply and demand, market equilibrium, consumer and producer theory, market power, externalities, and public goods. Taught with an emphasis on applied examples drawn from energy markets and agricultural economics.</p>
+          <div class="course-games">
+            <a class="course-game-chip cgc-disabled" href="#">
+              <span class="cgc-emoji">🏪</span>
+              <span class="cgc-info">
+                <span class="cgc-name">Double Auction Market</span>
+                <span class="cgc-tag">In development &mdash; Market equilibrium</span>
+              </span>
+            </a>
+            <a class="course-game-chip cgc-disabled" href="#">
+              <span class="cgc-emoji">🏭</span>
+              <span class="cgc-info">
+                <span class="cgc-name">Factory &amp; Fishery: The Externality Game</span>
+                <span class="cgc-tag">In development &mdash; Externalities &amp; Coase bargaining</span>
+              </span>
+            </a>
+          </div>
+        </div>
+      </details>
+
+      <details class="course-row">
+        <summary class="course-row-header">
+          <div class="course-row-left">
+            <span class="course-name-text">Principles of Macroeconomics</span>
+          </div>
+          <span class="course-row-arrow">▾</span>
+        </summary>
+        <div class="course-row-body">
+          <p class="course-desc">Core undergraduate macroeconomics: GDP, unemployment, inflation, fiscal and monetary policy, the Phillips Curve, and open-economy macroeconomics. Strong emphasis on understanding Federal Reserve policy and interpreting real economic data.</p>
+          <div class="course-games">
+            <a class="course-game-chip" href="chair-the-fed.html" target="_blank">
+              <span class="cgc-emoji">🏛️</span>
+              <span class="cgc-info">
+                <span class="cgc-name">Chair the Fed: Monetary Policy Simulation</span>
+                <span class="cgc-tag">~30 min &mdash; Monetary policy &amp; Phillips Curve</span>
+              </span>
+              <span class="cgc-arrow">→</span>
+            </a>
+            <a class="course-game-chip" href="bull-or-bear.html" target="_blank">
+              <span class="cgc-emoji">🐂</span>
+              <span class="cgc-info">
+                <span class="cgc-name">Bull or Bear? Market Headlines Game</span>
+                <span class="cgc-tag">~25 min &mdash; Fed policy, inflation, market reactions</span>
+              </span>
+              <span class="cgc-arrow">→</span>
+            </a>
+            <a class="course-game-chip cgc-disabled" href="#">
+              <span class="cgc-emoji">📊</span>
+              <span class="cgc-info">
+                <span class="cgc-name">FOMC: Committee Vote</span>
+                <span class="cgc-tag">In development &mdash; Central bank deliberation</span>
+              </span>
+            </a>
+          </div>
+        </div>
+      </details>
+
+      <details class="course-row">
+        <summary class="course-row-header">
+          <div class="course-row-left">
+            <span class="course-name-text">Engineering Economics</span>
+          </div>
+          <span class="course-row-arrow">▾</span>
+        </summary>
+        <div class="course-row-body">
+          <p class="course-desc">Economic analysis for engineering decisions: time value of money, present worth, annual worth, rate of return, benefit-cost analysis, depreciation, and income tax effects. Uses the Chan Park textbook with real engineering project case studies.</p>
+          <div class="course-games">
+            <a class="course-game-chip" href="compound-interest.html" target="_blank">
+              <span class="cgc-emoji">📈</span>
+              <span class="cgc-info">
+                <span class="cgc-name">The Time Machine: Compound Interest</span>
+                <span class="cgc-tag">~15 min &mdash; Time value of money</span>
+              </span>
+              <span class="cgc-arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </details>
+
+      <details class="course-row">
+        <summary class="course-row-header">
+          <div class="course-row-left">
+            <span class="course-name-text">Managerial Accounting</span>
+          </div>
+          <span class="course-row-arrow">▾</span>
+        </summary>
+        <div class="course-row-body">
+          <p class="course-desc">Accounting for internal business decisions: cost behavior, cost-volume-profit analysis, budgeting, variance analysis, and performance measurement. Focuses on how managers use accounting information to plan, control, and evaluate operations.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="course-group">
+      <div class="course-group-label">Graduate</div>
+
+      <details class="course-row">
+        <summary class="course-row-header">
+          <div class="course-row-left">
+            <span class="course-name-text">Engineering Data Analytics (EMGT 5004)</span>
+          </div>
+          <span class="course-row-arrow">▾</span>
+        </summary>
+        <div class="course-row-body">
+          <p class="course-desc">Graduate-level applied statistics and data analytics for engineering managers. Topics include regression analysis, statistical inference, time series, and data visualization in R and Python. Students work with real datasets from engineering and operations contexts.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="course-group">
+      <div class="course-group-label">Outreach &amp; Continuing Education</div>
+
+      <details class="course-row">
+        <summary class="course-row-header">
+          <div class="course-row-left">
+            <span class="course-name-text">Money Hacks: Engineering Your Financial Future</span>
+          </div>
+          <span class="course-row-arrow">▾</span>
+        </summary>
+        <div class="course-row-body">
+          <p class="course-desc">A weeklong financial literacy intensive for high school students in NMT's Summer STEM program. Covers personal budgeting, compound interest, investing basics, credit scores, entrepreneurship, and crypto &mdash; using hands-on games and simulations throughout. Students leave with a personalized financial blueprint.</p>
+          <div class="course-games">
+            <a class="course-game-chip" href="spend-or-save.html" target="_blank">
+              <span class="cgc-emoji">💸</span>
+              <span class="cgc-info"><span class="cgc-name">Spend or Save?</span><span class="cgc-tag">~20 min &mdash; Budgeting &amp; opportunity cost</span></span>
+              <span class="cgc-arrow">→</span>
+            </a>
+            <a class="course-game-chip" href="bull-or-bear.html" target="_blank">
+              <span class="cgc-emoji">🐂</span>
+              <span class="cgc-info"><span class="cgc-name">Bull or Bear?</span><span class="cgc-tag">~25 min &mdash; Financial markets</span></span>
+              <span class="cgc-arrow">→</span>
+            </a>
+            <a class="course-game-chip" href="compound-interest.html" target="_blank">
+              <span class="cgc-emoji">📈</span>
+              <span class="cgc-info"><span class="cgc-name">The Time Machine: Compound Interest</span><span class="cgc-tag">~15 min &mdash; Investing</span></span>
+              <span class="cgc-arrow">→</span>
+            </a>
+            <a class="course-game-chip" href="dropship-or-flop.html" target="_blank">
+              <span class="cgc-emoji">🛍️</span>
+              <span class="cgc-info"><span class="cgc-name">Dropship or Flop?</span><span class="cgc-tag">~25 min &mdash; Entrepreneurship &amp; margin</span></span>
+              <span class="cgc-arrow">→</span>
+            </a>
+            <a class="course-game-chip" href="crypto-crash-or-moon.html" target="_blank">
+              <span class="cgc-emoji">📉</span>
+              <span class="cgc-info"><span class="cgc-name">Crash or Moon?</span><span class="cgc-tag">~25 min &mdash; Speculation vs investing</span></span>
+              <span class="cgc-arrow">→</span>
+            </a>
+            <a class="course-game-chip" href="credit-score-simulator.html" target="_blank">
+              <span class="cgc-emoji">💳</span>
+              <span class="cgc-info"><span class="cgc-name">Credit Score Simulator</span><span class="cgc-tag">~30 min &mdash; Credit &amp; debt</span></span>
+              <span class="cgc-arrow">→</span>
+            </a>
+            <a class="course-game-chip" href="financial-future-flashforward.html" target="_blank">
+              <span class="cgc-emoji">🔭</span>
+              <span class="cgc-info"><span class="cgc-name">Financial Future Flashforward</span><span class="cgc-tag">~30 min &mdash; Life planning</span></span>
+              <span class="cgc-arrow">→</span>
+            </a>
+            <a class="course-game-chip" href="final-boss-quiz.html" target="_blank">
+              <span class="cgc-emoji">🏆</span>
+              <span class="cgc-info"><span class="cgc-name">Final Boss Quiz</span><span class="cgc-tag">~30 min &mdash; Week review</span></span>
+              <span class="cgc-arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- GAMES LIBRARY -->
+  <div class="games-section">
+    <h2>All Classroom Games</h2>
+    <p class="games-intro">Every game runs in the browser. No installation, no accounts. Designed for 20–30 minutes of class time. Filter by subject area.</p>
+
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterGames('all',this)">All</button>
+      <button class="filter-btn" onclick="filterGames('macro',this)">Macro</button>
+      <button class="filter-btn" onclick="filterGames('micro',this)">Micro</button>
+      <button class="filter-btn" onclick="filterGames('finlit',this)">Financial Literacy</button>
+    </div>
+
+    <div class="games-grid" id="games-grid">
+
+      <div class="game-card" data-cat="macro">
+        <div class="gc-top">
+          <span class="gc-emoji">🏛️</span>
+          <div class="gc-header">
+            <p class="gc-course">Macroeconomics</p>
+            <p class="gc-name">Chair the Fed: Monetary Policy Simulation</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <p class="gc-desc">Students role-play as Fed Chair, setting interest rates each quarter to manage inflation and unemployment across a simulated economy. Makes the Phillips Curve tradeoff visceral before students put numbers to paper.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~30 min</span>
+            <span class="gc-tag">Individual</span>
+            <span class="gc-tag">Monetary Policy</span>
+          </div>
+          <a class="gc-link" href="chair-the-fed.html" target="_blank">Play →</a>
+        </div>
+      </div>
+
+      <div class="game-card" data-cat="macro finlit">
+        <div class="gc-top">
+          <span class="gc-emoji">🐂</span>
+          <div class="gc-header">
+            <p class="gc-course">Macroeconomics &mdash; Financial Literacy</p>
+            <p class="gc-name">Bull or Bear?</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <p class="gc-desc">Twelve real news headlines. Students predict whether each one sends the market up or down, then see the explanation. Covers Fed decisions, earnings reports, inflation, and geopolitical risk. Streak bonuses create competition.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~25 min</span>
+            <span class="gc-tag">Competitive</span>
+            <span class="gc-tag">Financial Markets</span>
+          </div>
+          <a class="gc-link" href="bull-or-bear.html" target="_blank">Play →</a>
+        </div>
+      </div>
+
+      <div class="game-card" data-cat="finlit">
+        <div class="gc-top">
+          <span class="gc-emoji">💸</span>
+          <div class="gc-header">
+            <p class="gc-course">Financial Literacy</p>
+            <p class="gc-name">Spend or Save?</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <p class="gc-desc">Ten rounds of real-life financial decisions — tax refunds, car repairs, bonuses. Choices compound across rounds and a running balance shows how early decisions ripple through later ones.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~20 min</span>
+            <span class="gc-tag">Individual</span>
+            <span class="gc-tag">Budgeting</span>
+          </div>
+          <a class="gc-link" href="spend-or-save.html" target="_blank">Play →</a>
+        </div>
+      </div>
+
+      <div class="game-card" data-cat="finlit">
+        <div class="gc-top">
+          <span class="gc-emoji">📈</span>
+          <div class="gc-header">
+            <p class="gc-course">Financial Literacy &mdash; Engineering Econ</p>
+            <p class="gc-name">The Time Machine: Compound Interest</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <p class="gc-desc">An interactive calculator with sliders for starting amount, age, return rate, and time horizon. A bar chart and cost-of-waiting table make the math visible. The moment students drag the start age from 18 to 28 and watch the number collapse is the whole lesson.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~15 min</span>
+            <span class="gc-tag">Individual</span>
+            <span class="gc-tag">Time Value of Money</span>
+          </div>
+          <a class="gc-link" href="compound-interest.html" target="_blank">Open →</a>
+        </div>
+      </div>
+
+      <div class="game-card" data-cat="micro finlit">
+        <div class="gc-top">
+          <span class="gc-emoji">🛍️</span>
+          <div class="gc-header">
+            <p class="gc-course">Microeconomics &mdash; Financial Literacy</p>
+            <p class="gc-name">Dropship or Flop?</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <p class="gc-desc">Ten product scenarios. Students evaluate each on margin, shipping time, and competition, then decide viability. After each pick, the verdict reveals the underlying economics. Teaches profit margin, market saturation, and consumer behavior.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~25 min</span>
+            <span class="gc-tag">Individual</span>
+            <span class="gc-tag">Entrepreneurship</span>
+          </div>
+          <a class="gc-link" href="dropship-or-flop.html" target="_blank">Play →</a>
+        </div>
+      </div>
+
+      <div class="game-card" data-cat="finlit">
+        <div class="gc-top">
+          <span class="gc-emoji">📉</span>
+          <div class="gc-header">
+            <p class="gc-course">Financial Literacy</p>
+            <p class="gc-name">Crash or Moon?</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <p class="gc-desc">Eight real historical crypto charts with the final three months hidden. Students draw their prediction then pick crash or moon. The real chart is revealed with context. The lesson: short-term prediction is closer to guessing than analysis.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~25 min</span>
+            <span class="gc-tag">Individual</span>
+            <span class="gc-tag">Speculation</span>
+          </div>
+          <a class="gc-link" href="crypto-crash-or-moon.html" target="_blank">Play →</a>
+        </div>
+      </div>
+
+      <div class="game-card" data-cat="finlit">
+        <div class="gc-top">
+          <span class="gc-emoji">💳</span>
+          <div class="gc-header">
+            <p class="gc-course">Financial Literacy</p>
+            <p class="gc-name">Credit Score Simulator</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <p class="gc-desc">Eight decisions across eight years (ages 18–25). A live score gauge updates after each choice. At the car loan stage, a rate table shows what the player's score actually costs them in dollars over five years.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~30 min</span>
+            <span class="gc-tag">Individual</span>
+            <span class="gc-tag">Credit &amp; Debt</span>
+          </div>
+          <a class="gc-link" href="credit-score-simulator.html" target="_blank">Play →</a>
+        </div>
+      </div>
+
+      <div class="game-card" data-cat="finlit">
+        <div class="gc-top">
+          <span class="gc-emoji">🔭</span>
+          <div class="gc-header">
+            <p class="gc-course">Financial Literacy</p>
+            <p class="gc-name">Financial Future Flashforward</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <p class="gc-desc">Five major life decisions — education, housing, transportation, investing, career — each showing their projected net worth impact at age 40. A running total updates with every choice. The end screen shows the cost of each decision vs. the optimal path.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~30 min</span>
+            <span class="gc-tag">Individual</span>
+            <span class="gc-tag">Life Planning</span>
+          </div>
+          <a class="gc-link" href="financial-future-flashforward.html" target="_blank">Play →</a>
+        </div>
+      </div>
+
+      <div class="game-card" data-cat="finlit">
+        <div class="gc-top">
+          <span class="gc-emoji">🏆</span>
+          <div class="gc-header">
+            <p class="gc-course">Financial Literacy</p>
+            <p class="gc-name">Final Boss Quiz</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <p class="gc-desc">Fifteen questions across five categories: budgeting, investing, entrepreneurship, credit, and big-picture mindset. Difficulty and points scale up. Streak bonuses reward consecutive correct answers. Designed as a competitive end-of-week review.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~30 min</span>
+            <span class="gc-tag">Competitive</span>
+            <span class="gc-tag">Week Review</span>
+          </div>
+          <a class="gc-link" href="final-boss-quiz.html" target="_blank">Play →</a>
+        </div>
+      </div>
+
+      <!-- placeholders -->
+      <div class="game-card placeholder" data-cat="micro">
+        <div class="gc-top">
+          <span class="gc-emoji">🏪</span>
+          <div class="gc-header">
+            <p class="gc-course">Microeconomics</p>
+            <p class="gc-name">Double Auction Market</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <span class="gc-badge">In Development</span>
+          <p class="gc-desc">Students trade a commodity as buyers and sellers with private valuations. Price and quantity converge to the competitive equilibrium, illustrating market efficiency without abstraction.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~30 min</span>
+            <span class="gc-tag">Whole Class</span>
+            <span class="gc-tag">Market Equilibrium</span>
+          </div>
+          <a class="gc-link disabled" href="#">Coming Soon</a>
+        </div>
+      </div>
+
+      <div class="game-card placeholder" data-cat="micro">
+        <div class="gc-top">
+          <span class="gc-emoji">🏭</span>
+          <div class="gc-header">
+            <p class="gc-course">Microeconomics</p>
+            <p class="gc-name">Factory &amp; Fishery</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <span class="gc-badge">In Development</span>
+          <p class="gc-desc">A two-player negotiation game where a factory and fishery bargain over pollution levels. Illustrates Coase bargaining, Pigouvian taxes, and why markets underprice negative externalities.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~30 min</span>
+            <span class="gc-tag">Pairs</span>
+            <span class="gc-tag">Externalities</span>
+          </div>
+          <a class="gc-link disabled" href="#">Coming Soon</a>
+        </div>
+      </div>
+
+      <div class="game-card placeholder" data-cat="macro">
+        <div class="gc-top">
+          <span class="gc-emoji">📊</span>
+          <div class="gc-header">
+            <p class="gc-course">Macroeconomics</p>
+            <p class="gc-name">FOMC: Committee Vote</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <span class="gc-badge">In Development</span>
+          <p class="gc-desc">Each student is assigned an FOMC member with a distinct policy philosophy. The class votes on rate decisions after reviewing economic data, illustrating how committee deliberation shapes monetary outcomes.</p>
+          <div class="gc-meta">
+            <span class="gc-tag">~30 min</span>
+            <span class="gc-tag">Whole Class</span>
+            <span class="gc-tag">Monetary Policy</span>
+          </div>
+          <a class="gc-link disabled" href="#">Coming Soon</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-left">Suraj Ghimire &mdash; New Mexico Tech</div>
+  <div class="footer-right">
+    <a href="research.html">Research</a>
+    <a href="teaching.html">Teaching</a>
+    <a href="about.html">About</a>
+    <a href="mailto:suraj.ghimire@nmt.edu">Email</a>
+  </div>
+</footer>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 10));
+  const toggle = document.getElementById('nav-toggle');
+  const navLinks = document.getElementById('nav-links');
+  toggle.addEventListener('click', () => { toggle.classList.toggle('open'); navLinks.classList.toggle('open'); });
+  function closeNav() { toggle.classList.remove('open'); navLinks.classList.remove('open'); }
+
+  function filterGames(cat, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.game-card').forEach(card => {
+      const cats = card.dataset.cat || '';
+      card.style.display = (cat === 'all' || cats.includes(cat)) ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

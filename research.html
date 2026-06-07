@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research — Suraj Ghimire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+/* PAGE BANNER */
+.page-banner {
+  background: var(--navy);
+  padding: 5rem 8vw 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.page-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Cg fill='none' stroke='%234a7c2f' stroke-width='0.7' opacity='0.18'%3E%3Cellipse cx='500' cy='200' rx='260' ry='110'/%3E%3Cellipse cx='500' cy='200' rx='210' ry='85'/%3E%3Cellipse cx='500' cy='200' rx='160' ry='62'/%3E%3Cellipse cx='500' cy='200' rx='110' ry='42'/%3E%3Cellipse cx='500' cy='200' rx='65' ry='25'/%3E%3Cellipse cx='100' cy='50' rx='120' ry='50'/%3E%3Cellipse cx='100' cy='50' rx='80' ry='32'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
+  pointer-events: none;
+}
+.page-banner-inner { position: relative; z-index: 1; }
+.page-banner-eyebrow {
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sage-light);
+  margin-bottom: 0.8rem;
+}
+.page-banner-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  font-weight: 300;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 1.2rem;
+}
+.page-banner-title em { font-style: italic; color: var(--sage-light); }
+.page-banner-sub {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.5);
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+/* RESEARCH BODY */
+.research-body {
+  padding: 5rem 8vw;
+  max-width: 1100px;
+}
+
+/* ABSTRACT TOGGLE */
+.paper-abstract-toggle {
+  display: none;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+  max-width: 640px;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--rule);
+}
+.paper-abstract-toggle.open { display: block; }
+.toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage);
+  padding: 0;
+  margin-top: 0.5rem;
+  transition: color 0.2s;
+}
+.toggle-btn:hover { color: var(--forest); }
+
+/* GRANT CARD */
+.grant-card {
+  background: var(--sage-pale);
+  border: 1px solid var(--sage-light);
+  border-left: 3px solid var(--forest);
+  padding: 1.5rem 1.8rem;
+  margin-top: 0.5rem;
+  max-width: 680px;
+}
+.grant-label {
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--forest);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+.grant-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--navy);
+  margin-bottom: 0.3rem;
+}
+.grant-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+.grant-desc {
+  font-size: 0.84rem;
+  color: var(--text-mid);
+  line-height: 1.7;
+}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a class="nav-home" href="index.html">
+    <div class="nav-monogram">SG</div>
+    <span class="nav-wordmark">Suraj Ghimire</span>
+  </a>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="research.html" class="active" onclick="closeNav()">Research</a></li>
+    <li><a href="teaching.html" onclick="closeNav()">Teaching</a></li>
+    <li><a href="about.html" onclick="closeNav()">About</a></li>
+    <li><a href="about.html#contact" onclick="closeNav()">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+  <div class="page-banner">
+    <div class="page-banner-inner">
+      <p class="page-banner-eyebrow">Environmental &amp; Health Economics</p>
+      <h1 class="page-banner-title">Research on <em>what pollution costs</em><br>the people who live with it</h1>
+      <p class="page-banner-sub">My work estimates the social costs of agricultural air pollution, examines welfare losses from sub-threshold ozone exposure, and evaluates the financial viability of biogas energy systems. I use quasi-experimental methods, atmospheric dispersion modeling, and spatial analysis.</p>
+    </div>
+  </div>
+
+  <div class="research-body page-section visible">
+
+    <div class="paper-list">
+
+      <!-- FORTHCOMING -->
+      <p class="paper-group-label">Forthcoming</p>
+
+      <div class="paper">
+        <p class="paper-venue">Forthcoming &mdash; Journal of Agricultural and Resource Economics</p>
+        <p class="paper-title">The Health and Economic Impacts of Dairy Air Pollution: Evidence from New Mexico</p>
+        <p class="paper-authors">Suraj Ghimire, Andrew Goodkind, Jingjing Wang</p>
+        <button class="toggle-btn" onclick="toggleAbstract(this)">Abstract ↓</button>
+        <div class="paper-abstract-toggle">
+          Estimates county-level morbidity and mortality damages from dairy CAFO emissions in New Mexico, combining atmospheric dispersion modeling (InMAP) with epidemiological dose-response functions from the peer-reviewed literature. Variance decomposition shows that value-of-statistical-life parameters account for approximately 65 percent of total estimated damages, with ammonia emissions representing the dominant physical pathway. Finds that social costs of dairy air pollution are substantial relative to the economic value the sector generates for the state.
+        </div>
+      </div>
+
+      <!-- UNDER REVIEW -->
+      <p class="paper-group-label">Under Review</p>
+
+      <div class="paper">
+        <p class="paper-venue">Revise &amp; Resubmit &mdash; Applied Economics Letters</p>
+        <p class="paper-title">Beyond the Threshold: The Hidden Economic Costs of Safe Ozone Pollution</p>
+        <p class="paper-authors">Suraj Ghimire, Andrew Goodkind, Benjamin Jones</p>
+        <button class="toggle-btn" onclick="toggleAbstract(this)">Abstract ↓</button>
+        <div class="paper-abstract-toggle">
+          Estimates welfare costs attributable to ozone exposure at concentrations below the current National Ambient Air Quality Standard, contributing to the policy debate over whether existing standards adequately protect public health. Examines how functional form assumptions in the dose-response relationship affect damage estimates and the implied stringency of the efficient standard.
+        </div>
+      </div>
+
+      <!-- PUBLISHED -->
+      <p class="paper-group-label">Published</p>
+
+      <div class="paper">
+        <p class="paper-venue">Energies, 18(23), 6286 &mdash; 2025</p>
+        <p class="paper-title">The Tipping Point: Economic Viability and Resilience of Dairy Manure Bioenergy Under Market and Policy Shocks</p>
+        <p class="paper-authors">Suraj Ghimire, Jingjing Wang</p>
+        <button class="toggle-btn" onclick="toggleAbstract(this)">Abstract ↓</button>
+        <div class="paper-abstract-toggle">
+          Develops a Financial Resilience Index framework to evaluate combined heat and power versus renewable natural gas systems across a range of dairy farm sizes. Uses Monte Carlo simulation to characterize viability under variability in energy prices, carbon credit markets, and capital costs. Finds that policy instruments calibrated to average conditions may fail the farms that most need support, particularly smaller operations with thin margins.
+        </div>
+      </div>
+
+      <!-- WORKING PAPERS -->
+      <p class="paper-group-label">Working Papers</p>
+
+      <div class="paper">
+        <p class="paper-venue">Working Paper</p>
+        <p class="paper-title">Distributional Impacts of Exposure to CAFOs: A Case Study of Large Dairies in New Mexico</p>
+        <p class="paper-authors">Suraj Ghimire, Jingjing Wang</p>
+        <button class="toggle-btn" onclick="toggleAbstract(this)">Abstract ↓</button>
+        <div class="paper-abstract-toggle">
+          Examines whether income and racial disparities exist in the distribution of dairy air pollution damages across New Mexico communities, contributing to the environmental justice literature on agricultural externalities. Combines spatial damage estimates with Census demographic data to characterize the distributional incidence of unpriced pollution costs.
+        </div>
+      </div>
+
+      <div class="paper">
+        <p class="paper-venue">Working Paper</p>
+        <p class="paper-title">Aligning Private Incentives and Public Health: A Social Cost-Benefit Analysis of Dairy Anaerobic Digesters</p>
+        <p class="paper-authors">Suraj Ghimire, Jingjing Wang</p>
+        <button class="toggle-btn" onclick="toggleAbstract(this)">Abstract ↓</button>
+        <div class="paper-abstract-toggle">
+          Asks whether the public benefits of anaerobic digester adoption &mdash; reduced methane emissions and improved local air quality &mdash; are sufficient to justify public subsidy of systems that are privately marginal. Develops a social cost-benefit framework that internalizes damages from methane and particulate precursor emissions avoided by digester deployment.
+        </div>
+      </div>
+
+      <!-- GRANTS -->
+      <p class="paper-group-label" id="grants">Grants &amp; Funding</p>
+
+    </div>
+
+    <div class="grant-card">
+      <p class="grant-label">Co-Principal Investigator &mdash; NSF Award No. 2520791 &mdash; 2025&ndash;present</p>
+      <p class="grant-title">Harnessing AI for Spatial Environmental Risk Modeling and Mitigation</p>
+      <p class="grant-meta">Total Award: $250,000 &mdash; with Andrew Goodkind, Jingjing Wang, and Benjamin Jones (University of New Mexico)</p>
+      <p class="grant-desc">Applies machine learning and satellite imagery to detect and characterize environmental hazards associated with agricultural operations at spatial resolutions that conventional monitoring networks cannot achieve. Focuses on CAFO detection and emission estimation across the rural Southwest.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-left">Suraj Ghimire &mdash; New Mexico Tech</div>
+  <div class="footer-right">
+    <a href="research.html">Research</a>
+    <a href="teaching.html">Teaching</a>
+    <a href="about.html">About</a>
+    <a href="mailto:suraj.ghimire@nmt.edu">Email</a>
+  </div>
+</footer>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 10));
+  const toggle = document.getElementById('nav-toggle');
+  const navLinks = document.getElementById('nav-links');
+  toggle.addEventListener('click', () => { toggle.classList.toggle('open'); navLinks.classList.toggle('open'); });
+  function closeNav() { toggle.classList.remove('open'); navLinks.classList.remove('open'); }
+
+  function toggleAbstract(btn) {
+    const abstract = btn.nextElementSibling;
+    const open = abstract.classList.toggle('open');
+    btn.textContent = open ? 'Abstract ↑' : 'Abstract ↓';
+  }
+
+  const sections = document.querySelectorAll('.page-section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.05 });
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

@@ -3,855 +3,281 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Suraj Ghimire, Ph.D. | Economist</title>
+<title>Suraj Ghimire | Environmental Economist</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <style>
-  :root {
-    --cream: #f5f0e8;
-    --cream-dark: #ede7d9;
-    --navy: #1c2b3a;
-    --navy-light: #2e4057;
-    --gold: #9a7b4f;
-    --gold-light: #c4a97d;
-    --text: #2a2a2a;
-    --text-muted: #6b6b6b;
-    --rule: #d4c9b5;
-  }
+.hero {
+  min-height: calc(100vh - 56px);
+  background: var(--navy);
+  display: flex; align-items: center;
+  position: relative; overflow: hidden;
+  padding: 5rem 8vw;
+}
+.hero-topo {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Cg fill='none' stroke='%234a7c2f' stroke-width='0.8' opacity='0.18'%3E%3Cellipse cx='650' cy='300' rx='320' ry='140'/%3E%3Cellipse cx='650' cy='300' rx='265' ry='112'/%3E%3Cellipse cx='650' cy='300' rx='210' ry='85'/%3E%3Cellipse cx='650' cy='300' rx='155' ry='60'/%3E%3Cellipse cx='650' cy='300' rx='100' ry='38'/%3E%3Cellipse cx='650' cy='300' rx='52' ry='20'/%3E%3Cellipse cx='100' cy='80' rx='110' ry='48'/%3E%3Cellipse cx='100' cy='80' rx='72' ry='30'/%3E%3Cellipse cx='100' cy='80' rx='38' ry='16'/%3E%3Cellipse cx='180' cy='530' rx='145' ry='62'/%3E%3Cellipse cx='180' cy='530' rx='96' ry='40'/%3E%3Cellipse cx='180' cy='530' rx='54' ry='22'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
+}
+.hero-inner {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 5vw; align-items: center;
+  width: 100%; max-width: 1100px;
+}
+.hero-eyebrow {
+  font-size: 0.67rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--sage-light);
+  font-weight: 500; margin-bottom: 1.3rem;
+}
+.hero-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 5.5vw, 4.8rem);
+  font-weight: 300; color: #fff;
+  line-height: 1.0; margin-bottom: 0.15em;
+}
+.hero-name em { font-style: italic; color: var(--sage-light); }
+.hero-position {
+  font-size: 0.78rem; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.38); line-height: 1.9;
+  margin-top: 1.1rem; margin-bottom: 1.7rem;
+}
+.hero-divider { width: 30px; height: 1px; background: var(--sage); margin-bottom: 1.7rem; }
+.hero-statement {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.25rem, 2.1vw, 1.7rem);
+  font-weight: 400; color: rgba(255,255,255,0.88);
+  line-height: 1.55; max-width: 540px; margin-bottom: 1.5rem;
+}
+.hero-statement em { font-style: italic; color: var(--sage-light); }
+.hero-sub {
+  font-size: 0.87rem; color: rgba(255,255,255,0.42);
+  max-width: 500px; line-height: 1.8; margin-bottom: 2.2rem;
+}
+.hero-ctas { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+.hero-photo-wrap {
+  flex-shrink: 0;
+  width: clamp(160px, 20vw, 270px);
+  height: clamp(160px, 20vw, 270px);
+  border-radius: 50%; overflow: hidden;
+  border: 3px solid rgba(184,212,160,0.3);
+  box-shadow: 0 0 0 10px rgba(45,80,22,0.2), 0 20px 55px rgba(0,0,0,0.45);
+}
+.hero-photo-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 12%;
+  display: block;
+}
 
-  body {
-    background-color: var(--cream);
-    color: var(--text);
-    font-family: 'Jost', sans-serif;
-    font-weight: 300;
-    font-size: 16px;
-    line-height: 1.7;
-    overflow-x: hidden;
-  }
+.news-strip {
+  background: var(--forest); padding: 2.5rem 8vw;
+  display: grid; grid-template-columns: 90px 1fr;
+  gap: 2.5rem; align-items: start;
+}
+.news-label {
+  font-size: 0.63rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--sage-light);
+  font-weight: 500; padding-top: 0.12rem;
+}
+.news-items { display: flex; flex-direction: column; gap: 0.7rem; }
+.news-item { display: flex; gap: 1.2rem; align-items: baseline; }
+.news-date {
+  font-size: 0.67rem; color: rgba(255,255,255,0.28);
+  white-space: nowrap; min-width: 60px;
+}
+.news-text { font-size: 0.85rem; color: rgba(255,255,255,0.68); line-height: 1.5; }
+.news-text a { color: var(--sage-light); text-decoration: none; }
+.news-text a:hover { text-decoration: underline; }
+.news-text em { font-style: italic; color: rgba(255,255,255,0.55); }
 
-  /* ── NAV ───────────────────────────────────────────── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    background: var(--cream);
-    border-bottom: 1px solid var(--rule);
-    padding: 0 5vw;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-    transition: box-shadow 0.3s;
-  }
-  nav.scrolled { box-shadow: 0 2px 20px rgba(28,43,58,0.08); }
+.cards-section { padding: 3.5rem 8vw; background: var(--cream); }
+.cards-label {
+  font-size: 0.64rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.4rem;
+}
+.nav-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+.nav-card {
+  display: flex; flex-direction: column;
+  padding: 1.3rem 1.4rem; text-decoration: none;
+  border: 1px solid var(--rule); background: #fff;
+  transition: all 0.2s; position: relative; overflow: hidden;
+}
+.nav-card::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--sage); transform: scaleX(0);
+  transform-origin: left; transition: transform 0.22s ease;
+}
+.nav-card:hover { box-shadow: 0 4px 16px rgba(45,80,22,0.08); border-color: var(--sage-light); }
+.nav-card:hover::after { transform: scaleX(1); }
+.nc-label {
+  font-size: 0.61rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--sage);
+  margin-bottom: 0.35rem; font-weight: 500;
+}
+.nc-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.12rem; font-weight: 500;
+  color: var(--navy); margin-bottom: 0.35rem;
+}
+.nc-desc { font-size: 0.79rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 0.85rem; flex: 1; }
+.nc-arrow { font-size: 0.68rem; color: var(--sage); }
 
-  .nav-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.15rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    color: var(--navy);
-    text-decoration: none;
-    z-index: 101;
-  }
+.pillars { background: var(--cream-dark); padding: 3rem 8vw; }
+.pillars-label {
+  font-size: 0.63rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.6rem;
+}
+.pillars-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  border: 1px solid var(--rule); gap: 1px; background: var(--rule);
+}
+.pillar { background: #fff; padding: 1.6rem 1.7rem; }
+.pillar-icon { font-size: 1.3rem; display: block; margin-bottom: 0.7rem; }
+.pillar-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem; font-weight: 500;
+  color: var(--navy); margin-bottom: 0.4rem;
+}
+.pillar-text { font-size: 0.81rem; color: var(--text-muted); line-height: 1.7; }
 
-  .nav-links {
-    display: flex;
-    gap: 2rem;
-    list-style: none;
-  }
-  .nav-links a {
-    text-decoration: none;
-    font-size: 0.78rem;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--navy); }
-
-  /* hamburger */
-  .nav-toggle {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    cursor: pointer;
-    z-index: 101;
-    background: none;
-    border: none;
-    padding: 4px;
-  }
-  .nav-toggle span {
-    display: block;
-    width: 24px;
-    height: 1.5px;
-    background: var(--navy);
-    transition: all 0.3s;
-    transform-origin: center;
-  }
-  .nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-  .nav-toggle.open span:nth-child(2) { opacity: 0; }
-  .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-
-  @media (max-width: 640px) {
-    .nav-toggle { display: flex; }
-    .nav-links {
-      display: none;
-      position: fixed;
-      top: 60px; left: 0; right: 0;
-      background: var(--cream);
-      border-bottom: 1px solid var(--rule);
-      flex-direction: column;
-      gap: 0;
-      padding: 0.5rem 0 1rem;
-      box-shadow: 0 8px 24px rgba(28,43,58,0.1);
-    }
-    .nav-links.open { display: flex; }
-    .nav-links li { padding: 0; }
-    .nav-links a {
-      display: block;
-      padding: 0.75rem 6vw;
-      font-size: 0.85rem;
-    }
-  }
-
-  /* ── HERO ──────────────────────────────────────────── */
-  .hero {
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding-top: 60px;
-  }
-  .hero-left {
-    background: var(--navy);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 8vw 6vw 8vw 8vw;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero-left::before {
-    content: '';
-    position: absolute;
-    top: -80px; right: -80px;
-    width: 320px; height: 320px;
-    border-radius: 50%;
-    border: 1px solid rgba(196,169,125,0.2);
-  }
-  .hero-left::after {
-    content: '';
-    position: absolute;
-    bottom: 60px; left: -40px;
-    width: 180px; height: 180px;
-    border-radius: 50%;
-    border: 1px solid rgba(196,169,125,0.12);
-  }
-  .hero-eyebrow {
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold-light);
-    margin-bottom: 1.5rem;
-    font-weight: 400;
-  }
-  .hero-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(3rem, 5vw, 5.5rem);
-    font-weight: 300;
-    line-height: 1.0;
-    color: #f0ebe1;
-    margin-bottom: 0.2em;
-  }
-  .hero-name em { font-style: italic; color: var(--gold-light); }
-  .hero-title {
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    color: rgba(240,235,225,0.6);
-    margin-top: 1.5rem;
-    line-height: 1.8;
-    font-weight: 300;
-  }
-  .hero-divider {
-    width: 40px; height: 1px;
-    background: var(--gold);
-    margin: 2rem 0;
-  }
-  .hero-tagline {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.1rem;
-    font-style: italic;
-    color: rgba(240,235,225,0.5);
-    line-height: 1.6;
-    max-width: 340px;
-  }
-  .hero-right {
-    background: var(--cream);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 8vw 8vw 8vw 6vw;
-  }
-  .hero-bio-label {
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 1.5rem;
-  }
-  .hero-bio {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.25rem;
-    font-weight: 400;
-    line-height: 1.75;
-    color: var(--navy);
-    margin-bottom: 2.5rem;
-  }
-  .hero-links {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  /* ── BUTTONS ───────────────────────────────────────── */
-  .btn {
-    display: inline-block;
-    padding: 0.6rem 1.5rem;
-    font-size: 0.75rem;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: all 0.2s;
-    border: 1px solid;
-  }
-  .btn-primary {
-    background: var(--navy);
-    color: var(--cream);
-    border-color: var(--navy);
-  }
-  .btn-primary:hover { background: var(--navy-light); border-color: var(--navy-light); }
-  .btn-secondary {
-    background: transparent;
-    color: var(--navy);
-    border-color: var(--rule);
-  }
-  .btn-secondary:hover { border-color: var(--navy); }
-
-  /* ── SECTIONS ──────────────────────────────────────── */
-  section {
-    padding: 7rem 10vw;
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  section.visible { opacity: 1; transform: translateY(0); }
-
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    gap: 1.5rem;
-    margin-bottom: 4rem;
-    flex-wrap: wrap;
-  }
-  .section-number {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.85rem;
-    color: var(--gold);
-    font-style: italic;
-    white-space: nowrap;
-  }
-  .section-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(2rem, 3vw, 2.8rem);
-    font-weight: 400;
-    color: var(--navy);
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-  }
-  .section-rule {
-    flex: 1;
-    min-width: 40px;
-    height: 1px;
-    background: var(--rule);
-  }
-
-  /* ── RESEARCH ──────────────────────────────────────── */
-  #research { background: var(--cream); }
-
-  .paper {
-    border-left: 2px solid var(--rule);
-    padding: 0 0 2.5rem 2rem;
-    margin-bottom: 0.5rem;
-    position: relative;
-    transition: border-color 0.3s;
-  }
-  .paper:hover { border-color: var(--gold); }
-  .paper::before {
-    content: '';
-    position: absolute;
-    left: -5px; top: 4px;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--rule);
-    transition: background 0.3s;
-  }
-  .paper:hover::before { background: var(--gold); }
-  .paper-status {
-    font-size: 0.68rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 400;
-    margin-bottom: 0.5rem;
-  }
-  .paper-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: var(--navy);
-    line-height: 1.4;
-    margin-bottom: 0.4rem;
-  }
-  .paper-authors {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin-bottom: 0.8rem;
-    font-style: italic;
-  }
-  .paper-abstract {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    line-height: 1.7;
-    max-width: 680px;
-  }
-  .research-group-label {
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin: 3rem 0 1.5rem;
-    padding-left: 2rem;
-  }
-  .research-group-label:first-of-type { margin-top: 0; }
-
-  /* ── TEACHING ──────────────────────────────────────── */
-  #teaching { background: var(--cream-dark); }
-
-  .teaching-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 4rem;
-  }
-  .course-card {
-    background: var(--cream);
-    padding: 1.5rem;
-    border: 1px solid var(--rule);
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .course-card:hover {
-    border-color: var(--gold-light);
-    box-shadow: 0 4px 20px rgba(28,43,58,0.06);
-  }
-  .course-level {
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 0.5rem;
-  }
-  .course-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.05rem;
-    font-weight: 500;
-    color: var(--navy);
-    line-height: 1.3;
-  }
-
-  .eval-banner {
-    background: var(--navy);
-    padding: 3rem 3.5rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
-  }
-  .eval-stat { text-align: center; }
-  .eval-number {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 3rem;
-    font-weight: 300;
-    color: var(--gold-light);
-    line-height: 1;
-    display: block;
-  }
-  .eval-label {
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(240,235,225,0.5);
-    margin-top: 0.5rem;
-    display: block;
-  }
-
-  /* game card */
-  .game-card {
-    background: var(--navy);
-    padding: 2rem 2.5rem;
-    display: flex;
-    align-items: center;
-    gap: 2.5rem;
-    flex-wrap: wrap;
-  }
-  .game-card-icon { font-size: 2.8rem; flex-shrink: 0; }
-  .game-card-body { flex: 1; min-width: 200px; }
-  .game-card-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--gold-light);
-    margin-bottom: 0.4rem;
-  }
-  .game-card-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.4rem;
-    font-weight: 500;
-    color: #f0ebe1;
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
-  }
-  .game-card-desc {
-    font-size: 0.84rem;
-    color: rgba(240,235,225,0.55);
-    line-height: 1.6;
-    max-width: 520px;
-  }
-  .btn-game {
-    display: inline-block;
-    margin-top: 1.2rem;
-    padding: 0.6rem 1.5rem;
-    font-size: 0.75rem;
-    font-weight: 400;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    text-decoration: none;
-    border: 1px solid var(--gold-light);
-    color: var(--gold-light);
-    transition: all 0.2s;
-  }
-  .btn-game:hover {
-    background: rgba(196,169,125,0.12);
-  }
-
-  /* ── CV / BACKGROUND ───────────────────────────────── */
-  #cv { background: var(--cream); }
-  .cv-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-  }
-  .cv-block h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--navy);
-    margin-bottom: 1.2rem;
-    padding-bottom: 0.6rem;
-    border-bottom: 1px solid var(--rule);
-  }
-  .cv-item {
-    margin-bottom: 1.2rem;
-    font-size: 0.88rem;
-    color: var(--text-muted);
-    line-height: 1.6;
-  }
-  .cv-item strong {
-    display: block;
-    color: var(--text);
-    font-weight: 400;
-  }
-
-  /* ── CONTACT ───────────────────────────────────────── */
-  #contact {
-    background: var(--navy);
-    text-align: center;
-  }
-  #contact .section-title { color: #f0ebe1; }
-  #contact .section-number { color: var(--gold-light); }
-  #contact .section-rule { background: rgba(240,235,225,0.15); }
-
-  .contact-intro {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    font-style: italic;
-    color: rgba(240,235,225,0.6);
-    max-width: 520px;
-    margin: 0 auto 3rem;
-    line-height: 1.7;
-  }
-  .contact-links {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
-  .contact-link {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    text-decoration: none;
-    transition: opacity 0.2s;
-  }
-  .contact-link:hover { opacity: 0.7; }
-  .contact-link-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: rgba(240,235,225,0.4);
-  }
-  .contact-link-value {
-    font-size: 0.95rem;
-    color: #f0ebe1;
-  }
-
-  /* ── FOOTER ────────────────────────────────────────── */
-  footer {
-    background: #111d27;
-    padding: 1.5rem 10vw;
-    text-align: center;
-    font-size: 0.75rem;
-    color: rgba(240,235,225,0.25);
-    letter-spacing: 0.05em;
-  }
-
-  /* ── RESPONSIVE ────────────────────────────────────── */
-  @media (max-width: 900px) {
-    .cv-grid { grid-template-columns: 1fr; gap: 2rem; }
-  }
-
-  @media (max-width: 768px) {
-    .hero { grid-template-columns: 1fr; min-height: auto; }
-    .hero-left { padding: 4rem 6vw 3rem; min-height: 55vh; justify-content: flex-end; }
-    .hero-right { padding: 3rem 6vw 5rem; }
-    nav { padding: 0 6vw; }
-    section { padding: 4rem 6vw; }
-    .eval-banner { padding: 2rem 1.5rem; }
-    .game-card { padding: 1.5rem; gap: 1.5rem; }
-    .section-header { margin-bottom: 2.5rem; }
-    .hero-name { font-size: clamp(2.8rem, 10vw, 4rem); }
-  }
-
-  @media (max-width: 480px) {
-    section { padding: 3.5rem 5vw; }
-    .teaching-grid { grid-template-columns: 1fr; }
-    .eval-banner { grid-template-columns: 1fr 1fr; }
-    .hero-bio { font-size: 1.1rem; }
-    .section-title { font-size: 1.8rem; }
-    .contact-links { gap: 1rem; }
-    .contact-link-value { font-size: 0.85rem; }
-    .game-card-title { font-size: 1.2rem; }
-  }
+@media (max-width: 860px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  .hero { padding: 3.5rem 6vw; align-items: flex-start; }
+  .hero-photo-wrap { width: 140px; height: 140px; }
+  .nav-cards { grid-template-columns: 1fr; }
+  .pillars-grid { grid-template-columns: 1fr; }
+  .news-strip { grid-template-columns: 1fr; gap: 1rem; }
+}
 </style>
 </head>
 <body>
 
 <nav id="navbar">
-  <a class="nav-name" href="#top">Suraj Ghimire</a>
+  <a class="nav-home" href="index.html">
+    <div class="nav-monogram">SG</div>
+    <span class="nav-wordmark">Suraj Ghimire</span>
+  </a>
   <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
     <span></span><span></span><span></span>
   </button>
   <ul class="nav-links" id="nav-links">
-    <li><a href="#research"  onclick="closeNav()">Research</a></li>
-    <li><a href="#teaching"  onclick="closeNav()">Teaching</a></li>
-    <li><a href="#cv"        onclick="closeNav()">Background</a></li>
-    <li><a href="#contact"   onclick="closeNav()">Contact</a></li>
+    <li><a href="research.html" onclick="closeNav()">Research</a></li>
+    <li><a href="teaching.html" onclick="closeNav()">Teaching</a></li>
+    <li><a href="about.html" onclick="closeNav()">About</a></li>
+    <li><a href="about.html#contact" onclick="closeNav()">Contact</a></li>
   </ul>
 </nav>
 
-<!-- HERO -->
-<div class="hero" id="top">
-  <div class="hero-left">
-    <span class="hero-eyebrow">Environmental &amp; Health Economics</span>
-    <h1 class="hero-name">Suraj<br><em>Ghimire</em></h1>
-    <div class="hero-divider"></div>
-    <p class="hero-title">
-      Ph.D., Economics — University of New Mexico<br>
-      Assistant Teaching Professor<br>
-      New Mexico Institute of Mining and Technology
-    </p>
-    <p class="hero-tagline">Studying what markets fail to price, and what that costs the communities that live with it.</p>
+<div class="page-wrap">
+  <div class="hero">
+    <div class="hero-topo"></div>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <p class="hero-eyebrow">Environmental &amp; Resource Economist</p>
+        <h1 class="hero-name">Suraj<br><em>Ghimire</em></h1>
+        <p class="hero-position">Ph.D., Economics &mdash; University of New Mexico<br>Assistant Teaching Professor, New Mexico Tech</p>
+        <div class="hero-divider"></div>
+        <p class="hero-statement">Markets are good at pricing what people trade.<br>They are bad at pricing <em>what they damage.</em><br>I try to close that gap.</p>
+        <p class="hero-sub">I am an applied environmental economist working on air quality, energy transitions, and the costs of environmental harm that go uncounted in market prices. My tools are econometrics, dispersion modeling, and spatial analysis. My questions are about efficiency, fairness, and what good environmental policy actually requires.</p>
+        <div class="hero-ctas">
+          <a href="research.html" class="btn btn-forest">Research →</a>
+          <a href="about.html" class="btn btn-light">About me</a>
+        </div>
+      </div>
+      <div class="hero-photo-wrap">
+        <img src="suraj.png" alt="Suraj Ghimire">
+      </div>
+    </div>
   </div>
-  <div class="hero-right">
-    <p class="hero-bio-label">About</p>
-    <p class="hero-bio">
-      I am an economist working at the intersection of environmental health, agricultural externalities, and energy policy. My research quantifies the social costs of air pollution from dairy farming operations, examines the welfare consequences of ozone exposure below federal regulatory thresholds, and evaluates the financial viability of biogas energy systems.<br><br>
-      My teaching spans principles of macroeconomics and microeconomics, natural resource and environmental economics, energy markets, and graduate-level statistics and data analytics. I hold a Ph.D. in Economics from the University of New Mexico (2023).
-    </p>
-    <div class="hero-links">
-      <a href="#research" class="btn btn-primary">View Research</a>
-      <a href="Suraj_CV_April2026.pdf" class="btn btn-secondary" target="_blank">Download CV</a>
+
+  <div class="news-strip">
+    <div class="news-label">Recent</div>
+    <div class="news-items">
+      <div class="news-item">
+        <span class="news-date">Apr 2026</span>
+        <span class="news-text">Paper accepted — forthcoming in the <em>Journal of Agricultural and Resource Economics</em>: health and economic damages from dairy CAFO air pollution in New Mexico.</span>
+      </div>
+      <div class="news-item">
+        <span class="news-date">2025</span>
+        <span class="news-text">Co-PI, NSF Award No. 2520791 ($250,000) — applying machine learning and satellite imagery to spatial environmental risk modeling.</span>
+      </div>
+      <div class="news-item">
+        <span class="news-date">2025</span>
+        <span class="news-text">Published in <em>Energies</em>: economic viability and resilience of dairy manure bioenergy under market and policy shocks.</span>
+      </div>
+      <div class="news-item">
+        <span class="news-date">Jun 2026</span>
+        <span class="news-text">Teaching <a href="summer-stem.html">Money Hacks</a> — financial literacy for high school students in NMT's Summer STEM program.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards-section">
+    <div class="cards-label">Explore</div>
+    <div class="nav-cards">
+      <a class="nav-card" href="research.html">
+        <span class="nc-label">Research</span>
+        <span class="nc-title">Environmental &amp; Resource Economics</span>
+        <span class="nc-desc">Air quality, agricultural externalities, energy policy, environmental justice. Forthcoming in JARE, under review at Applied Economics Letters, Co-PI on $250K NSF grant.</span>
+        <span class="nc-arrow">View papers &amp; grants →</span>
+      </a>
+      <a class="nav-card" href="teaching.html">
+        <span class="nc-label">Teaching</span>
+        <span class="nc-title">Courses &amp; Classroom Games</span>
+        <span class="nc-desc">Principles of macro and micro, engineering economics, data analytics at NMT — plus a growing library of browser-based simulations for classroom use.</span>
+        <span class="nc-arrow">See courses &amp; games →</span>
+      </a>
+      <a class="nav-card" href="about.html">
+        <span class="nc-label">About</span>
+        <span class="nc-title">CV &amp; Background</span>
+        <span class="nc-desc">Education, positions, industry experience, and honors. Grew up in rural Nepal; arrived at environmental economics the long way around.</span>
+        <span class="nc-arrow">Read more →</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="pillars">
+    <div class="pillars-label">Research Areas</div>
+    <div class="pillars-grid">
+      <div class="pillar">
+        <span class="pillar-icon">💨</span>
+        <div class="pillar-title">Air Pollution &amp; Health</div>
+        <p class="pillar-text">What does pollution actually cost the people who breathe it? I estimate health damages using atmospheric dispersion models and epidemiological dose-response functions, translating physical exposure into welfare losses.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">⚖️</span>
+        <div class="pillar-title">Environmental Justice</div>
+        <p class="pillar-text">Environmental costs are not distributed randomly. I examine whether income and racial disparities shape who bears unpriced pollution burdens — and what that means for policy evaluation.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">⚡</span>
+        <div class="pillar-title">Energy &amp; Climate Policy</div>
+        <p class="pillar-text">When are clean energy investments privately viable, and when do the public benefits exceed private returns? I evaluate energy transitions with attention to which communities and policy designs actually deliver.</p>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- RESEARCH -->
-<section id="research">
-  <div class="section-header">
-    <span class="section-number">01</span>
-    <h2 class="section-title">Research</h2>
-    <div class="section-rule"></div>
-  </div>
-
-  <p class="research-group-label">Forthcoming</p>
-
-  <div class="paper">
-    <p class="paper-status">Forthcoming — Journal of Agricultural and Resource Economics</p>
-    <p class="paper-title">The Health and Economic Impacts of Dairy Air Pollution: Evidence from New Mexico</p>
-    <p class="paper-authors">Suraj Ghimire, Andrew Goodkind, Jingjing Wang</p>
-    <p class="paper-abstract">Estimates county-level morbidity and mortality damages from dairy concentrated animal feeding operation emissions in New Mexico, combining atmospheric dispersion modeling with dose-response functions from the epidemiological literature. Finds that the social costs of dairy air pollution are substantial relative to the economic value the sector generates.</p>
-  </div>
-
-  <p class="research-group-label">Under Review</p>
-
-  <div class="paper">
-    <p class="paper-status">Revise &amp; Resubmit — Applied Economics Letters</p>
-    <p class="paper-title">Beyond the Threshold: The Hidden Economic Costs of Safe Ozone Pollution</p>
-    <p class="paper-authors">Suraj Ghimire, Andrew Goodkind, Benjamin Jones</p>
-    <p class="paper-abstract">Estimates the welfare costs attributable to ozone exposure at concentrations below the current National Ambient Air Quality Standard, contributing to the policy debate over whether existing standards adequately protect public health. Examines how functional form assumptions in the dose-response relationship affect damage estimates.</p>
-  </div>
-
-  <p class="research-group-label">Published</p>
-
-  <div class="paper">
-    <p class="paper-status">Energies, 18(23), 6286 — 2025</p>
-    <p class="paper-title">The Tipping Point: Economic Viability and Resilience of Dairy Manure Bioenergy Under Market and Policy Shocks</p>
-    <p class="paper-authors">Suraj Ghimire, Jingjing Wang</p>
-    <p class="paper-abstract">Develops a Financial Resilience Index framework to evaluate combined heat and power versus renewable natural gas systems across a range of dairy farm sizes. Uses Monte Carlo simulation to characterize viability under variability in energy prices, carbon credit markets, and capital costs. Finds that policy instruments calibrated to average conditions may fail the farms that most need support.</p>
-  </div>
-
-  <p class="research-group-label">Working Papers</p>
-
-  <div class="paper">
-    <p class="paper-status">Working Paper</p>
-    <p class="paper-title">Distributional Impacts of Exposure to CAFOs: A Case Study of Large Dairies in New Mexico</p>
-    <p class="paper-authors">Suraj Ghimire, Jingjing Wang</p>
-    <p class="paper-abstract">Examines whether income and racial disparities exist in the distribution of dairy air pollution damages across New Mexico communities, contributing to the environmental justice literature on agricultural externalities.</p>
-  </div>
-
-  <div class="paper">
-    <p class="paper-status">Working Paper</p>
-    <p class="paper-title">Aligning Private Incentives and Public Health: A Social Cost-Benefit Analysis of Dairy Anaerobic Digesters</p>
-    <p class="paper-authors">Suraj Ghimire, Jingjing Wang</p>
-    <p class="paper-abstract">Asks whether the public benefits of anaerobic digester adoption, including reduced methane emissions and improved local air quality, are sufficient to justify public subsidy of systems that are privately marginal.</p>
-  </div>
-
-  <p class="research-group-label">Grants</p>
-
-  <div class="paper">
-    <p class="paper-status">NSF Award 2520791 — Co-Principal Investigator, 2025–present</p>
-    <p class="paper-title">Harnessing AI for Spatial Environmental Risk Modeling and Mitigation</p>
-    <p class="paper-authors">Total Award: $250,000</p>
-    <p class="paper-abstract">Applies machine learning and satellite imagery to detect and characterize environmental hazards associated with agricultural operations at spatial resolutions that conventional monitoring networks cannot achieve.</p>
-  </div>
-</section>
-
-<!-- TEACHING -->
-<section id="teaching">
-  <div class="section-header">
-    <span class="section-number">02</span>
-    <h2 class="section-title">Teaching</h2>
-    <div class="section-rule"></div>
-  </div>
-
-  <div class="teaching-grid">
-    <div class="course-card">
-      <p class="course-level">Undergraduate</p>
-      <p class="course-name">Principles of Microeconomics</p>
-    </div>
-    <div class="course-card">
-      <p class="course-level">Undergraduate</p>
-      <p class="course-name">Principles of Macroeconomics</p>
-    </div>
-    <div class="course-card">
-      <p class="course-level">Undergraduate</p>
-      <p class="course-name">Natural Resource &amp; Environmental Economics</p>
-    </div>
-    <div class="course-card">
-      <p class="course-level">Undergraduate</p>
-      <p class="course-name">Fundamentals of Accounting I &amp; II</p>
-    </div>
-    <div class="course-card">
-      <p class="course-level">Graduate</p>
-      <p class="course-name">Engineering Statistics</p>
-    </div>
-    <div class="course-card">
-      <p class="course-level">Graduate</p>
-      <p class="course-name">Engineering Data Analytics</p>
-    </div>
-    <div class="course-card">
-      <p class="course-level">Graduate</p>
-      <p class="course-name">Energy Markets</p>
-    </div>
-    <div class="course-card">
-      <p class="course-level">Undergraduate</p>
-      <p class="course-name">Introduction to Entrepreneurship</p>
-    </div>
-  </div>
-
-  <div class="eval-banner">
-    <div class="eval-stat">
-      <span class="eval-number">4.56</span>
-      <span class="eval-label">Avg. Accessibility</span>
-    </div>
-    <div class="eval-stat">
-      <span class="eval-number">5.00</span>
-      <span class="eval-label">Peak Course Rating</span>
-    </div>
-    <div class="eval-stat">
-      <span class="eval-number">10</span>
-      <span class="eval-label">Courses Evaluated</span>
-    </div>
-    <div class="eval-stat">
-      <span class="eval-number">80%</span>
-      <span class="eval-label">Avg. Response Rate</span>
-    </div>
-  </div>
-
-  <!-- Game resource card -->
-  <div class="game-card">
-    <div class="game-card-icon">🏛️</div>
-    <div class="game-card-body">
-      <p class="game-card-label">Interactive Teaching Resource &mdash; Principles of Macroeconomics</p>
-      <p class="game-card-title">Chair the Fed: Monetary Policy Simulation</p>
-      <p class="game-card-desc">Students take the role of Federal Reserve Chair and set interest rates each quarter to manage inflation and unemployment across a simulated economy. Used as an assessed activity for the Phillips Curve unit, the game makes the short-run tradeoff tangible before students put numbers on paper.</p>
-      <a href="chair-the-fed.html" class="btn-game" target="_blank">Play the Simulation &rarr;</a>
-    </div>
-  </div>
-</section>
-
-<!-- CV / BACKGROUND -->
-<section id="cv">
-  <div class="section-header">
-    <span class="section-number">03</span>
-    <h2 class="section-title">Background</h2>
-    <div class="section-rule"></div>
-  </div>
-
-  <div class="cv-grid">
-    <div>
-      <div class="cv-block">
-        <h3>Education</h3>
-        <div class="cv-item">
-          <strong>Ph.D., Economics &mdash; 2023</strong>
-          University of New Mexico, Albuquerque<br>
-          Dissertation: Concentrated Animal Feeding Operations, Environmental Quality and Public Health
-        </div>
-        <div class="cv-item">
-          <strong>M.A., Economics &mdash; 2019</strong>
-          University of New Mexico
-        </div>
-        <div class="cv-item">
-          <strong>M.B.A., General Management &mdash; 2017</strong>
-          Southeast Missouri State University
-        </div>
-      </div>
-      <div class="cv-block" style="margin-top:2.5rem;">
-        <h3>Methods &amp; Tools</h3>
-        <div class="cv-item">R, Python, Stata, SQL &mdash; QGIS &mdash; LaTeX &mdash; Tableau / Power BI &mdash; Atmospheric dispersion modeling (InMAP) &mdash; Monte Carlo simulation</div>
-      </div>
-    </div>
-    <div>
-      <div class="cv-block">
-        <h3>Academic Positions</h3>
-        <div class="cv-item">
-          <strong>Assistant Teaching Professor &mdash; 2022&ndash;present</strong>
-          Dept. of Computer Science &amp; Engineering<br>
-          New Mexico Institute of Mining and Technology
-        </div>
-        <div class="cv-item">
-          <strong>Instructor &mdash; Spring 2022</strong>
-          Dept. of Economics, University of New Mexico
-        </div>
-      </div>
-      <div class="cv-block" style="margin-top:2.5rem;">
-        <h3>Selected Honors</h3>
-        <div class="cv-item">Regional Finalist (Mentor), Energy Tech University Prize, U.S. Dept. of Energy &mdash; 2025</div>
-        <div class="cv-item">Graduate Research Fellowship, Center for Regional Studies, UNM &mdash; 2021&ndash;22</div>
-        <div class="cv-item">Social Justice Scholarship, Northeast Agricultural and Resource Economics Association &mdash; 2022</div>
-        <div class="cv-item">Berkeley/Sloan Summer School Diversity Fellowship, UC Berkeley &mdash; 2021</div>
-      </div>
-    </div>
-  </div>
-
-  <div style="margin-top:3.5rem; text-align:center;">
-    <a href="Suraj_CV_April2026.pdf" class="btn btn-primary" target="_blank">Download Full CV</a>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="contact">
-  <div class="section-header" style="justify-content:center;">
-    <span class="section-number">04</span>
-    <h2 class="section-title">Contact</h2>
-  </div>
-  <p class="contact-intro">I welcome inquiries from students, collaborators, and search committees.</p>
-  <div class="contact-links">
-    <a class="contact-link" href="mailto:suraj.ghimire@nmt.edu">
-      <span class="contact-link-label">Email</span>
-      <span class="contact-link-value">suraj.ghimire@nmt.edu</span>
-    </a>
-    <a class="contact-link" href="tel:5053070353">
-      <span class="contact-link-label">Phone</span>
-      <span class="contact-link-value">505-307-0353</span>
-    </a>
-    <a class="contact-link" href="https://www.nmt.edu" target="_blank">
-      <span class="contact-link-label">Institution</span>
-      <span class="contact-link-value">New Mexico Tech</span>
-    </a>
-  </div>
-</section>
-
 <footer>
-  &copy; 2026 Suraj Ghimire &nbsp;&mdash;&nbsp; Department of Computer Science &amp; Engineering, New Mexico Institute of Mining and Technology
+  <div class="footer-left">Suraj Ghimire &mdash; New Mexico Tech &mdash; 2026</div>
+  <div class="footer-right">
+    <a href="research.html">Research</a>
+    <a href="teaching.html">Teaching</a>
+    <a href="about.html">About</a>
+    <a href="mailto:suraj.ghimire@nmt.edu">Email</a>
+  </div>
 </footer>
 
 <script>
-  // ── Nav scroll shadow ──
   const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 10);
-  });
-
-  // ── Mobile hamburger ──
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 10));
   const toggle = document.getElementById('nav-toggle');
   const navLinks = document.getElementById('nav-links');
-  toggle.addEventListener('click', () => {
-    toggle.classList.toggle('open');
-    navLinks.classList.toggle('open');
-  });
-  function closeNav() {
-    toggle.classList.remove('open');
-    navLinks.classList.remove('open');
-  }
-
-  // ── Section fade-in on scroll (THE FIX) ──
-  const sections = document.querySelectorAll('section');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.08 });
-
-  sections.forEach(s => observer.observe(s));
+  toggle.addEventListener('click', () => { toggle.classList.toggle('open'); navLinks.classList.toggle('open'); });
+  function closeNav() { toggle.classList.remove('open'); navLinks.classList.remove('open'); }
 </script>
 </body>
 </html>

@@ -237,7 +237,16 @@
     font-weight: 700;
     font-size: 15px;
     flex-shrink: 0;
+    opacity: 0; /* Hidden initially */
+    transform: translateX(10px);
+    transition: all 0.3s ease;
   }
+  /* Revealed state for the impact numbers */
+  .option-btn.revealed .option-impact {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
   .option-btn.chosen-good {
     border-color: var(--green);
     background: rgba(57,211,83,0.08);
@@ -484,7 +493,6 @@
     <p>10 rounds. Real choices. Watch your balance grow — or disappear.</p>
   </div>
 
-  <!-- START SCREEN -->
   <div class="start-screen" id="start-screen">
     <h2>Here's how it works</h2>
     <p>You're 22. You just started your first job. Every round, something happens and you have to decide what to do with your money. Your decisions compound — a bad choice early can cost you thousands by the end.</p>
@@ -497,7 +505,6 @@
     <button class="start-btn" onclick="startGame()">Start the Game →</button>
   </div>
 
-  <!-- GAME SCREEN -->
   <div id="game-screen" style="display:none;">
     <div class="hud">
       <div class="hud-cell balance">
@@ -536,7 +543,6 @@
     </div>
   </div>
 
-  <!-- END SCREEN -->
   <div id="end-screen">
     <div class="eyebrow">Game Over</div>
     <div class="end-grade" id="end-grade">A</div>
@@ -736,7 +742,7 @@ function renderRound() {
   card.offsetHeight;
   card.style.animation = 'fadeUp 0.4s ease both';
 
-  // render options
+  // render options (impact starts hidden)
   const grid = document.getElementById('options-grid');
   grid.innerHTML = '';
   s.options.forEach((opt, i) => {
@@ -748,7 +754,7 @@ function renderRound() {
         <div class="option-name">${opt.name}</div>
         <div class="option-sub">${opt.sub}</div>
       </div>
-      <div class="option-impact" style="color:${opt.delta > 0 ? 'var(--green)' : opt.delta < -800 ? 'var(--red)' : 'var(--gold)'}">${opt.impact}</div>
+      <div class="option-impact" id="impact-${i}"></div>
     `;
     btn.onclick = () => choose(i);
     grid.appendChild(btn);
@@ -760,19 +766,29 @@ function choose(idx) {
   answered = true;
 
   const s = SCENARIOS[currentRound];
-  const opt = s.options[idx];
+  const chosenOpt = s.options[idx];
 
-  balance = Math.max(0, balance + opt.delta);
-  if (opt.quality === 'good') smartMoves++;
+  balance = Math.max(0, balance + chosenOpt.delta);
+  if (chosenOpt.quality === 'good') smartMoves++;
 
-  history.push({ round: currentRound + 1, title: s.title, choice: opt.name, delta: opt.delta, quality: opt.quality });
+  history.push({ round: currentRound + 1, title: s.title, choice: chosenOpt.name, delta: chosenOpt.delta, quality: chosenOpt.quality });
 
-  // style buttons
+  // Style buttons and reveal the hidden impact numbers for ALL options
   const btns = document.querySelectorAll('.option-btn');
   btns.forEach((btn, i) => {
     btn.disabled = true;
+    
+    // Inject the text and set the correct color based on the delta
+    const currentOpt = s.options[i];
+    const impactDiv = btn.querySelector('.option-impact');
+    impactDiv.textContent = currentOpt.impact;
+    impactDiv.style.color = currentOpt.delta > 0 ? 'var(--green)' : currentOpt.delta < -800 ? 'var(--red)' : 'var(--gold)';
+    
+    // Trigger the CSS reveal transition
+    btn.classList.add('revealed');
+
     if (i === idx) {
-      btn.classList.add(`chosen-${opt.quality}`);
+      btn.classList.add(`chosen-${currentOpt.quality}`);
     } else {
       btn.classList.add('unchosen');
     }
@@ -785,26 +801,26 @@ function choose(idx) {
   const balCell = document.querySelector('.hud-cell.balance');
   balCell.classList.remove('flash-up', 'flash-down');
   balCell.offsetHeight;
-  balCell.classList.add(opt.delta >= 0 ? 'flash-up' : 'flash-down');
+  balCell.classList.add(chosenOpt.delta >= 0 ? 'flash-up' : 'flash-down');
 
   // show feedback
   const feedback = document.getElementById('feedback');
   feedback.style.display = 'block';
-  feedback.className = `feedback ${opt.quality}`;
+  feedback.className = `feedback ${chosenOpt.quality}`;
 
   const icons = { good: '✅', okay: '⚠️', bad: '❌' };
-  document.getElementById('feedback-title').textContent = `${icons[opt.quality]} ${opt.feedback}`;
-  document.getElementById('feedback-body').textContent = opt.explain;
+  document.getElementById('feedback-title').textContent = `${icons[chosenOpt.quality]} ${chosenOpt.feedback}`;
+  document.getElementById('feedback-body').textContent = chosenOpt.explain;
 
   const compEl = document.getElementById('feedback-compound');
-  if (opt.compound && opt.delta > 0) {
-    const future = Math.round(Math.abs(opt.delta) * Math.pow(1.07, 30));
+  if (chosenOpt.compound && chosenOpt.delta > 0) {
+    const future = Math.round(Math.abs(chosenOpt.delta) * Math.pow(1.07, 30));
     compEl.style.display = 'block';
-    compEl.innerHTML = `💡 In 30 years at 7% return, <span>$${Math.abs(opt.delta).toLocaleString()}</span> invested today becomes <span>$${future.toLocaleString()}</span>.`;
-  } else if (opt.compound && opt.delta < 0) {
-    const lost = Math.round(Math.abs(opt.delta) * Math.pow(1.07, 30));
+    compEl.innerHTML = `💡 In 30 years at 7% return, <span>$${Math.abs(chosenOpt.delta).toLocaleString()}</span> invested today becomes <span>$${future.toLocaleString()}</span>.`;
+  } else if (chosenOpt.compound && chosenOpt.delta < 0) {
+    const lost = Math.round(Math.abs(chosenOpt.delta) * Math.pow(1.07, 30));
     compEl.style.display = 'block';
-    compEl.innerHTML = `💡 That <span>$${Math.abs(opt.delta).toLocaleString()}</span> spent could have grown to <span>$${lost.toLocaleString()}</span> in 30 years.`;
+    compEl.innerHTML = `💡 That <span>$${Math.abs(chosenOpt.delta).toLocaleString()}</span> spent could have grown to <span>$${lost.toLocaleString()}</span> in 30 years.`;
   } else {
     compEl.style.display = 'none';
   }

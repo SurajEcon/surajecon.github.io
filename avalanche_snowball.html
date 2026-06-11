@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avalanche vs. Snowball Showdown — Money Hacks</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1c2b3a; --blue:#1565c0; --blueL:#90caf9;
+  --orange:#e65100; --orangeL:#ffcc80;
+  --gold:#f9a825; --green:#2e7d32; --greenL:#a5d6a7;
+  --red:#c62828; --white:#fff; --muted:#90a4ae;
+  --border:rgba(21,101,192,0.25);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Jost',sans-serif;font-weight:300;background:#101620;color:#fff;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 15% 15%, rgba(21,101,192,0.14) 0%, transparent 55%),
+             radial-gradient(ellipse at 85% 85%, rgba(230,81,0,0.12) 0%, transparent 55%);}
+
+.header{background:rgba(16,22,32,0.95);border-bottom:1px solid var(--border);padding:0.75rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);}
+.header-brand{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--blueL);}
+.header-sub{font-size:0.75rem;color:var(--muted);}
+
+.screen{display:none;min-height:calc(100vh - 58px);flex-direction:column;align-items:center;padding:2rem;}
+.screen.active{display:flex;}
+
+.btn{display:inline-block;padding:0.65rem 1.8rem;font-size:0.75rem;letter-spacing:0.12em;
+  text-transform:uppercase;font-family:'Jost',sans-serif;font-weight:500;
+  border:1px solid;cursor:pointer;transition:all 0.2s;background:none;}
+.btn-blue{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-blue:hover{background:#1976d2;}
+.btn-orange{background:var(--orange);color:#fff;border-color:var(--orange);}
+.btn-orange:hover{background:#f4511e;}
+.btn-gold{background:var(--gold);color:#1a1a1a;border-color:var(--gold);font-weight:600;}
+.btn-outline{background:transparent;color:var(--blueL);border-color:rgba(144,202,249,0.35);}
+.btn-outline:hover{border-color:var(--blueL);}
+.btn-sm{padding:0.4rem 1rem;font-size:0.68rem;}
+.btn:disabled{opacity:0.35;cursor:not-allowed;}
+
+/* HOME */
+.home-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.3rem,5.5vw,4.2rem);text-align:center;line-height:1.1;margin-bottom:0.5rem;margin-top:1rem;}
+.home-title em{font-style:italic;color:var(--blueL);}
+.home-sub{color:var(--muted);text-align:center;max-width:560px;margin-bottom:2rem;font-size:1rem;line-height:1.7;}
+
+.team-cards{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;max-width:780px;width:100%;margin-bottom:1.5rem;}
+.team-card{border:2px solid;padding:1.4rem;text-align:center;}
+.team-card.snowball{background:rgba(21,101,192,0.1);border-color:var(--blue);}
+.team-card.avalanche{background:rgba(230,81,0,0.1);border-color:var(--orange);}
+.tc-icon{font-size:2.4rem;margin-bottom:0.4rem;}
+.tc-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;margin-bottom:0.5rem;}
+.team-card.snowball .tc-title{color:var(--blueL);}
+.team-card.avalanche .tc-title{color:var(--orangeL);}
+.tc-desc{font-size:0.85rem;color:var(--muted);line-height:1.6;}
+.tc-pro-con{font-size:0.78rem;margin-top:0.6rem;text-align:left;}
+.tc-pro-con div{margin-bottom:0.2rem;}
+.tc-pro{color:var(--greenL);}
+.tc-con{color:#ef9a9a;}
+
+.scenario-box{background:#16202e;border:1px solid var(--border);padding:1.4rem 1.8rem;max-width:780px;width:100%;margin-bottom:1.5rem;}
+.scenario-label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--blueL);margin-bottom:0.6rem;}
+.debt-table{width:100%;border-collapse:collapse;}
+.debt-table th{font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);
+  text-align:left;padding:0.4rem 0.6rem;border-bottom:1px solid var(--border);}
+.debt-table td{padding:0.5rem 0.6rem;font-size:0.95rem;border-bottom:1px solid rgba(255,255,255,0.05);}
+.debt-name{font-weight:500;}
+.extra-payment{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--gold);text-align:center;margin-top:0.8rem;}
+
+/* GAME PLAY */
+#screen-game{padding:1.5rem;align-items:center;}
+.round-info{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;}
+.round-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#fff;margin-bottom:1.2rem;text-align:center;}
+
+.order-zone{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:820px;width:100%;margin-bottom:1.5rem;}
+.order-col{border:2px solid;padding:1.2rem;}
+.order-col.snowball{border-color:var(--blue);background:rgba(21,101,192,0.08);}
+.order-col.avalanche{border-color:var(--orange);background:rgba(230,81,0,0.08);}
+.order-col-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;text-align:center;margin-bottom:0.8rem;}
+.order-col.snowball .order-col-title{color:var(--blueL);}
+.order-col.avalanche .order-col-title{color:var(--orangeL);}
+.order-instruction{font-size:0.78rem;color:var(--muted);text-align:center;margin-bottom:0.8rem;}
+
+.debt-pool{display:flex;flex-direction:column;gap:0.5rem;min-height:60px;}
+.debt-chip{background:#1c2838;border:1px solid rgba(255,255,255,0.15);padding:0.6rem 0.9rem;
+  cursor:grab;font-size:0.9rem;display:flex;justify-content:space-between;align-items:center;
+  transition:all 0.15s;user-select:none;}
+.debt-chip:hover{border-color:var(--gold);}
+.debt-chip.placed{opacity:0.35;cursor:default;}
+.debt-chip-name{font-weight:500;}
+.debt-chip-meta{font-size:0.78rem;color:var(--muted);}
+
+.order-slots{display:flex;flex-direction:column;gap:0.5rem;margin-top:0.8rem;}
+.order-slot{border:1px dashed rgba(255,255,255,0.2);padding:0.6rem 0.9rem;min-height:42px;
+  display:flex;align-items:center;font-size:0.9rem;color:var(--muted);}
+.order-slot.filled{border-style:solid;border-color:var(--gold);color:#fff;background:rgba(249,168,37,0.08);}
+.order-slot-num{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);margin-right:0.6rem;font-weight:600;}
+
+.check-result{max-width:820px;width:100%;margin-top:0.5rem;}
+.result-banner{padding:0.8rem 1.2rem;text-align:center;font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;font-weight:600;margin-bottom:0.8rem;display:none;}
+.result-banner.show{display:block;}
+.result-banner.correct{background:rgba(46,125,50,0.2);border:1px solid var(--green);color:var(--greenL);}
+.result-banner.incorrect{background:rgba(198,40,40,0.18);border:1px solid var(--red);color:#ef9a9a;}
+.explanation{background:#16202e;border-left:3px solid var(--blue);padding:0.9rem 1.2rem;
+  font-size:0.9rem;color:var(--blueL);line-height:1.65;font-style:italic;display:none;}
+.explanation.show{display:block;}
+
+.controls-bar{display:flex;gap:0.75rem;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;}
+
+/* PROGRESS */
+.progress-bar{display:flex;gap:0.4rem;margin-bottom:1rem;}
+.progress-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.15);}
+.progress-dot.done{background:var(--gold);}
+.progress-dot.current{background:var(--blueL);}
+
+/* END */
+#screen-end{padding:2rem;text-align:center;}
+.end-title{font-family:'Cormorant Garamond',serif;font-size:3rem;color:var(--gold);margin-bottom:1rem;}
+.end-summary{max-width:620px;margin:0 auto 2rem;padding:1.2rem 1.5rem;background:#16202e;
+  border-left:3px solid var(--blue);font-size:0.95rem;color:var(--blueL);line-height:1.7;text-align:left;font-style:italic;}
+
+@media(max-width:700px){
+  .team-cards,.order-zone{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div>
+    <div class="header-brand">🏔️ Avalanche vs. Snowball Showdown</div>
+    <div class="header-sub">Money Hacks · Day 4 · NMT Summer STEM 2026</div>
+  </div>
+  <div style="display:flex;gap:0.5rem;">
+    <button class="btn btn-outline btn-sm" onclick="goHome()">Home</button>
+    <a href="summer-stem.html" class="btn btn-outline btn-sm" style="text-decoration:none;">← Course Page</a>
+  </div>
+</header>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <p style="font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--blueL);margin-bottom:0.5rem;">MONEY HACKS · DAY 4 · GAME 4</p>
+  <h1 class="home-title">Two Strategies.<br><em>One Pile of Debt.</em></h1>
+  <p class="home-sub">Two teams, two debt-payoff philosophies. Drag each debt into the order YOUR strategy would pay it off. Fastest correct order wins each round — 3 rounds total.</p>
+
+  <div class="team-cards">
+    <div class="team-card snowball">
+      <div class="tc-icon">❄️</div>
+      <div class="tc-title">Team Snowball</div>
+      <div class="tc-desc">Pay minimums on everything. Extra money goes to the SMALLEST balance first.</div>
+      <div class="tc-pro-con">
+        <div class="tc-pro">✓ Quick wins build motivation</div>
+        <div class="tc-con">✗ May pay more total interest</div>
+      </div>
+    </div>
+    <div class="team-card avalanche">
+      <div class="tc-icon">🏔️</div>
+      <div class="tc-title">Team Avalanche</div>
+      <div class="tc-desc">Pay minimums on everything. Extra money goes to the HIGHEST interest rate first.</div>
+      <div class="tc-pro-con">
+        <div class="tc-pro">✓ Mathematically optimal — least interest</div>
+        <div class="tc-con">✗ First "win" may take longer</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-blue" onclick="startGame()" style="padding:0.85rem 2.5rem;font-size:0.85rem;">Start Round 1 →</button>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="screen-game">
+  <div class="progress-bar" id="progress-bar"></div>
+  <div class="round-info" id="round-info">Round 1 of 3</div>
+  <div class="round-title" id="round-title">The Scenario</div>
+
+  <div class="scenario-box">
+    <div class="scenario-label">YOUR DEBTS — $<span id="extra-amount">200</span>/month extra to put toward debt</div>
+    <table class="debt-table" id="debt-table">
+      <thead><tr><th>Debt</th><th>Balance</th><th>APR</th></tr></thead>
+      <tbody id="debt-table-body"></tbody>
+    </table>
+  </div>
+
+  <div class="order-zone">
+    <div class="order-col snowball">
+      <div class="order-col-title">❄️ Team Snowball — Your Order</div>
+      <div class="order-instruction">Drag debts here, smallest BALANCE gets extra money first</div>
+      <div class="order-slots" id="snowball-slots"></div>
+    </div>
+    <div class="order-col avalanche">
+      <div class="order-col-title">🏔️ Team Avalanche — Your Order</div>
+      <div class="order-instruction">Drag debts here, highest APR gets extra money first</div>
+      <div class="order-slots" id="avalanche-slots"></div>
+    </div>
+  </div>
+
+  <div class="scenario-box" style="margin-bottom:0;">
+    <div class="scenario-label">DRAG TO ASSIGN — click a debt, then click a slot above</div>
+    <div class="debt-pool" id="debt-pool"></div>
+  </div>
+
+  <div class="check-result">
+    <div class="result-banner" id="snowball-result"></div>
+    <div class="result-banner" id="avalanche-result"></div>
+    <div class="explanation" id="round-explanation"></div>
+  </div>
+
+  <div class="controls-bar">
+    <button class="btn btn-blue" id="btn-check" onclick="checkAnswers()">Check Both Orders →</button>
+    <button class="btn btn-gold" id="btn-next" onclick="nextRound()" disabled>Next Round →</button>
+  </div>
+</div>
+
+<!-- END -->
+<div class="screen" id="screen-end">
+  <p style="font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--blueL);margin-bottom:1rem;">All 3 Rounds Complete</p>
+  <div class="end-title">🏔️❄️ Showdown Complete!</div>
+  <div class="end-summary">
+    "There's no wrong answer between these two strategies — the 'best' one is the one you'll actually stick with.
+    Avalanche saves the most money mathematically. Snowball builds momentum through quick wins.
+    Notice in Round 1, both methods agreed on the order — sometimes the smallest balance IS the highest rate.
+    But in Rounds 2 and 3, the strategies genuinely diverged. That's where you have to choose: optimize for math, or optimize for motivation. Both are valid — just know which one you're picking and why."
+  </div>
+  <div style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;">
+    <button class="btn btn-blue" onclick="startGame()">Play Again</button>
+    <button class="btn btn-outline" onclick="goHome()">Home</button>
+    <a href="summer-stem.html" class="btn btn-outline" style="text-decoration:none;">← Course Page</a>
+  </div>
+</div>
+
+<script>
+// ── ROUND DATA ─────────────────────────────────────
+const ROUNDS = [
+  {
+    title: "Round 1 — Both Strategies Agree",
+    extra: 200,
+    debts: [
+      {id:"A", name:"Card A", balance:500, apr:28},
+      {id:"B", name:"Card B", balance:2000, apr:18},
+      {id:"C", name:"Card C", balance:1200, apr:22},
+    ],
+    explanation: "In this round, Card A is BOTH the smallest balance AND the highest APR — so Snowball and Avalanche agree on the first target. Snowball order: A → C → B (smallest balance first). Avalanche order: A → C → B (highest rate first). When the smallest debt also happens to carry the highest rate, there's no tradeoff — both strategies point the same direction."
+  },
+  {
+    title: "Round 2 — The Strategies Diverge",
+    extra: 250,
+    debts: [
+      {id:"A", name:"Card A", balance:3000, apr:28},
+      {id:"B", name:"Card B", balance:400, apr:14},
+      {id:"C", name:"Card C", balance:1500, apr:20},
+    ],
+    explanation: "Now they genuinely conflict. Snowball order: B → C → A (smallest balance, $400, first — quick win!). Avalanche order: A → C → B (highest rate, 28%, first — saves the most money). Snowball gets a debt eliminated FAST (Card B in maybe a month or two). Avalanche takes longer to see a debt disappear but saves more in total interest because the 28% balance stops accumulating sooner."
+  },
+  {
+    title: "Round 3 — Real-World Mix",
+    extra: 300,
+    debts: [
+      {id:"A", name:"Store Card", balance:600, apr:26},
+      {id:"B", name:"Car Loan", balance:8000, apr:6},
+      {id:"C", name:"Credit Card", balance:2500, apr:24},
+    ],
+    explanation: "Snowball order: A → C → B (smallest balance, $600, first). Avalanche order: A → C → B (highest rate, 26%, first) — they agree again here! Notice the Car Loan at 6% APR comes LAST in both strategies despite being the largest balance — its rate is so much lower than the credit cards that it's barely 'urgent' compared to the high-interest debt. This is realistic: most people's biggest balance (mortgage, car loan) often has the LOWEST rate, so it's rarely the priority for extra payments."
+  },
+];
+
+let G = {
+  round: 0,
+  selectedDebt: null,
+  snowballOrder: [null,null,null],
+  avalancheOrder: [null,null,null],
+  placedDebts: new Set(),
+};
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+}
+function goHome(){showScreen('home');}
+
+function startGame(){
+  G.round = 0;
+  showScreen('game');
+  loadRound();
+}
+
+function loadRound(){
+  G.round++;
+  G.selectedDebt = null;
+  G.snowballOrder = [null,null,null];
+  G.avalancheOrder = [null,null,null];
+  G.placedDebts = new Set();
+
+  const r = ROUNDS[G.round-1];
+  document.getElementById('round-info').textContent = `Round ${G.round} of ${ROUNDS.length}`;
+  document.getElementById('round-title').textContent = r.title;
+  document.getElementById('extra-amount').textContent = r.extra;
+
+  // progress dots
+  const pb = document.getElementById('progress-bar');
+  pb.innerHTML = '';
+  for(let i=0;i<ROUNDS.length;i++){
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot' + (i<G.round-1?' done':(i===G.round-1?' current':''));
+    pb.appendChild(dot);
+  }
+
+  // debt table
+  const tbody = document.getElementById('debt-table-body');
+  tbody.innerHTML = r.debts.map(d=>`
+    <tr><td class="debt-name">${d.name}</td><td>$${d.balance.toLocaleString()}</td><td>${d.apr}%</td></tr>
+  `).join('');
+
+  // debt pool
+  renderPool();
+  renderSlots();
+
+  // reset result UI
+  document.getElementById('snowball-result').className = 'result-banner';
+  document.getElementById('avalanche-result').className = 'result-banner';
+  document.getElementById('round-explanation').className = 'explanation';
+  document.getElementById('btn-check').disabled = false;
+  document.getElementById('btn-next').disabled = true;
+}
+
+function renderPool(){
+  const r = ROUNDS[G.round-1];
+  const pool = document.getElementById('debt-pool');
+  pool.innerHTML = r.debts.map(d=>{
+    const isPlaced = countPlacements(d.id) >= 2; // placed in both columns
+    return `<div class="debt-chip ${isPlaced?'placed':''} ${G.selectedDebt===d.id?'selected':''}"
+      style="${G.selectedDebt===d.id?'border-color:var(--gold);background:rgba(249,168,37,0.12);':''}"
+      onclick="selectDebt('${d.id}')">
+      <span class="debt-chip-name">${d.name}</span>
+      <span class="debt-chip-meta">$${d.balance.toLocaleString()} · ${d.apr}%</span>
+    </div>`;
+  }).join('');
+}
+
+function countPlacements(id){
+  let c=0;
+  if(G.snowballOrder.includes(id)) c++;
+  if(G.avalancheOrder.includes(id)) c++;
+  return c;
+}
+
+function selectDebt(id){
+  G.selectedDebt = (G.selectedDebt===id) ? null : id;
+  renderPool();
+}
+
+function renderSlots(){
+  const r = ROUNDS[G.round-1];
+  ['snowball','avalanche'].forEach(strategy=>{
+    const orderArr = strategy==='snowball'?G.snowballOrder:G.avalancheOrder;
+    const container = document.getElementById(strategy+'-slots');
+    container.innerHTML = orderArr.map((debtId,i)=>{
+      const debt = r.debts.find(d=>d.id===debtId);
+      const filled = !!debt;
+      return `<div class="order-slot ${filled?'filled':''}" onclick="placeInSlot('${strategy}',${i})">
+        <span class="order-slot-num">${i+1}</span>
+        ${filled ? `${debt.name} ($${debt.balance.toLocaleString()}, ${debt.apr}%)` : 'Click to place selected debt here'}
+      </div>`;
+    }).join('');
+  });
+}
+
+function placeInSlot(strategy, slotIndex){
+  if(!G.selectedDebt) return;
+  const orderArr = strategy==='snowball'?G.snowballOrder:G.avalancheOrder;
+
+  // remove this debt if already placed elsewhere in this strategy
+  const existingIdx = orderArr.indexOf(G.selectedDebt);
+  if(existingIdx !== -1) orderArr[existingIdx] = null;
+
+  // if slot occupied, swap out
+  orderArr[slotIndex] = G.selectedDebt;
+
+  G.selectedDebt = null;
+  renderPool();
+  renderSlots();
+}
+
+function checkAnswers(){
+  const r = ROUNDS[G.round-1];
+
+  // correct orders
+  const snowballCorrect = [...r.debts].sort((a,b)=>a.balance-b.balance).map(d=>d.id);
+  const avalancheCorrect = [...r.debts].sort((a,b)=>b.apr-a.apr).map(d=>d.id);
+
+  const snowballOk = JSON.stringify(G.snowballOrder) === JSON.stringify(snowballCorrect);
+  const avalancheOk = JSON.stringify(G.avalancheOrder) === JSON.stringify(avalancheCorrect);
+
+  const sb = document.getElementById('snowball-result');
+  sb.textContent = `❄️ Snowball: ${snowballOk ? 'Correct!' : 'Not quite — order should be by SMALLEST balance first'}`;
+  sb.className = 'result-banner show ' + (snowballOk?'correct':'incorrect');
+
+  const ab = document.getElementById('avalanche-result');
+  ab.textContent = `🏔️ Avalanche: ${avalancheOk ? 'Correct!' : 'Not quite — order should be by HIGHEST APR first'}`;
+  ab.className = 'result-banner show ' + (avalancheOk?'correct':'incorrect');
+
+  const expl = document.getElementById('round-explanation');
+  expl.textContent = r.explanation;
+  expl.className = 'explanation show';
+
+  document.getElementById('btn-check').disabled = true;
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextRound(){
+  if(G.round >= ROUNDS.length){
+    showScreen('end');
+    return;
+  }
+  loadRound();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debt Trap or Escape? / Scam Spotter — Money Hacks</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1c2b3a; --teal:#006064; --tealL:#80deea;
+  --gold:#f9a825; --green:#2e7d32; --greenL:#a5d6a7;
+  --red:#c62828; --redL:#ef9a9a; --white:#fff; --muted:#607d8b;
+  --border:rgba(0,96,100,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Jost',sans-serif;font-weight:300;background:#0f1a1a;color:#fff;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 80% 20%, rgba(0,150,160,0.12) 0%, transparent 60%),
+             radial-gradient(ellipse at 20% 80%, rgba(45,80,22,0.08) 0%, transparent 50%);}
+
+.header{background:rgba(15,26,26,0.95);border-bottom:1px solid var(--border);padding:0.75rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);}
+.header-brand{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--tealL);}
+.header-sub{font-size:0.75rem;color:var(--muted);}
+
+.screen{display:none;min-height:calc(100vh - 58px);flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
+.screen.active{display:flex;}
+
+.home-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.3rem,5.5vw,4.2rem);text-align:center;line-height:1.1;margin-bottom:0.5rem;}
+.home-title em{font-style:italic;color:var(--tealL);}
+.home-sub{color:var(--muted);text-align:center;max-width:520px;margin-bottom:2rem;font-size:1rem;line-height:1.7;}
+
+.mode-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;max-width:760px;width:100%;margin-bottom:2rem;}
+.mode-card{background:#16282a;border:1px solid var(--border);padding:1.6rem;text-align:left;cursor:pointer;transition:all 0.2s;}
+.mode-card:hover{border-color:var(--tealL);transform:translateY(-2px);}
+.mc-icon{font-size:2rem;margin-bottom:0.5rem;}
+.mc-label{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--tealL);margin-bottom:0.3rem;}
+.mc-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#fff;margin-bottom:0.4rem;}
+.mc-desc{font-size:0.85rem;color:var(--muted);line-height:1.6;}
+
+.btn{display:inline-block;padding:0.65rem 1.8rem;font-size:0.75rem;letter-spacing:0.12em;
+  text-transform:uppercase;font-family:'Jost',sans-serif;font-weight:500;
+  border:1px solid;cursor:pointer;transition:all 0.2s;background:none;}
+.btn-teal{background:var(--teal);color:#fff;border-color:var(--teal);}
+.btn-teal:hover{background:#00838f;}
+.btn-gold{background:var(--gold);color:#1a1a1a;border-color:var(--gold);font-weight:600;}
+.btn-outline{background:transparent;color:var(--tealL);border-color:rgba(128,222,234,0.35);}
+.btn-outline:hover{border-color:var(--tealL);}
+.btn-sm{padding:0.4rem 1rem;font-size:0.68rem;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+.setup-box{background:#16282a;border:1px solid var(--border);padding:2rem;max-width:480px;width:100%;}
+.setup-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:#fff;margin-bottom:0.3rem;}
+.setup-sub{font-size:0.85rem;color:var(--muted);margin-bottom:1.4rem;}
+.input-group{display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem;}
+.input-group label{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--tealL);}
+.inp{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:#fff;
+  padding:0.65rem 1rem;font-family:'Jost',sans-serif;font-size:1rem;width:100%;}
+.inp:focus{outline:none;border-color:var(--tealL);}
+
+#screen-game{padding:0;align-items:stretch;justify-content:flex-start;}
+.game-wrap{display:grid;grid-template-rows:auto 1fr auto;min-height:calc(100vh - 58px);}
+
+.scoreboard{background:rgba(15,26,26,0.96);border-bottom:1px solid var(--border);padding:0.85rem 2rem;
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;}
+.sb-team{display:flex;flex-direction:column;gap:0.15rem;}
+.sb-team.right{align-items:flex-end;}
+.sb-name{font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--tealL);}
+.sb-chips{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:600;line-height:1;}
+.sb-chips.winning{color:var(--gold);}
+.sb-center{text-align:center;}
+.sb-round{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.2rem;}
+
+.scenario-area{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem 2rem;width:100%;}
+.scenario-badge{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;
+  background:rgba(0,96,100,0.3);border:1px solid rgba(128,222,234,0.3);color:var(--tealL);
+  padding:0.2rem 0.8rem;margin-bottom:1rem;}
+.scenario-card{background:#16282a;border:2px solid rgba(128,222,234,0.25);padding:1.6rem 2rem;
+  max-width:720px;width:100%;margin-bottom:1.2rem;}
+.scenario-text{font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,2.6vw,1.7rem);
+  line-height:1.5;color:#fff;text-align:center;}
+
+.bet-zone{width:100%;max-width:720px;background:#16282a;border:1px solid var(--border);padding:1rem 1.5rem;}
+.bet-title{font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--tealL);margin-bottom:0.75rem;text-align:center;}
+.bet-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.bet-team{display:flex;flex-direction:column;gap:0.5rem;align-items:center;}
+.bet-team-name{font-size:0.8rem;letter-spacing:0.08em;text-transform:uppercase;color:#fff;font-weight:500;}
+.chip-btns{display:flex;gap:0.3rem;}
+.chip-btn{width:30px;height:30px;border-radius:50%;background:#0f1a1a;border:1px solid rgba(249,168,37,0.3);
+  color:var(--gold);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'Jost',sans-serif;}
+.chip-btn:hover{background:rgba(249,168,37,0.15);border-color:var(--gold);}
+.chip-btn.selected{background:var(--gold);color:#1a1a1a;border-color:var(--gold);}
+.dir-btns{display:flex;gap:0.4rem;}
+.dir-btn{padding:0.4rem 1.1rem;font-size:0.72rem;font-weight:600;letter-spacing:0.06em;
+  font-family:'Jost',sans-serif;border:1px solid;cursor:pointer;transition:all 0.18s;text-transform:uppercase;}
+.dir-btn.opt-good{border-color:rgba(165,214,167,0.4);background:rgba(46,125,50,0.1);color:var(--greenL);}
+.dir-btn.opt-good:hover,.dir-btn.opt-good.selected{background:var(--green);color:#fff;border-color:var(--green);}
+.dir-btn.opt-bad{border-color:rgba(239,154,154,0.4);background:rgba(198,40,40,0.1);color:var(--redL);}
+.dir-btn.opt-bad:hover,.dir-btn.opt-bad.selected{background:var(--red);color:#fff;border-color:var(--red);}
+.bet-summary{font-size:0.78rem;color:var(--muted);}
+.bet-summary span{color:var(--gold);font-weight:500;}
+
+.outcome-panel{width:100%;max-width:720px;margin-top:0.8rem;display:none;}
+.outcome-panel.show{display:block;}
+.outcome-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem;}
+.outcome-team{padding:0.8rem 1rem;text-align:center;border:1px solid rgba(255,255,255,0.1);}
+.outcome-team.won{background:rgba(46,125,50,0.2);border-color:var(--green);}
+.outcome-team.lost{background:rgba(198,40,40,0.15);border-color:var(--red);}
+.outcome-team-name{font-size:0.8rem;color:#fff;margin-bottom:0.3rem;}
+.outcome-result{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;}
+.outcome-result.won{color:var(--greenL);}
+.outcome-result.lost{color:var(--redL);}
+.outcome-change{font-size:0.82rem;margin-top:0.2rem;color:var(--muted);}
+.verdict-banner{padding:0.6rem 1.2rem;text-align:center;font-family:'Cormorant Garamond',serif;
+  font-size:1.3rem;font-weight:600;margin-bottom:0.8rem;}
+.verdict-banner.good{background:rgba(46,125,50,0.2);border:1px solid var(--green);color:var(--greenL);}
+.verdict-banner.bad{background:rgba(198,40,40,0.18);border:1px solid var(--red);color:var(--redL);}
+.outcome-lesson{padding:0.85rem 1.1rem;background:#0f1a1a;border-left:3px solid var(--teal);
+  font-size:0.9rem;color:var(--tealL);line-height:1.65;font-style:italic;}
+
+.controls-bar{background:rgba(15,26,26,0.96);border-top:1px solid var(--border);padding:0.85rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;}
+.ctrl-left,.ctrl-right{display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;}
+
+#screen-end{padding:2rem;text-align:center;}
+.end-title{font-family:'Cormorant Garamond',serif;font-size:3.3rem;color:var(--gold);margin-bottom:0.3rem;}
+.end-sub{font-size:1rem;color:var(--muted);margin-bottom:1.5rem;}
+.end-scores{display:flex;gap:2rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap;}
+.end-score-card{background:#16282a;border:1px solid rgba(249,168,37,0.3);padding:1.5rem 2rem;text-align:center;min-width:170px;}
+.esc-name{font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--tealL);margin-bottom:0.3rem;}
+.esc-chips{font-family:'Cormorant Garamond',serif;font-size:2.8rem;color:var(--gold);}
+.esc-result{font-size:0.85rem;margin-top:0.3rem;}
+.end-lesson{max-width:620px;margin:0 auto 2rem;padding:1.2rem 1.5rem;background:#16282a;
+  border-left:3px solid var(--teal);font-size:0.95rem;color:var(--tealL);line-height:1.7;text-align:left;font-style:italic;}
+
+@media(max-width:600px){
+  .scoreboard{grid-template-columns:1fr 1fr;grid-template-rows:auto auto;}
+  .sb-center{grid-column:1/-1;order:-1;}
+  .bet-grid,.outcome-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div>
+    <div class="header-brand" id="header-title">🪤 Debt Trap or Escape? / 🕵️ Scam Spotter</div>
+    <div class="header-sub">Money Hacks · Day 4 · NMT Summer STEM 2026</div>
+  </div>
+  <div style="display:flex;gap:0.5rem;">
+    <button class="btn btn-outline btn-sm" onclick="goHome()">Home</button>
+    <a href="summer-stem.html" class="btn btn-outline btn-sm" style="text-decoration:none;">← Course Page</a>
+  </div>
+</header>
+
+<!-- HOME / MODE SELECT -->
+<div class="screen active" id="screen-home">
+  <p style="font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--tealL);margin-bottom:1rem;">MONEY HACKS · DAY 4</p>
+  <h1 class="home-title">Bet the Chips.<br><em>Spot the Trap.</em></h1>
+  <p class="home-sub">Two chip-betting games. Same mechanic as Day 3's crypto challenge — pick a mode, set up your teams, and play.</p>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="selectMode('debt')">
+      <div class="mc-icon">🪤</div>
+      <div class="mc-label">Game 3 · 11:05am</div>
+      <div class="mc-title">Debt Trap or Escape?</div>
+      <div class="mc-desc">6 real debt scenarios. Teams bet chips on whether the situation gets WORSE (trap) or BETTER (escape). Reveal includes the real math.</div>
+    </div>
+    <div class="mode-card" onclick="selectMode('scam')">
+      <div class="mc-icon">🕵️</div>
+      <div class="mc-label">Game 6 · 1:50pm</div>
+      <div class="mc-title">Scam Spotter</div>
+      <div class="mc-desc">8 real-world messages and offers. Teams bet chips: SCAM or LEGIT. Reveal includes the actual red flags to watch for.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="screen" id="screen-setup">
+  <div class="setup-box">
+    <h2 class="setup-title" id="setup-title">Set Up Teams</h2>
+    <p class="setup-sub" id="setup-sub">Enter team names. Each team starts with chips.</p>
+    <div class="input-group">
+      <label>Team A Name</label>
+      <input type="text" id="team-a-name" class="inp" value="Team A">
+    </div>
+    <div class="input-group">
+      <label>Team B Name</label>
+      <input type="text" id="team-b-name" class="inp" value="Team B">
+    </div>
+    <div class="input-group">
+      <label>Starting chips per team</label>
+      <input type="number" id="start-chips" class="inp" value="15" min="5" max="50">
+    </div>
+    <div style="display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap;">
+      <button class="btn btn-teal" onclick="startGame()">Start Game →</button>
+      <button class="btn btn-outline btn-sm" onclick="goHome()">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="screen-game">
+  <div class="game-wrap">
+    <div class="scoreboard">
+      <div class="sb-team left">
+        <span class="sb-name" id="sb-name-a">Team A</span>
+        <span class="sb-chips" id="sb-chips-a">15</span>
+      </div>
+      <div class="sb-center">
+        <div class="sb-round" id="sb-round">Round 1 of 6</div>
+        <div style="font-size:1.5rem;">🪙</div>
+      </div>
+      <div class="sb-team right">
+        <span class="sb-name" id="sb-name-b">Team B</span>
+        <span class="sb-chips" id="sb-chips-b">15</span>
+      </div>
+    </div>
+
+    <div class="scenario-area">
+      <div class="scenario-badge" id="scenario-badge">Round 1</div>
+      <div class="scenario-card">
+        <div class="scenario-text" id="scenario-text">Loading...</div>
+      </div>
+
+      <div class="bet-zone" id="bet-zone">
+        <div class="bet-title">Place Your Bets — Teams discuss privately, then reveal together</div>
+        <div class="bet-grid">
+          <div class="bet-team" id="bet-team-a">
+            <div class="bet-team-name" id="bet-name-a">Team A</div>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <span style="font-size:0.7rem;color:var(--muted);">Chips:</span>
+              <div class="chip-btns" id="chips-a">
+                <button class="chip-btn selected" onclick="setChip('a',1)">1</button>
+                <button class="chip-btn" onclick="setChip('a',2)">2</button>
+                <button class="chip-btn" onclick="setChip('a',3)">3</button>
+                <button class="chip-btn" onclick="setChip('a',5)">5</button>
+              </div>
+            </div>
+            <div class="dir-btns" id="dir-a"></div>
+            <div class="bet-summary" id="bet-summary-a"></div>
+          </div>
+          <div class="bet-team" id="bet-team-b">
+            <div class="bet-team-name" id="bet-name-b">Team B</div>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <span style="font-size:0.7rem;color:var(--muted);">Chips:</span>
+              <div class="chip-btns" id="chips-b">
+                <button class="chip-btn selected" onclick="setChip('b',1)">1</button>
+                <button class="chip-btn" onclick="setChip('b',2)">2</button>
+                <button class="chip-btn" onclick="setChip('b',3)">3</button>
+                <button class="chip-btn" onclick="setChip('b',5)">5</button>
+              </div>
+            </div>
+            <div class="dir-btns" id="dir-b"></div>
+            <div class="bet-summary" id="bet-summary-b"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="outcome-panel" id="outcome-panel">
+        <div class="verdict-banner" id="verdict-banner"></div>
+        <div class="outcome-grid">
+          <div class="outcome-team" id="outcome-a">
+            <div class="outcome-team-name" id="oc-name-a">Team A</div>
+            <div class="outcome-result" id="oc-result-a"></div>
+            <div class="outcome-change" id="oc-change-a"></div>
+          </div>
+          <div class="outcome-team" id="outcome-b">
+            <div class="outcome-team-name" id="oc-name-b">Team B</div>
+            <div class="outcome-result" id="oc-result-b"></div>
+            <div class="outcome-change" id="oc-change-b"></div>
+          </div>
+        </div>
+        <div class="outcome-lesson" id="outcome-lesson"></div>
+      </div>
+    </div>
+
+    <div class="controls-bar">
+      <div class="ctrl-left">
+        <button class="btn btn-teal" id="btn-reveal" onclick="revealOutcome()">Reveal →</button>
+        <button class="btn btn-gold" id="btn-next" onclick="nextRound()" disabled>Next Round →</button>
+      </div>
+      <div class="ctrl-right">
+        <button class="btn btn-outline btn-sm" onclick="if(confirm('End game?'))showEndScreen()">End Game</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- END -->
+<div class="screen" id="screen-end">
+  <p style="font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--tealL);margin-bottom:1rem;">Game Complete</p>
+  <div class="end-title" id="end-winner-name">Team A Wins!</div>
+  <p class="end-sub" id="end-sub">Final chip counts</p>
+  <div class="end-scores">
+    <div class="end-score-card">
+      <div class="esc-name" id="end-name-a">Team A</div>
+      <div class="esc-chips" id="end-chips-a">18</div>
+      <div class="esc-result" id="end-result-a"></div>
+    </div>
+    <div class="end-score-card">
+      <div class="esc-name" id="end-name-b">Team B</div>
+      <div class="esc-chips" id="end-chips-b">12</div>
+      <div class="esc-result" id="end-result-b"></div>
+    </div>
+  </div>
+  <div class="end-lesson" id="end-lesson"></div>
+  <div style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;">
+    <button class="btn btn-teal" onclick="goSetup()">Play Again</button>
+    <button class="btn btn-outline" onclick="goHome()">Home</button>
+    <a href="summer-stem.html" class="btn btn-outline" style="text-decoration:none;">← Course Page</a>
+  </div>
+</div>
+
+<script>
+// ── DATA ───────────────────────────────────────────
+const MODES = {
+  debt: {
+    title: "🪤 Debt Trap or Escape?",
+    optA: {key:"trap", label:"🪤 Trap", cls:"opt-bad"},
+    optB: {key:"escape", label:"🔓 Escape", cls:"opt-good"},
+    scenarios: [
+      {text:"You owe $2,000 on a card at 24% APR. You pay $500 today, then keep using the card normally.",
+       answer:"trap",
+       lesson:"TRAP. Paying $500 feels like progress, but if you keep charging the same card, the balance creeps right back up. Available credit feels like 'extra money' psychologically — that's the trap."},
+      {text:"You're offered a 'balance transfer' card: 0% APR for 12 months, then it jumps to 26%.",
+       answer:"trap",
+       lesson:"TRAP (mostly). 0% intro APR is real relief IF you pay it off in 12 months. Most people don't — then 26% hits a balance that's often LARGER than where they started, because spending continued during the 'free' period."},
+      {text:"You have $3,000 in savings AND $3,000 in credit card debt at 22% APR. You leave both alone.",
+       answer:"trap",
+       lesson:"TRAP — the most common mistake of all. $3,000 earning ~4% in savings while $3,000 owes 22% means you're net LOSING about 18%/year. Use savings to pay down high-interest debt first (keep a small emergency cushion)."},
+      {text:"You take out a payday loan for $300 to cover a bill, due back $345 in 2 weeks.",
+       answer:"trap",
+       lesson:"TRAP — the worst one here. $300 → $345 in 2 weeks = 15% interest for 2 weeks = roughly 390% APR annualized. Payday loans are designed for people who can't pay back on time, generating repeat fees."},
+      {text:"You consolidate 4 credit cards (avg 24% APR) into one personal loan at 11% APR, same total balance.",
+       answer:"escape",
+       lesson:"ESCAPE. Converting 24% debt into 11% debt on the same balance roughly cuts your interest cost in half immediately. The catch: only works if you don't run the credit cards back up afterward."},
+      {text:"You make only the minimum payment but stop using the card entirely going forward.",
+       answer:"escape",
+       lesson:"ESCAPE (slow but real). Stopping new charges means the balance actually decreases over time, even slowly. Combined with the Avalanche or Snowball method, this is how real debt payoff begins."},
+    ]
+  },
+  scam: {
+    title: "🕵️ Scam Spotter",
+    optA: {key:"scam", label:"🚨 Scam", cls:"opt-bad"},
+    optB: {key:"legit", label:"✅ Legit", cls:"opt-good"},
+    scenarios: [
+      {text:"Text message: 'Your bank account is locked. Click here to verify your identity now.'",
+       answer:"scam",
+       lesson:"SCAM. 'Click here to verify' + urgency ('locked') is classic phishing. Real banks don't lock accounts via text link. Always go directly to your bank's app or website — never click the link."},
+      {text:"Email: 'Congratulations! You won a $1,000 gift card. Claim within 24 hours.'",
+       answer:"scam",
+       lesson:"SCAM. 'You won' something you never entered, plus urgency ('24 hours'), equals a prize scam. If you didn't enter, you can't win."},
+      {text:"Phone call: 'This is the IRS. You owe back taxes — pay now in gift cards or face arrest.'",
+       answer:"scam",
+       lesson:"SCAM — and an easy one once you know it. The IRS NEVER calls demanding immediate payment via gift cards. This is one of the most common scams targeting people of all ages — gift cards are untraceable."},
+      {text:"Job posting: 'Earn $500/day working from home, no experience — just send $99 for a starter kit.'",
+       answer:"scam",
+       lesson:"SCAM. '$500/day, no experience, pay $99 upfront' — legitimate jobs do not require YOU to pay THEM to start. Any 'pay first' job offer is almost always a scam."},
+      {text:"Email from your bank's real domain about a large purchase you didn't make, asking you to confirm.",
+       answer:"legit",
+       lesson:"LEGIT (probably). Banks DO send fraud alerts for unusual purchases. Key difference from a scam: this didn't ask you to 'click here' — the right move is to log in directly through the app, not via the email link, to verify."},
+      {text:"DM from a stranger: 'I'm a recruiter for [big company] — click this link to schedule your interview.'",
+       answer:"scam",
+       lesson:"SCAM (likely). Unsolicited recruiter DMs with links are a common social media scam. Real recruiters typically don't cold-DM with immediate links — verify through the company's actual careers page."},
+      {text:"Text from your actual mom's phone number: 'Hey it's me, I lost my phone, can you Venmo me $200?'",
+       answer:"scam",
+       lesson:"SCAM. 'It's me, lost my phone' from a number claiming to be a parent is a widespread scam (often via spoofed numbers). Always verify by calling the REAL known number — not the one that just texted you."},
+      {text:"Official-looking letter: you're pre-approved for a credit card with 0% intro APR.",
+       answer:"legit",
+       lesson:"LEGIT (usually). Pre-approved credit card offers are real, though often not the best deal. Not a scam — but read the fine print on what happens after the 0% intro period ends (remember the APR lecture!)."},
+    ]
+  }
+};
+
+let G = {
+  mode: null,
+  teamA: 'Team A', teamB: 'Team B',
+  chipsA: 15, chipsB: 15,
+  startChips: 15,
+  round: 0,
+  betA: {chips:1, dir:null},
+  betB: {chips:1, dir:null},
+  revealed: false,
+  history: [],
+};
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+}
+function goHome(){showScreen('home');}
+function goSetup(){showScreen('setup');}
+
+function selectMode(mode){
+  G.mode = mode;
+  const m = MODES[mode];
+  document.getElementById('header-title').textContent = m.title;
+  document.getElementById('setup-title').textContent = m.title + " — Setup";
+  document.getElementById('setup-sub').textContent = `${m.scenarios.length} rounds. Enter team names and starting chips.`;
+  showScreen('setup');
+}
+
+function startGame(){
+  G.teamA = document.getElementById('team-a-name').value.trim()||'Team A';
+  G.teamB = document.getElementById('team-b-name').value.trim()||'Team B';
+  G.startChips = parseInt(document.getElementById('start-chips').value)||15;
+  G.chipsA = G.startChips;
+  G.chipsB = G.startChips;
+  G.round = 0;
+  G.history = [];
+
+  document.getElementById('sb-name-a').textContent = G.teamA;
+  document.getElementById('sb-name-b').textContent = G.teamB;
+  document.getElementById('bet-name-a').textContent = G.teamA;
+  document.getElementById('bet-name-b').textContent = G.teamB;
+
+  // build direction buttons for this mode
+  const m = MODES[G.mode];
+  ['a','b'].forEach(team=>{
+    const el = document.getElementById('dir-'+team);
+    el.innerHTML = `
+      <button class="dir-btn ${m.optA.cls}" id="dir-${team}-A" onclick="setDir('${team}','${m.optA.key}')">${m.optA.label}</button>
+      <button class="dir-btn ${m.optB.cls}" id="dir-${team}-B" onclick="setDir('${team}','${m.optB.key}')">${m.optB.label}</button>
+    `;
+  });
+
+  showScreen('game');
+  loadRound();
+}
+
+function loadRound(){
+  G.round++;
+  G.revealed = false;
+  G.betA = {chips:1, dir:null};
+  G.betB = {chips:1, dir:null};
+  const m = MODES[G.mode];
+  const total = m.scenarios.length;
+  const sc = m.scenarios[G.round-1];
+
+  document.getElementById('sb-round').textContent = `Round ${G.round} of ${total}`;
+  document.getElementById('scenario-badge').textContent = `Round ${G.round} of ${total}`;
+  document.getElementById('scenario-text').textContent = sc.text;
+
+  ['a','b'].forEach(team=>resetBetUI(team));
+  document.getElementById('outcome-panel').classList.remove('show');
+  document.getElementById('bet-zone').style.display = '';
+  document.getElementById('btn-reveal').disabled = false;
+  document.getElementById('btn-next').disabled = true;
+  updateScoreboard();
+}
+
+function resetBetUI(team){
+  document.querySelectorAll(`#chips-${team} .chip-btn`).forEach((btn,i)=>{
+    btn.classList.toggle('selected',[1,2,3,5][i]===1);
+  });
+  const m = MODES[G.mode];
+  document.getElementById(`dir-${team}-A`).classList.remove('selected');
+  document.getElementById(`dir-${team}-B`).classList.remove('selected');
+  updateBetSummary(team);
+}
+
+function setChip(team,val){
+  if(G.revealed) return;
+  G['bet'+team.toUpperCase()].chips = val;
+  document.querySelectorAll(`#chips-${team} .chip-btn`).forEach(btn=>{
+    btn.classList.toggle('selected', parseInt(btn.textContent)===val);
+  });
+  updateBetSummary(team);
+}
+
+function setDir(team,key){
+  if(G.revealed) return;
+  G['bet'+team.toUpperCase()].dir = key;
+  const m = MODES[G.mode];
+  document.getElementById(`dir-${team}-A`).classList.toggle('selected', m.optA.key===key);
+  document.getElementById(`dir-${team}-B`).classList.toggle('selected', m.optB.key===key);
+  updateBetSummary(team);
+}
+
+function updateBetSummary(team){
+  const bet = G['bet'+team.toUpperCase()];
+  const m = MODES[G.mode];
+  const el = document.getElementById(`bet-summary-${team}`);
+  let label = "— nothing yet";
+  if(bet.dir===m.optA.key) label = m.optA.label;
+  if(bet.dir===m.optB.key) label = m.optB.label;
+  el.innerHTML = `Bet: <span>${bet.chips} chip${bet.chips>1?'s':''}</span> on <span>${label}</span>`;
+}
+
+function revealOutcome(){
+  G.revealed = true;
+  const m = MODES[G.mode];
+  const sc = m.scenarios[G.round-1];
+  const correct = sc.answer;
+
+  document.getElementById('bet-zone').style.display = 'none';
+  document.getElementById('btn-reveal').disabled = true;
+
+  const wonA = G.betA.dir === correct;
+  const wonB = G.betB.dir === correct;
+  const deltaA = wonA ? G.betA.chips : (G.betA.dir ? -G.betA.chips : 0);
+  const deltaB = wonB ? G.betB.chips : (G.betB.dir ? -G.betB.chips : 0);
+  G.chipsA = Math.max(0, G.chipsA + deltaA);
+  G.chipsB = Math.max(0, G.chipsB + deltaB);
+  G.history.push({wonA, wonB, betA:G.betA, betB:G.betB});
+
+  const panel = document.getElementById('outcome-panel');
+  panel.classList.add('show');
+
+  // verdict banner
+  const isGoodAnswer = correct === m.optB.key; // optB is always the "good" one (escape/legit)
+  const banner = document.getElementById('verdict-banner');
+  const verdictLabel = correct === m.optA.key ? m.optA.label : m.optB.label;
+  banner.textContent = "Verdict: " + verdictLabel.toUpperCase();
+  banner.className = 'verdict-banner ' + (isGoodAnswer ? 'good' : 'bad');
+
+  function setOutcome(team, won, delta, dirChoice){
+    const el = document.getElementById(`outcome-${team}`);
+    const rEl = document.getElementById(`oc-result-${team}`);
+    const cEl = document.getElementById(`oc-change-${team}`);
+    el.className = 'outcome-team ' + (won ? 'won' : (dirChoice ? 'lost' : ''));
+    rEl.className = 'outcome-result ' + (won ? 'won' : (dirChoice ? 'lost' : ''));
+    if(!dirChoice){
+      rEl.textContent = 'No bet placed';
+      cEl.textContent = '';
+    } else if(won){
+      rEl.textContent = `+${delta} chip${delta>1?'s':''}`;
+      cEl.textContent = 'Correct call!';
+    } else {
+      rEl.textContent = `−${Math.abs(delta)} chip${Math.abs(delta)>1?'s':''}`;
+      cEl.textContent = 'Wrong call.';
+    }
+  }
+  setOutcome('a', wonA, deltaA, G.betA.dir);
+  setOutcome('b', wonB, deltaB, G.betB.dir);
+  document.getElementById('oc-name-a').textContent = G.teamA;
+  document.getElementById('oc-name-b').textContent = G.teamB;
+  document.getElementById('outcome-lesson').textContent = sc.lesson;
+
+  updateScoreboard();
+  const total = m.scenarios.length;
+  document.getElementById('btn-next').disabled = G.round >= total;
+  if(G.round >= total){
+    setTimeout(showEndScreen, 1000);
+  }
+}
+
+function nextRound(){
+  const total = MODES[G.mode].scenarios.length;
+  if(G.round >= total){ showEndScreen(); return; }
+  loadRound();
+}
+
+function updateScoreboard(){
+  const aEl = document.getElementById('sb-chips-a');
+  const bEl = document.getElementById('sb-chips-b');
+  aEl.textContent = G.chipsA;
+  bEl.textContent = G.chipsB;
+  aEl.className = 'sb-chips' + (G.chipsA > G.chipsB ? ' winning' : '');
+  bEl.className = 'sb-chips' + (G.chipsB > G.chipsA ? ' winning' : '');
+}
+
+function showEndScreen(){
+  showScreen('end');
+  const winner = G.chipsA >= G.chipsB ? G.teamA : G.teamB;
+  document.getElementById('end-winner-name').textContent = winner + ' Wins!';
+  document.getElementById('end-name-a').textContent = G.teamA;
+  document.getElementById('end-name-b').textContent = G.teamB;
+  document.getElementById('end-chips-a').textContent = G.chipsA;
+  document.getElementById('end-chips-b').textContent = G.chipsB;
+  const aWon = G.chipsA >= G.chipsB;
+  document.getElementById('end-result-a').textContent = aWon ? '🏆 Winner' : 'Runner up';
+  document.getElementById('end-result-a').style.color = aWon ? '#a5d6a7' : '#ef9a9a';
+  document.getElementById('end-result-b').textContent = !aWon ? '🏆 Winner' : 'Runner up';
+  document.getElementById('end-result-b').style.color = !aWon ? '#a5d6a7' : '#ef9a9a';
+
+  const lessonEl = document.getElementById('end-lesson');
+  if(G.mode === 'debt'){
+    lessonEl.textContent = "Notice the pattern across the TRAP scenarios: paying down debt while still spending on the same card, leaving high-interest debt next to low-interest savings, 0% intro offers that revert. The trap usually isn't one bad decision — it's continuing old behavior while believing something has changed. The ESCAPE scenarios both involved an active change: lowering the rate (consolidation) or stopping new charges entirely.";
+  } else {
+    lessonEl.textContent = "What's the ONE thing almost every scam in this game has in common? Urgency — a request to act RIGHT NOW, often through a link or an unusual payment method (gift cards, Venmo, wire transfer). 'Slow down and verify independently' defeats almost every scam on this list.";
+  }
+}
+</script>
+</body>
+</html>

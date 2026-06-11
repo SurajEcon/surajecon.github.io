@@ -336,6 +336,8 @@
   .opt-text { flex:1; }
   .opt-name { font-weight:600; font-size:14px; margin-bottom:2px; }
   .opt-sub  { font-size:12px; color:var(--muted); }
+  
+  /* Impact text hidden by default */
   .opt-impact {
     font-family:'IBM Plex Mono', monospace;
     font-size:13px;
@@ -343,6 +345,14 @@
     flex-shrink:0;
     min-width:48px;
     text-align:right;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+  }
+  /* Revealed state for impact text */
+  .option-btn.revealed .opt-impact {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .option-btn.picked-good { border-color:var(--green); background:var(--green-dim); }
@@ -970,21 +980,19 @@ function renderScenario() {
   preview.innerHTML = '<span>Affects:</span> ' + s.impactTags.map(t =>
     `<span class="impact-tag">${t}</span>`).join('');
 
-  // options
+  // options (impact text is rendered but hidden via CSS initially)
   const stack = document.getElementById('options-stack');
   stack.innerHTML = '';
   s.options.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className = 'option-btn';
-    const impColor = opt.delta > 0 ? 'var(--green)' : opt.delta < 0 ? 'var(--red)' : 'var(--muted)';
-    const impSign  = opt.delta > 0 ? '+' : '';
     btn.innerHTML = `
       <div class="opt-letter">${opt.letter}</div>
       <div class="opt-text">
         <div class="opt-name">${opt.name}</div>
         <div class="opt-sub">${opt.sub}</div>
       </div>
-      <div class="opt-impact" style="color:${impColor}">${impSign}${opt.impact}</div>
+      <div class="opt-impact" id="impact-${i}"></div>
     `;
     btn.onclick = () => choose(i);
     stack.appendChild(btn);
@@ -1009,41 +1017,55 @@ function choose(idx) {
   answered = true;
 
   const s   = SCENARIOS[currentScenario];
-  const opt = s.options[idx];
+  const chosenOpt = s.options[idx];
   const prevScore = score;
-  score = Math.min(850, Math.max(300, score + opt.delta));
+  score = Math.min(850, Math.max(300, score + chosenOpt.delta));
   scoreHistory.push(score);
 
-  // style buttons
+  // Style buttons and reveal the hidden impact numbers for ALL options
   document.querySelectorAll('.option-btn').forEach((btn, i) => {
     btn.disabled = true;
-    if (i === idx) btn.classList.add(`picked-${opt.quality}`);
-    else btn.classList.add('unchosen');
+    
+    // Inject the text and set the correct color based on the delta
+    const currentOpt = s.options[i];
+    const impactDiv = btn.querySelector('.opt-impact');
+    const impSign  = currentOpt.delta > 0 ? '+' : '';
+    impactDiv.textContent = `${currentOpt.impact}`;
+    impactDiv.style.color = currentOpt.delta > 0 ? 'var(--green)' : currentOpt.delta < 0 ? 'var(--red)' : 'var(--muted)';
+    
+    // Trigger the CSS reveal transition
+    btn.classList.add('revealed');
+
+    if (i === idx) {
+        btn.classList.add(`picked-${currentOpt.quality}`);
+    } else {
+        btn.classList.add('unchosen');
+    }
   });
 
   // update gauge
-  updateGauge(score, opt.delta);
+  updateGauge(score, chosenOpt.delta);
 
   // update pip
   const pip = document.getElementById(`pip-${currentScenario}`);
-  if (pip) pip.className = `year-pip ${opt.quality === 'good' ? 'done-good' : opt.quality === 'bad' ? 'done-bad' : 'done-neu'}`;
+  if (pip) pip.className = `year-pip ${chosenOpt.quality === 'good' ? 'done-good' : chosenOpt.quality === 'bad' ? 'done-bad' : 'done-neu'}`;
 
   // feedback
   const fb = document.getElementById('feedback-panel');
-  fb.className = `feedback-panel show ${opt.quality}`;
+  fb.className = `feedback-panel show ${chosenOpt.quality}`;
 
   const deltaEl = document.getElementById('fb-delta');
-  const sign = opt.delta > 0 ? '+' : '';
-  deltaEl.textContent = `${sign}${opt.delta} pts`;
-  deltaEl.style.color = opt.delta > 0 ? 'var(--green)' : opt.delta < 0 ? 'var(--red)' : 'var(--muted)';
+  const sign = chosenOpt.delta > 0 ? '+' : '';
+  deltaEl.textContent = `${sign}${chosenOpt.delta} pts`;
+  deltaEl.style.color = chosenOpt.delta > 0 ? 'var(--green)' : chosenOpt.delta < 0 ? 'var(--red)' : 'var(--muted)';
 
-  document.getElementById('fb-title').textContent = opt.feedback;
-  document.getElementById('fb-body').textContent  = opt.explain;
+  document.getElementById('fb-title').textContent = chosenOpt.feedback;
+  document.getElementById('fb-body').textContent  = chosenOpt.explain;
 
   const realCostEl = document.getElementById('fb-real-cost');
-  if (opt.realCost) {
+  if (chosenOpt.realCost) {
     realCostEl.className = 'fb-real-cost show';
-    realCostEl.innerHTML = `💸 <strong>Real cost:</strong> ${opt.realCost}`;
+    realCostEl.innerHTML = `💸 <strong>Real cost:</strong> ${chosenOpt.realCost}`;
   } else {
     realCostEl.className = 'fb-real-cost';
   }

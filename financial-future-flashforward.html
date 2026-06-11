@@ -317,12 +317,23 @@
   .opt-content {}
   .opt-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
   .opt-desc { font-size: 12px; color: var(--muted); }
+  
+  /* Impact text hidden by default */
   .opt-delta {
     font-family: 'Fraunces', serif;
     font-size: 15px;
     font-weight: 700;
     flex-shrink: 0;
     text-align: right;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+  }
+  
+  /* Revealed state for impact text */
+  .opt-btn.revealed .opt-delta {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .opt-btn.chose-great { border-color:var(--green);  background:var(--green-bg); }
@@ -995,21 +1006,19 @@ function renderChapter() {
   stakes.innerHTML = '<span style="color:var(--muted);font-size:12px;">Affects:</span> ' +
     ch.stakes.map(s => `<span class="stake-tag">${s}</span>`).join('');
 
-  // options
+  // options (impact text is rendered but hidden via CSS initially)
   const grid = document.getElementById('options-grid');
   grid.innerHTML = '';
   ch.options.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className = 'opt-btn';
-    const sign   = opt.netWorthDelta >= 0 ? '+' : '';
-    const col    = opt.netWorthDelta >= 0 ? 'var(--green)' : 'var(--red)';
     btn.innerHTML = `
       <div class="opt-num">${opt.num}</div>
       <div class="opt-content">
         <div class="opt-name">${opt.name}</div>
         <div class="opt-desc">${opt.desc}</div>
       </div>
-      <div class="opt-delta" style="color:${col}">${sign}${fmt(opt.netWorthDelta)}</div>
+      <div class="opt-delta" id="delta-${i}"></div>
     `;
     btn.onclick = () => choose(i);
     grid.appendChild(btn);
@@ -1032,46 +1041,60 @@ function choose(idx) {
   answered = true;
 
   const ch  = CHAPTERS[currentChapter];
-  const opt = ch.options[idx];
+  const chosenOpt = ch.options[idx];
 
   // update financials
-  netWorth      += opt.netWorthDelta;
-  totalAssets   += opt.assets || 0;
-  totalDebt     += opt.debt || 0;
-  monthlySavings = (monthlySavings || 0) + (opt.monthlySavings || 0);
+  netWorth      += chosenOpt.netWorthDelta;
+  totalAssets   += chosenOpt.assets || 0;
+  totalDebt     += chosenOpt.debt || 0;
+  monthlySavings = (monthlySavings || 0) + (chosenOpt.monthlySavings || 0);
 
-  choices.push({ chapter: ch.title, choice: opt.name, delta: opt.netWorthDelta, quality: opt.quality });
+  choices.push({ chapter: ch.title, choice: chosenOpt.name, delta: chosenOpt.netWorthDelta, quality: chosenOpt.quality });
 
-  // style buttons
+  // Style buttons and reveal the hidden impact numbers for ALL options
   document.querySelectorAll('.opt-btn').forEach((btn, i) => {
     btn.disabled = true;
-    if (i === idx) btn.classList.add(`chose-${opt.quality}`);
-    else btn.classList.add('dimmed');
+    
+    // Inject the text and set the correct color based on the delta
+    const currentOpt = ch.options[i];
+    const deltaDiv = btn.querySelector('.opt-delta');
+    const sign = currentOpt.netWorthDelta >= 0 ? '+' : '';
+    deltaDiv.textContent = `${sign}${fmt(currentOpt.netWorthDelta)}`;
+    deltaDiv.style.color = currentOpt.netWorthDelta >= 0 ? 'var(--green)' : 'var(--red)';
+    
+    // Trigger the CSS reveal transition
+    btn.classList.add('revealed');
+
+    if (i === idx) {
+        btn.classList.add(`chose-${currentOpt.quality}`);
+    } else {
+        btn.classList.add('dimmed');
+    }
   });
 
   // update segment
-  segStates[currentChapter] = `filled-${opt.quality}`;
+  segStates[currentChapter] = `filled-${chosenOpt.quality}`;
   if (currentChapter + 1 < 5) segStates[currentChapter + 1] = 'current';
   updateWorthDisplay(true);
 
   // outcome panel
   const panel = document.getElementById('outcome-panel');
   panel.className = 'outcome-panel show';
-  document.getElementById('op-bar').className    = `op-bar ${opt.quality}`;
-  document.getElementById('op-verdict').className = `op-verdict ${opt.quality}`;
-  document.getElementById('op-verdict').textContent = opt.quality === 'great' ? '✦ Smart Move' : opt.quality === 'okay' ? '◎ Reasonable' : '✕ Costly Choice';
-  const sign = opt.netWorthDelta >= 0 ? '+' : '';
+  document.getElementById('op-bar').className    = `op-bar ${chosenOpt.quality}`;
+  document.getElementById('op-verdict').className = `op-verdict ${chosenOpt.quality}`;
+  document.getElementById('op-verdict').textContent = chosenOpt.quality === 'great' ? '✦ Smart Move' : chosenOpt.quality === 'okay' ? '◎ Reasonable' : '✕ Costly Choice';
+  const sign = chosenOpt.netWorthDelta >= 0 ? '+' : '';
   const deltaEl = document.getElementById('op-delta');
-  deltaEl.className = `op-delta ${opt.netWorthDelta >= 0 ? 'pos' : 'neg'}`;
-  deltaEl.textContent = sign + fmt(opt.netWorthDelta);
+  deltaEl.className = `op-delta ${chosenOpt.netWorthDelta >= 0 ? 'pos' : 'neg'}`;
+  deltaEl.textContent = sign + fmt(chosenOpt.netWorthDelta);
   document.getElementById('op-age-label').textContent = `impact by age 40`;
-  document.getElementById('op-explain').textContent  = opt.explain;
-  document.getElementById('op-ripple').innerHTML     = opt.ripple;
+  document.getElementById('op-explain').textContent  = chosenOpt.explain;
+  document.getElementById('op-ripple').innerHTML     = chosenOpt.ripple;
 
   const cc = document.getElementById('compound-callout');
-  if (opt.compound) {
+  if (chosenOpt.compound) {
     cc.className = 'compound-callout show';
-    cc.textContent = '📐 ' + opt.compound;
+    cc.textContent = '📐 ' + chosenOpt.compound;
   } else {
     cc.className = 'compound-callout';
   }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teaching — Suraj Ghimire</title>
+<title>Teaching: Suraj Ghimire</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -134,9 +134,9 @@
   <div class="page-banner banner-forest">
     <div class="topo-overlay"></div>
     <div class="page-banner-inner">
-      <p class="page-banner-eyebrow">New Mexico Tech &mdash; CS &amp; Engineering</p>
-      <h1 class="page-banner-title">Teaching economics<br>to <em>engineers</em></h1>
-      <p class="page-banner-sub">I teach graduate and undergraduates courses in business and economics. My goal is to make economic reasoning concrete through real data, applied problems, and fun games students can play in class.</p>
+      <p class="page-banner-eyebrow">Courses &amp; Classroom Games</p>
+      <h1 class="page-banner-title">Teaching economics<br>through <em>doing</em></h1>
+      <p class="page-banner-sub">I teach undergraduate and graduate courses in economics and business. My goal is to make economic reasoning concrete through real data, applied problems, and fun games students can play in class.</p>
     </div>
   </div>
 
@@ -151,10 +151,9 @@
         <a class="course-card has-page" href="survey-of-economics.html">
           <div class="cc-level">Economics</div>
           <div class="cc-name">Survey of Economics</div>
-          <div class="cc-desc">A semester-long tour of macro and micro economics for non-majors spanning scarcity, markets, money and policy. Taught chapter by chapter with accompanying interactive games.</div>
-       <span class="cc-badge">Full course page →</span>
-        </a> 
-      </div>
+          <div class="cc-desc">A semester-long tour of micro and macro for non-majors spanning scarcity, markets, money, and policy. Taught chapter by chapter with accompanying interactive games.</div>
+          <span class="cc-badge">Full course page →</span>
+        </a>
         <div class="course-card">
           <div class="cc-level">Economics</div>
           <div class="cc-name">Principles of Microeconomics</div>
@@ -205,16 +204,32 @@
   <!-- GAMES LIBRARY -->
   <div class="games-section page-section">
     <h2>Classroom Games</h2>
-    <p class="games-intro">All games run in the browser — no installation, no accounts. Designed for ~30 minutes of class time. Each is built around one economic concept that's hard to make concrete through lecture alone.</p>
+    <p class="games-intro">All games run in the browser. No installation, no accounts. Designed for ~30 minutes of class time. Each is built around one economic concept that's hard to make concrete through lecture alone.</p>
 
     <div class="filter-row">
       <button class="filter-btn active" onclick="filterGames('all',this)">All</button>
+      <button class="filter-btn" onclick="filterGames('survey',this)">Survey of Economics</button>
       <button class="filter-btn" onclick="filterGames('macro',this)">Macro</button>
       <button class="filter-btn" onclick="filterGames('micro',this)">Micro</button>
       <button class="filter-btn" onclick="filterGames('finlit',this)">Financial Literacy</button>
     </div>
 
     <div class="games-grid" id="games-grid">
+
+      <div class="game-card" data-cat="survey micro">
+        <div class="gc-top">
+          <span class="gc-emoji">🏝️</span>
+          <div>
+            <p class="gc-course">Survey of Economics &middot; Ch. 1</p>
+            <p class="gc-name">Frontier Run</p>
+          </div>
+        </div>
+        <div class="gc-body">
+          <p class="gc-desc">No quiz questions. Students run a 24 worker island economy, splitting workers between fishing and coconuts, and watch their own choices trace out a real production possibilities frontier. Five short missions cover efficiency, opportunity cost, and shocks to the curve.</p>
+          <div class="gc-meta"><span class="gc-tag">~20 min</span><span class="gc-tag">Individual</span><span class="gc-tag">Scarcity &amp; PPF</span></div>
+          <a class="gc-link" href="survey-econ-ch1-frontier-run.html" target="_blank">Play →</a>
+        </div>
+      </div>
 
       <div class="game-card" data-cat="macro">
         <div class="gc-top">
@@ -227,7 +242,7 @@
         <div class="gc-body">
           <p class="gc-desc">Students role-play as Fed Chair, setting interest rates each quarter to manage inflation and unemployment. Makes the Phillips Curve tradeoff visceral before they formalize it.</p>
           <div class="gc-meta"><span class="gc-tag">~30 min</span><span class="gc-tag">Individual</span><span class="gc-tag">Monetary Policy</span></div>
-          <a class="gc-link" href="chair_the_fed.html" target="_blank">Play →</a>
+          <a class="gc-link" href="chair-the-fed.html" target="_blank">Play →</a>
         </div>
       </div>
 
@@ -242,7 +257,7 @@
         <div class="gc-body">
           <p class="gc-desc">Twelve real news headlines. Predict whether each sends the market up or down. Covers Fed decisions, earnings, inflation, geopolitical risk. Streak bonuses create competition.</p>
           <div class="gc-meta"><span class="gc-tag">~25 min</span><span class="gc-tag">Competitive</span><span class="gc-tag">Financial Markets</span></div>
-          <a class="gc-link" href="bull_or_bear.html" target="_blank">Play →</a>
+          <a class="gc-link" href="bull-or-bear.html" target="_blank">Play →</a>
         </div>
       </div>
 
@@ -257,7 +272,7 @@
         <div class="gc-body">
           <p class="gc-desc">Ten rounds of real-life financial decisions that compound. A running balance shows how early choices ripple forward. Teaches budgeting and opportunity cost.</p>
           <div class="gc-meta"><span class="gc-tag">~20 min</span><span class="gc-tag">Individual</span><span class="gc-tag">Budgeting</span></div>
-          <a class="gc-link" href="spend_or_save.html" target="_blank">Play →</a>
+          <a class="gc-link" href="spend-or-save.html" target="_blank">Play →</a>
         </div>
       </div>
 
@@ -272,7 +287,7 @@
         <div class="gc-body">
           <p class="gc-desc">Interactive compound interest calculator with sliders for age, return rate, and time horizon. The moment students drag start age from 18 to 28 and watch the number collapse is the lesson.</p>
           <div class="gc-meta"><span class="gc-tag">~15 min</span><span class="gc-tag">Individual</span><span class="gc-tag">Time Value of Money</span></div>
-          <a class="gc-link" href="compound_interest.html" target="_blank">Open →</a>
+          <a class="gc-link" href="compound-interest.html" target="_blank">Open →</a>
         </div>
       </div>
 
@@ -287,7 +302,7 @@
         <div class="gc-body">
           <p class="gc-desc">Ten product scenarios. Students evaluate margin, shipping time, and competition, then decide viability. The verdict reveals the underlying economics. Teaches profit margin and market saturation.</p>
           <div class="gc-meta"><span class="gc-tag">~25 min</span><span class="gc-tag">Individual</span><span class="gc-tag">Entrepreneurship</span></div>
-          <a class="gc-link" href="dropship_or_flop.html" target="_blank">Play →</a>
+          <a class="gc-link" href="dropship-or-flop.html" target="_blank">Play →</a>
         </div>
       </div>
 
@@ -302,7 +317,7 @@
         <div class="gc-body">
           <p class="gc-desc">Real historical crypto charts with the last 3 months hidden. Draw your prediction, then see what happened and why. The lesson: short-term prediction is closer to guessing than analysis.</p>
           <div class="gc-meta"><span class="gc-tag">~25 min</span><span class="gc-tag">Individual</span><span class="gc-tag">Speculation</span></div>
-          <a class="gc-link" href="crypto_crash_or_moon.html" target="_blank">Play →</a>
+          <a class="gc-link" href="crypto-crash-or-moon.html" target="_blank">Play →</a>
         </div>
       </div>
 
@@ -317,7 +332,7 @@
         <div class="gc-body">
           <p class="gc-desc">Eight decisions across eight years (ages 18–25). A live score gauge updates after each choice. The car loan stage shows in real dollars what your score costs you over five years.</p>
           <div class="gc-meta"><span class="gc-tag">~30 min</span><span class="gc-tag">Individual</span><span class="gc-tag">Credit &amp; Debt</span></div>
-          <a class="gc-link" href="credit_score_simulator.html" target="_blank">Play →</a>
+          <a class="gc-link" href="credit-score-simulator.html" target="_blank">Play →</a>
         </div>
       </div>
 
@@ -332,7 +347,7 @@
         <div class="gc-body">
           <p class="gc-desc">Five major life decisions — education, housing, car, investing, career — each showing their impact on net worth at 40. A running total updates with every choice.</p>
           <div class="gc-meta"><span class="gc-tag">~30 min</span><span class="gc-tag">Individual</span><span class="gc-tag">Life Planning</span></div>
-          <a class="gc-link" href="financial_future_flashforward.html" target="_blank">Play →</a>
+          <a class="gc-link" href="financial-future-flashforward.html" target="_blank">Play →</a>
         </div>
       </div>
 
@@ -347,7 +362,7 @@
         <div class="gc-body">
           <p class="gc-desc">Fifteen questions, five categories, streak bonuses. Designed as a competitive end-of-week review. Points scale with difficulty. Play money prize for the winners.</p>
           <div class="gc-meta"><span class="gc-tag">~30 min</span><span class="gc-tag">Competitive</span><span class="gc-tag">Week Review</span></div>
-          <a class="gc-link" href="final_boss_quiz.html" target="_blank">Play →</a>
+          <a class="gc-link" href="final-boss-quiz.html" target="_blank">Play →</a>
         </div>
       </div>
 
@@ -405,12 +420,12 @@
 </div>
 
 <footer>
-  <div class="footer-left">Suraj Ghimire &mdash; New Mexico Tech &mdash; 2026</div>
+  <div class="footer-left">Suraj Ghimire &middot; 2026</div>
   <div class="footer-right">
     <a href="research.html">Research</a>
     <a href="teaching.html">Teaching</a>
     <a href="about.html">About</a>
-    <a href="mailto:suraj.ghimire@nmt.edu">Email</a>
+    <a href="#" class="email-link" data-user="surajghimire" data-domain="live.com">Email</a>
   </div>
 </footer>
 
@@ -421,6 +436,14 @@
   const navLinks = document.getElementById('nav-links');
   toggle.addEventListener('click', () => { toggle.classList.toggle('open'); navLinks.classList.toggle('open'); });
   function closeNav() { toggle.classList.remove('open'); navLinks.classList.remove('open'); }
+
+  document.querySelectorAll('.email-link, .email-text').forEach(function(el){
+    const u = el.getAttribute('data-user'), d = el.getAttribute('data-domain');
+    if (!u || !d) return;
+    const addr = u + '@' + d;
+    if (el.tagName === 'A') el.setAttribute('href', 'mailto:' + addr);
+    if (el.classList.contains('email-text')) el.textContent = addr;
+  });
   function filterGames(cat, btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');

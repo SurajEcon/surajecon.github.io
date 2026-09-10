@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frontier Run, Chapter 1: Foundations of Economics</title>
+<style>
+  :root{
+    --teal:#0f6a75;
+    --teal-dark:#0a4c54;
+    --gold:#e0a63a;
+    --coral:#e35d5d;
+    --mint:#2fae7a;
+    --sand:#f2d9a1;
+    --bg1:#0a4c54;
+    --card:#ffffff;
+    --ink:#12333a;
+    --muted:#5c7d82;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 800px at 20% -10%, #1c8b93 0%, var(--bg1) 45%, #062f34 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    color:var(--ink);
+  }
+  .wrap{ width:100%; max-width:760px; }
+  .shell{
+    background:var(--card);
+    border-radius:20px;
+    box-shadow:0 30px 60px rgba(0,0,0,0.35), 0 2px 0 rgba(255,255,255,0.4) inset;
+    overflow:hidden;
+    position:relative;
+  }
+  .topbar{
+    background:linear-gradient(120deg,var(--teal) 0%, var(--teal-dark) 100%);
+    color:white;
+    padding:16px 22px 14px;
+  }
+  .topbar .kicker{ font-size:12px; letter-spacing:.14em; text-transform:uppercase; opacity:.8; margin:0 0 4px; }
+  .topbar h1{ margin:0; font-size:21px; font-weight:800; }
+  .stats{ display:flex; gap:12px; margin-top:12px; font-size:13px; flex-wrap:wrap; }
+  .pill{ background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.25); padding:5px 12px; border-radius:999px; display:flex; align-items:center; gap:6px; font-weight:600; }
+  .progress-track{ height:8px; background:rgba(255,255,255,0.18); border-radius:999px; margin-top:12px; overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#f6cf7f); border-radius:999px; transition:width .45s ease; }
+
+  .stage{ padding:22px 24px 22px; display:flex; flex-direction:column; gap:16px; }
+  @media (min-width:600px){ .stage{ flex-direction:row; } }
+
+  .graphcol{ flex:0 0 auto; }
+  .panelcol{ flex:1 1 auto; display:flex; flex-direction:column; min-width:0; }
+
+  .missiontag{ display:inline-block; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); background:#e6f3f2; padding:4px 10px; border-radius:999px; margin-bottom:10px; width:fit-content; }
+  .missiontitle{ font-size:17px; font-weight:800; margin:0 0 6px; line-height:1.35; }
+  .missiontext{ font-size:14px; line-height:1.55; color:var(--muted); margin:0 0 12px; }
+  .readout{ display:flex; gap:10px; margin:6px 0 14px; flex-wrap:wrap; }
+  .readbox{ background:#f3f8f8; border-radius:12px; padding:8px 14px; font-size:13px; text-align:center; min-width:78px; }
+  .readbox b{ display:block; font-size:19px; color:var(--ink); }
+  .sliderrow{ margin:4px 0 10px; }
+  .sliderrow label{ display:block; font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+  input[type=range]{ width:100%; accent-color:var(--teal); }
+  .choices{ display:grid; gap:8px; margin:10px 0; }
+  .choicebtn{ text-align:left; padding:10px 14px; border-radius:10px; border:2px solid #e2edee; background:#fbfeff; font-size:13.5px; font-weight:600; color:var(--ink); cursor:pointer; }
+  .choicebtn:hover{ border-color:var(--teal); }
+  .choicebtn.correct{ background:#e7f8ef; border-color:var(--mint); color:#1c6b47; }
+  .choicebtn.wrong{ background:#fdecec; border-color:var(--coral); color:#a13636; }
+  .choicebtn[disabled]{ cursor:default; }
+  .feedback{ margin-top:6px; padding:11px 13px; border-radius:10px; background:#f3f8f8; font-size:13.5px; line-height:1.5; color:var(--muted); display:none; }
+  .feedback strong{ color:var(--ink); }
+  .feedback.ok{ background:#e7f8ef; color:#1c6b47; }
+  .feedback.ok strong{ color:#1c6b47; }
+  .actions{ margin-top:auto; padding-top:12px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  button.primary{
+    background:var(--teal); color:white; border:none; padding:11px 20px; border-radius:12px;
+    font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 8px 18px rgba(15,106,117,0.35);
+  }
+  button.primary:hover{ background:var(--teal-dark); }
+  button.primary[disabled]{ opacity:.4; cursor:default; box-shadow:none; }
+  button.ghost{ background:none; border:2px solid #cfe0e1; color:var(--teal-dark); padding:9px 16px; border-radius:12px; font-weight:700; cursor:pointer; font-size:13px; }
+  .hint{ font-size:12px; color:var(--muted); }
+
+  .panel{ padding:36px 28px 30px; text-align:center; }
+  .panel h2{ font-size:23px; margin:6px 0 8px; }
+  .panel p.lead{ color:var(--muted); font-size:14.5px; line-height:1.6; max-width:460px; margin:0 auto 20px; }
+  .badge{ width:80px;height:80px; border-radius:50%; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:34px; background:linear-gradient(135deg,var(--gold),#f2c463); box-shadow:0 10px 24px rgba(224,166,58,0.45); }
+  .startbtn{ background:linear-gradient(120deg,var(--gold),#eab545); color:#3c2a06; border:none; padding:13px 28px; border-radius:14px; font-size:15.5px; font-weight:800; cursor:pointer; box-shadow:0 12px 26px rgba(224,166,58,0.4); }
+  .startbtn:hover{ filter:brightness(1.05); }
+  .rules{ text-align:left; max-width:440px; margin:0 auto 24px; background:#f3f8f8; border-radius:14px; padding:15px 20px; font-size:13px; color:var(--muted); line-height:1.7; }
+  .rules b{ color:var(--ink); }
+
+  .resultcard{ background:linear-gradient(160deg,#0f6a75,#0a4c54); color:white; border-radius:18px; padding:24px 22px 20px; margin:6px 0 18px; }
+  .resultcard .name{ font-size:13px; letter-spacing:.12em; text-transform:uppercase; opacity:.75; }
+  .resultcard .score{ font-size:50px; font-weight:900; margin:6px 0 2px; }
+  .resultcard .outof{ font-size:14px; opacity:.75; margin-bottom:14px; }
+  .tier{ display:inline-block; margin-top:14px; padding:6px 16px; border-radius:999px; font-weight:800; font-size:13px; background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.3); }
+  .breakdown{ text-align:left; max-width:420px; margin:0 auto 18px; font-size:13.5px; }
+  .breakdown div{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eef4f4; }
+  .howto{ background:#fff7e8; border:1px solid #f1dcae; border-radius:14px; padding:14px 18px; font-size:13.5px; color:#6b4f14; text-align:left; line-height:1.6; margin-bottom:18px; }
+  .howto b{ color:#4a3506; }
+  .replay{ background:none; border:2px solid #cfe0e1; color:var(--teal-dark); padding:10px 22px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; }
+  .hidden{ display:none !important; }
+  .footer-note{ text-align:center; color:rgba(255,255,255,0.55); font-size:12px; margin-top:12px; }
+  svg text{ font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  input[type=number]{ font-size:15px; padding:8px 10px; border-radius:10px; border:2px solid #e2edee; width:100px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="shell" id="shell">
+
+    <!-- START SCREEN -->
+    <div class="panel" id="startScreen">
+      <div class="badge">🏝️</div>
+      <h2>Frontier Run</h2>
+      <p class="lead"><b>Chapter 1, Foundations of Economics.</b> You run a small island economy with 24 workers. You decide how many go fishing and how many gather coconuts. There is no quiz here. You build the production possibilities frontier yourself by experimenting, then use it to complete five short challenges.</p>
+      <div class="rules">
+        <div><b>🎣 Two goods, one resource.</b> Every worker you move to fishing is a worker you take off coconuts. That trade off is the whole game.</div>
+        <div><b>📈 Watch the curve.</b> As you slide, your point moves and leaves a trail. The shape that trail traces out is your production possibilities frontier.</div>
+        <div><b>📸 Screenshot the results screen</b> when you finish and upload it for credit.</div>
+      </div>
+      <button class="startbtn" id="startBtn">Take over the island →</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div class="hidden" id="gameScreen">
+      <div class="topbar">
+        <p class="kicker">Frontier Run · Chapter 1</p>
+        <h1>Foundations of Economics</h1>
+        <div class="stats">
+          <div class="pill">🎯 Score: <span id="scoreLabel">0</span> / 100</div>
+          <div class="pill">🧑‍🌾 Workers: <span id="workerLabel">24</span></div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="stage">
+        <div class="graphcol">
+          <svg id="graphSvg" width="300" height="260" viewBox="0 0 300 260"></svg>
+        </div>
+        <div class="panelcol">
+          <div class="missiontag" id="missionTag">Getting started</div>
+          <p class="missiontitle" id="missionTitle"></p>
+          <p class="missiontext" id="missionText"></p>
+
+          <div class="readout" id="readout"></div>
+
+          <div id="controls"></div>
+
+          <div class="choices hidden" id="choicesWrap"></div>
+
+          <div class="feedback" id="feedback"></div>
+
+          <div class="actions">
+            <span class="hint" id="hintText"></span>
+            <button class="primary" id="actionBtn">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div class="hidden panel" id="endScreen">
+      <div class="resultcard">
+        <div class="name">Frontier Run, Results</div>
+        <div class="score" id="finalScore">0</div>
+        <div class="outof">out of 100 points</div>
+        <div class="tier" id="tierLabel">Tier</div>
+      </div>
+      <div class="breakdown" id="breakdown"></div>
+      <div class="howto"><b>📸 One more step.</b> Take a screenshot of this results card with your score visible, then upload it to the Chapter 1 game assignment in Blackboard (or wherever your instructor has you submit it).</div>
+      <button class="replay" id="replayBtn">Run the island again</button>
+      <p class="footer-note">ECO 120 · Survey of Economics · Wor-Wic Community College</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   FRONTIER RUN, a production possibilities frontier simulator, not a quiz.
+   The player allocates a fixed number of workers between two goods (fish
+   and coconuts) using a slider. The output for each good follows a simple
+   diminishing returns curve, so the set of points the player can reach by
+   sliding traces out a real bowed out production possibilities frontier.
+   Every mission is answered by manipulating that live simulation rather
+   than by picking a memorized fact. No login, no data collection, no
+   network calls of any kind.
+   ========================================================================== */
+
+const TOTAL_WORKERS = 24;
+
+// Production functions. Multipliers can change between phases to model a
+// technology shock (fish) or a resource shock (coconuts).
+let kFish = 12;
+let kCoconut = 10;
+function fishOutput(workers){ return Math.round(kFish * Math.sqrt(Math.max(0, workers))); }
+function coconutOutput(workers){ return Math.round(kCoconut * Math.sqrt(Math.max(0, workers))); }
+
+const AXIS_MAX_COCONUT = 60;
+const AXIS_MAX_FISH = 100;
+const PLOT = { left: 46, top: 14, w: 232, h: 208 };
+
+function toX(coconutVal){ return PLOT.left + (coconutVal / AXIS_MAX_COCONUT) * PLOT.w; }
+function toY(fishVal){ return PLOT.top + PLOT.h - (fishVal / AXIS_MAX_FISH) * PLOT.h; }
+
+function frontierPathString(kF, kC, totalWorkers){
+  let pts = [];
+  for (let f = 0; f <= totalWorkers; f += 0.5){
+    const c = totalWorkers - f;
+    const F = kF * Math.sqrt(f);
+    const C = kC * Math.sqrt(c);
+    pts.push(`${toX(C).toFixed(1)},${toY(F).toFixed(1)}`);
+  }
+  return 'M ' + pts.join(' L ');
+}
+
+const svg = document.getElementById('graphSvg');
+let trailPoints = [];
+
+function renderGraph(currentFish, currentCoconut, opts){
+  opts = opts || {};
+  let parts = [];
+
+  // axes
+  parts.push(`<line x1="${PLOT.left}" y1="${PLOT.top}" x2="${PLOT.left}" y2="${PLOT.top+PLOT.h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<line x1="${PLOT.left}" y1="${PLOT.top+PLOT.h}" x2="${PLOT.left+PLOT.w}" y2="${PLOT.top+PLOT.h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<text x="${PLOT.left+PLOT.w/2}" y="${PLOT.top+PLOT.h+26}" font-size="11" fill="#5c7d82" text-anchor="middle">Coconuts produced</text>`);
+  parts.push(`<text x="12" y="${PLOT.top+PLOT.h/2}" font-size="11" fill="#5c7d82" text-anchor="middle" transform="rotate(-90 12 ${PLOT.top+PLOT.h/2})">Fish produced</text>`);
+
+  // faded previous frontier (before a shock)
+  if (opts.oldFrontier){
+    parts.push(`<path d="${opts.oldFrontier}" fill="none" stroke="#c9dadb" stroke-width="2" stroke-dasharray="4,4"/>`);
+  }
+
+  // current frontier
+  const curFrontier = frontierPathString(kFish, kCoconut, TOTAL_WORKERS - (opts.idle||0));
+  parts.push(`<path d="${curFrontier}" fill="none" stroke="#9fc9cc" stroke-width="2.5"/>`);
+
+  // reference marker (used in the opportunity cost mission)
+  if (opts.refPoint){
+    const rx = toX(opts.refPoint.c), ry = toY(opts.refPoint.f);
+    parts.push(`<circle cx="${rx}" cy="${ry}" r="5" fill="none" stroke="#e0a63a" stroke-width="2.5"/>`);
+    parts.push(`<text x="${rx+8}" y="${ry-6}" font-size="10" fill="#a5761f">start</text>`);
+  }
+
+  // trail
+  trailPoints.forEach(p => {
+    parts.push(`<circle cx="${toX(p.c)}" cy="${toY(p.f)}" r="3" fill="#0f6a75" opacity="0.28"/>`);
+  });
+
+  // current point
+  const cx = toX(currentCoconut), cy = toY(currentFish);
+  parts.push(`<circle cx="${cx}" cy="${cy}" r="6.5" fill="#e35d5d" stroke="white" stroke-width="2"/>`);
+
+  svg.innerHTML = parts.join('');
+}
+
+/* ---------------- Phase / mission state machine ---------------- */
+
+let phaseIndex = 0;
+let score = 0;
+const phaseScores = {};
+let fishWorkers = 12; // current slider value for the main phases
+let idleWorkers = 0;  // used only in the efficiency phase
+
+const missionTag = document.getElementById('missionTag');
+const missionTitle = document.getElementById('missionTitle');
+const missionText = document.getElementById('missionText');
+const readout = document.getElementById('readout');
+const controls = document.getElementById('controls');
+const choicesWrap = document.getElementById('choicesWrap');
+const feedback = document.getElementById('feedback');
+const actionBtn = document.getElementById('actionBtn');
+const hintText = document.getElementById('hintText');
+const progressFill = document.getElementById('progressFill');
+const scoreLabel = document.getElementById('scoreLabel');
+const workerLabel = document.getElementById('workerLabel');
+
+function updateReadout(){
+  const active = TOTAL_WORKERS - idleWorkers;
+  const f = Math.round((fishWorkers/24) * active);
+  const c = active - f;
+  const F = fishOutput(f);
+  const C = coconutOutput(c);
+  readout.innerHTML = `
+    <div class="readbox">Fish workers<b>${f}</b></div>
+    <div class="readbox">Coconut workers<b>${c}</b></div>
+    <div class="readbox">Fish output<b>${F}</b></div>
+    <div class="readbox">Coconut output<b>${C}</b></div>
+  `;
+  workerLabel.textContent = idleWorkers > 0 ? `${active} working, ${idleWorkers} idle` : '24';
+  return { f, c, F, C };
+}
+
+function pushTrail(c, f){
+  trailPoints.push({c, f});
+  if (trailPoints.length > 60) trailPoints.shift();
+}
+
+const PHASES = [
+  { key: 'p1', label: 'Warmup', title: 'Move some workers to fishing', points: 0 },
+  { key: 'p2', label: 'Mission 1 of 5', title: 'Efficient or not', points: 20 },
+  { key: 'p3', label: 'Mission 2 of 5', title: 'Hit both targets', points: 20 },
+  { key: 'p4', label: 'Mission 3 of 5', title: 'Name the tradeoff', points: 20 },
+  { key: 'p5', label: 'Mission 4 of 5', title: 'A new fishing boat', points: 20 },
+  { key: 'p6', label: 'Mission 5 of 5', title: 'Storm damage', points: 20 },
+];
+
+function setProgress(){
+  progressFill.style.width = `${(phaseIndex / PHASES.length) * 100}%`;
+}
+
+function mainSliderControl(onInput){
+  controls.innerHTML = `
+    <div class="sliderrow">
+      <label>Workers on fishing: <span id="fishWorkerNum">${fishWorkers}</span> of 24</label>
+      <input type="range" min="0" max="24" step="1" value="${fishWorkers}" id="mainSlider">
+    </div>`;
+  const slider = document.getElementById('mainSlider');
+  slider.addEventListener('input', () => {
+    fishWorkers = parseInt(slider.value, 10);
+    document.getElementById('fishWorkerNum').textContent = fishWorkers;
+    onInput();
+  });
+}
+
+function idleSliderControl(onInput){
+  controls.innerHTML = `
+    <div class="sliderrow">
+      <label>Workers given the day off: <span id="idleNum">${idleWorkers}</span> of 24</label>
+      <input type="range" min="0" max="12" step="1" value="${idleWorkers}" id="idleSlider">
+    </div>`;
+  const slider = document.getElementById('idleSlider');
+  slider.addEventListener('input', () => {
+    idleWorkers = parseInt(slider.value, 10);
+    document.getElementById('idleNum').textContent = idleWorkers;
+    onInput();
+  });
+}
+
+function showChoices(options, onPick){
+  choicesWrap.classList.remove('hidden');
+  choicesWrap.innerHTML = '';
+  options.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'choicebtn';
+    b.textContent = opt;
+    b.addEventListener('click', () => onPick(i, b));
+    choicesWrap.appendChild(b);
+  });
+}
+function hideChoices(){ choicesWrap.classList.add('hidden'); choicesWrap.innerHTML = ''; }
+function lockChoices(){ choicesWrap.querySelectorAll('.choicebtn').forEach(b => b.disabled = true); }
+
+function showFeedback(html, ok){
+  feedback.style.display = 'block';
+  feedback.className = 'feedback' + (ok ? ' ok' : '');
+  feedback.innerHTML = html;
+}
+function hideFeedback(){ feedback.style.display = 'none'; feedback.innerHTML = ''; }
+
+function awardPoints(phaseKey, pts){
+  if (phaseScores[phaseKey] === undefined){
+    phaseScores[phaseKey] = pts;
+    score += pts;
+    scoreLabel.textContent = score;
+  }
+}
+
+/* ---------------- Phase 0: warmup ---------------- */
+function startPhaseWarmup(){
+  missionTag.textContent = PHASES[0].label;
+  missionTitle.textContent = PHASES[0].title;
+  missionText.textContent = 'Drag the slider below and watch the red dot move on the graph. Try both ends, then a few points in the middle. The trail it leaves behind is your production possibilities frontier.';
+  hintText.textContent = '';
+  hideChoices();
+  hideFeedback();
+  idleWorkers = 0;
+  fishWorkers = 12;
+  trailPoints = [];
+  const draw = () => {
+    const r = updateReadout();
+    pushTrail(r.c, r.f);
+    renderGraph(r.F, r.C, {});
+  };
+  mainSliderControl(draw);
+  draw();
+  actionBtn.textContent = "I've explored enough, start the missions →";
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => { phaseIndex = 1; setProgress(); startPhaseEfficiency(); };
+}
+
+/* ---------------- Phase 1: efficiency (idle workers) ---------------- */
+function startPhaseEfficiency(){
+  const P = PHASES[1];
+  missionTag.textContent = P.label;
+  missionTitle.textContent = P.title;
+  missionText.textContent = 'The frontier line below is fixed at all 24 workers employed. Slide "workers given the day off" up and watch your red dot pull inside that line.';
+  hintText.textContent = '';
+  hideChoices();
+  hideFeedback();
+  fishWorkers = 12;
+  idleWorkers = 0;
+  trailPoints = [];
+  let answered = false;
+  const draw = () => {
+    const r = updateReadout();
+    pushTrail(r.c, r.f);
+    renderGraph(r.F, r.C, {});
+    if (idleWorkers >= 4 && !answered){
+      answered = true;
+      showChoices([
+        'My point is still right on the frontier line',
+        'My point has moved inside the frontier line, meaning resources are being wasted',
+      ], (i, btn) => {
+        lockChoices();
+        const correct = 1;
+        if (i === correct){
+          btn.classList.add('correct');
+          showFeedback('<strong>Exactly.</strong> Any point inside the frontier means the economy could produce more of one good, or both, without giving anything up. That is what an idle or misallocated resource looks like on a PPF.', true);
+          awardPoints('p2', 20);
+        } else {
+          btn.classList.add('wrong');
+          choicesWrap.children[correct].classList.add('correct');
+          showFeedback('Not quite. A point below the curve means workers are sitting idle instead of producing, so the economy is not making as much as it could.', false);
+          awardPoints('p2', 10);
+        }
+        scoreLabel.textContent = score;
+        actionBtn.disabled = false;
+      });
+    }
+  };
+  mainSliderControl(draw);
+  idleSliderControl(draw);
+  // combine both sliders into one control block
+  const mainBlock = `
+    <div class="sliderrow">
+      <label>Workers on fishing (of those still working): <span id="fishWorkerNum">${fishWorkers}</span></label>
+      <input type="range" min="0" max="24" step="1" value="${fishWorkers}" id="mainSlider">
+    </div>
+    <div class="sliderrow">
+      <label>Workers given the day off: <span id="idleNum">${idleWorkers}</span> of 24</label>
+      <input type="range" min="0" max="12" step="1" value="${idleWorkers}" id="idleSlider">
+    </div>`;
+  controls.innerHTML = mainBlock;
+  document.getElementById('mainSlider').addEventListener('input', (e) => { fishWorkers = parseInt(e.target.value,10); document.getElementById('fishWorkerNum').textContent = fishWorkers; draw(); });
+  document.getElementById('idleSlider').addEventListener('input', (e) => { idleWorkers = parseInt(e.target.value,10); document.getElementById('idleNum').textContent = idleWorkers; draw(); });
+  draw();
+  actionBtn.textContent = 'Next mission →';
+  actionBtn.disabled = true;
+  actionBtn.onclick = () => { phaseIndex = 2; setProgress(); startPhaseMission1(); };
+}
+
+/* ---------------- Phase 2: mission 1, hit both targets ---------------- */
+function startPhaseMission1(){
+  const P = PHASES[2];
+  missionTag.textContent = P.label;
+  missionTitle.textContent = P.title;
+  missionText.textContent = 'Full crew today, no one idle. Find one slider position where fish output is at least 40 AND coconut output is at least 30, at the same time. Click "Check this point" when you think you have it.';
+  hintText.textContent = '';
+  hideChoices();
+  hideFeedback();
+  idleWorkers = 0;
+  fishWorkers = 12;
+  trailPoints = [];
+  const draw = () => {
+    const r = updateReadout();
+    pushTrail(r.c, r.f);
+    renderGraph(r.F, r.C, {});
+  };
+  mainSliderControl(draw);
+  draw();
+  actionBtn.textContent = 'Check this point';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    const active = TOTAL_WORKERS - idleWorkers;
+    const f = Math.round((fishWorkers/24) * active);
+    const c = active - f;
+    const F = fishOutput(f), C = coconutOutput(c);
+    if (F >= 40 && C >= 30){
+      showFeedback(`<strong>That works.</strong> Fish ${F}, coconuts ${C}. Both goods are being produced, and both meet the target, because this island has enough workers to reach that combination without running out of anyone.`, true);
+      awardPoints('p3', 20);
+      actionBtn.textContent = 'Next mission →';
+      actionBtn.onclick = () => { phaseIndex = 3; setProgress(); startPhaseMission2(); };
+    } else {
+      showFeedback(`Not there yet. Fish ${F}, coconuts ${C}. Keep sliding, both numbers need to clear their target at once.`, false);
+    }
+  };
+}
+
+/* ---------------- Phase 3: mission 2, opportunity cost discovery ---------------- */
+function startPhaseMission2(){
+  const P = PHASES[3];
+  missionTag.textContent = P.label;
+  missionTitle.textContent = P.title;
+  const refF = fishOutput(8), refC = coconutOutput(16);
+  missionText.textContent = `Your gold ring on the graph marks your starting point: 8 workers fishing, giving fish ${refF} and coconuts ${refC}. Slide toward more coconuts until your coconut output is at least 46, then check in.`;
+  hintText.textContent = '';
+  hideChoices();
+  hideFeedback();
+  idleWorkers = 0;
+  fishWorkers = 8;
+  trailPoints = [];
+  const draw = () => {
+    const r = updateReadout();
+    pushTrail(r.c, r.f);
+    renderGraph(r.F, r.C, { refPoint: { f: refF, c: refC } });
+  };
+  mainSliderControl(draw);
+  draw();
+  actionBtn.textContent = 'Check this point';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    const f = fishWorkers, c = 24 - f;
+    const F = fishOutput(f), C = coconutOutput(c);
+    if (C >= 46){
+      const given = Math.max(0, refF - F);
+      showFeedback(`<strong>Good.</strong> Coconuts went from ${refC} to ${C}, but fish dropped from ${refF} to ${F}. You gave up ${given} units of fish to get those extra coconuts.`, true);
+      actionBtn.disabled = true;
+      showChoices([
+        'That ' + given + ' units of fish you gave up is called your marginal cost',
+        'That ' + given + ' units of fish you gave up is called your opportunity cost',
+        'That ' + given + ' units of fish you gave up is called a sunk cost',
+      ], (i, btn) => {
+        lockChoices();
+        if (i === 1){
+          btn.classList.add('correct');
+          showFeedback(`<strong>Right.</strong> The opportunity cost of a choice is the value of the next best alternative you gave up, here, the fish you did not catch.`, true);
+          awardPoints('p4', 20);
+        } else {
+          btn.classList.add('wrong');
+          choicesWrap.children[1].classList.add('correct');
+          showFeedback('The correct term is opportunity cost, the value of the next best alternative you gave up to get more coconuts.', false);
+          awardPoints('p4', 10);
+        }
+        actionBtn.disabled = false;
+        actionBtn.textContent = 'Next mission →';
+        actionBtn.onclick = () => { phaseIndex = 4; setProgress(); startPhaseMission3(); };
+      });
+    } else {
+      showFeedback(`Coconuts are at ${C} right now, you need at least 46. Slide further toward coconuts.`, false);
+    }
+  };
+}
+
+/* ---------------- Phase 4: mission 3, technology shock ---------------- */
+function startPhaseMission3(){
+  const P = PHASES[4];
+  missionTag.textContent = P.label;
+  missionTitle.textContent = P.title;
+  missionText.textContent = 'A trade ship just sold your island a better fishing net. Fishing output per worker just went up, coconut gathering did not change at all. Slide around and compare the new solid curve to the faded old one, then answer below.';
+  hintText.textContent = '';
+  hideChoices();
+  hideFeedback();
+  idleWorkers = 0;
+  const oldFrontier = frontierPathString(kFish, kCoconut, TOTAL_WORKERS);
+  kFish = 18; // the shock
+  fishWorkers = 12;
+  trailPoints = [];
+  const draw = () => {
+    const r = updateReadout();
+    pushTrail(r.c, r.f);
+    renderGraph(r.F, r.C, { oldFrontier });
+  };
+  mainSliderControl(draw);
+  draw();
+  actionBtn.textContent = 'Continue';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    actionBtn.disabled = true;
+    showChoices([
+      'The new curve stretched outward on the fish axis only, so this is growth from a fishing specific improvement',
+      'The new curve stretched outward on both axes evenly, so this is general economy wide growth',
+      'The curve did not move at all',
+    ], (i, btn) => {
+      lockChoices();
+      if (i === 0){
+        btn.classList.add('correct');
+        showFeedback('<strong>Right.</strong> Notice the coconut axis endpoint did not move. Only the fish end of the curve stretched out, which is exactly what you would expect from a technology upgrade that only helps fishing.', true);
+        awardPoints('p5', 20);
+      } else {
+        btn.classList.add('wrong');
+        choicesWrap.children[0].classList.add('correct');
+        showFeedback('Look again at where the curve meets the coconut axis. It did not move, only the fish end did, so this is growth specific to fishing rather than the whole economy.', false);
+        awardPoints('p5', 10);
+      }
+      actionBtn.disabled = false;
+      actionBtn.textContent = 'Final mission →';
+      actionBtn.onclick = () => { phaseIndex = 5; setProgress(); startPhaseMission4(); };
+    });
+  };
+}
+
+/* ---------------- Phase 5: mission 4, negative shock ---------------- */
+function startPhaseMission4(){
+  const P = PHASES[5];
+  missionTag.textContent = P.label;
+  missionTitle.textContent = P.title;
+  missionText.textContent = 'A storm just damaged the coconut groves, so coconut output per worker is down. Your fishing boat upgrade from before still stands. Find any allocation where fish output plus coconut output together add up to at least 65.';
+  hintText.textContent = 'Hint: putting everyone on fishing alone will not be enough this time.';
+  hideChoices();
+  hideFeedback();
+  idleWorkers = 0;
+  const oldFrontier = frontierPathString(kFish, kCoconut, TOTAL_WORKERS);
+  kFish = 12; // fishing boat effect reset to baseline for a clean second shock
+  kCoconut = 7; // the storm
+  fishWorkers = 16;
+  trailPoints = [];
+  const draw = () => {
+    const r = updateReadout();
+    pushTrail(r.c, r.f);
+    renderGraph(r.F, r.C, { oldFrontier });
+  };
+  mainSliderControl(draw);
+  draw();
+  actionBtn.textContent = 'Check this point';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    const f = fishWorkers, c = 24 - f;
+    const F = fishOutput(f), C = coconutOutput(c);
+    if (F + C >= 65){
+      showFeedback(`<strong>You found it.</strong> Fish ${F} plus coconuts ${C} equals ${F+C}. Putting every worker on fishing alone would only have given you ${fishOutput(24)} total, so spreading workers across both goods was the only way to clear 65.`, true);
+      awardPoints('p6', 20);
+      actionBtn.textContent = 'See my results →';
+      actionBtn.onclick = finishGame;
+    } else {
+      showFeedback(`Fish ${F} plus coconuts ${C} equals ${F+C}, you need at least 65. Try a different split.`, false);
+    }
+  };
+}
+
+/* ---------------- End screen ---------------- */
+function finishGame(){
+  document.getElementById('gameScreen').classList.add('hidden');
+  const endScreen = document.getElementById('endScreen');
+  endScreen.classList.remove('hidden');
+  progressFill.style.width = '100%';
+  document.getElementById('finalScore').textContent = score;
+  let tier = 'Bronze, keep practicing';
+  if (score >= 90) tier = '🏆 Platinum, frontier master';
+  else if (score >= 75) tier = '🥇 Gold, strong grasp';
+  else if (score >= 55) tier = '🥈 Silver, solid effort';
+  document.getElementById('tierLabel').textContent = tier;
+  const labels = {
+    p2: 'Reading a point off the frontier',
+    p3: 'Hitting a target combination',
+    p4: 'Naming an opportunity cost',
+    p5: 'Reading a one axis shift',
+    p6: 'Solving a resource shock',
+  };
+  const rows = Object.keys(labels).map(k => {
+    const pts = phaseScores[k] !== undefined ? phaseScores[k] : 0;
+    return `<div><span>${labels[k]}</span><span>${pts} / 20</span></div>`;
+  }).join('');
+  document.getElementById('breakdown').innerHTML = rows;
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  setProgress();
+  startPhaseWarmup();
+});
+document.getElementById('replayBtn').addEventListener('click', () => location.reload());
+</script>
+</body>
+</html>

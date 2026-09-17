@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Machine, Chapter 2: Markets and the Economy</title>
+<style>
+  :root{
+    --teal:#0f6a75;
+    --teal-dark:#0a4c54;
+    --gold:#e0a63a;
+    --coral:#e35d5d;
+    --mint:#2fae7a;
+    --sand:#f2d9a1;
+    --bg1:#0a4c54;
+    --card:#ffffff;
+    --ink:#12333a;
+    --muted:#5c7d82;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 800px at 20% -10%, #1c8b93 0%, var(--bg1) 45%, #062f34 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    color:var(--ink);
+  }
+  .wrap{ width:100%; max-width:820px; }
+  .shell{
+    background:var(--card);
+    border-radius:20px;
+    box-shadow:0 30px 60px rgba(0,0,0,0.35), 0 2px 0 rgba(255,255,255,0.4) inset;
+    overflow:hidden;
+    position:relative;
+  }
+  .topbar{
+    background:linear-gradient(120deg,var(--teal) 0%, var(--teal-dark) 100%);
+    color:white;
+    padding:16px 22px 14px;
+  }
+  .topbar .kicker{ font-size:12px; letter-spacing:.14em; text-transform:uppercase; opacity:.8; margin:0 0 4px; }
+  .topbar h1{ margin:0; font-size:21px; font-weight:800; }
+  .stats{ display:flex; gap:12px; margin-top:12px; font-size:13px; flex-wrap:wrap; }
+  .pill{ background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.25); padding:5px 12px; border-radius:999px; display:flex; align-items:center; gap:6px; font-weight:600; }
+  .progress-track{ height:8px; background:rgba(255,255,255,0.18); border-radius:999px; margin-top:12px; overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#f6cf7f); border-radius:999px; transition:width .45s ease; }
+
+  .stage{ padding:22px 24px 22px; display:flex; flex-direction:column; gap:16px; }
+  @media (min-width:640px){ .stage{ flex-direction:row; } }
+
+  .graphcol{ flex:0 0 auto; }
+  .panelcol{ flex:1 1 auto; display:flex; flex-direction:column; min-width:0; }
+
+  .missiontag{ display:inline-block; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); background:#e6f3f2; padding:4px 10px; border-radius:999px; margin-bottom:10px; width:fit-content; }
+  .missiontitle{ font-size:17px; font-weight:800; margin:0 0 6px; line-height:1.35; }
+  .missiontext{ font-size:14px; line-height:1.55; color:var(--muted); margin:0 0 12px; }
+  .readout{ display:flex; gap:10px; margin:6px 0 14px; flex-wrap:wrap; }
+  .readbox{ background:#f3f8f8; border-radius:12px; padding:8px 14px; font-size:13px; text-align:center; min-width:78px; }
+  .readbox b{ display:block; font-size:19px; color:var(--ink); }
+  .sliderrow{ margin:4px 0 10px; }
+  .sliderrow label{ display:block; font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+  input[type=range]{ width:100%; accent-color:var(--teal); }
+  .choices{ display:grid; gap:8px; margin:10px 0; }
+  .choicebtn{ text-align:left; padding:10px 14px; border-radius:10px; border:2px solid #e2edee; background:#fbfeff; font-size:13.5px; font-weight:600; color:var(--ink); cursor:pointer; }
+  .choicebtn:hover{ border-color:var(--teal); }
+  .choicebtn.correct{ background:#e7f8ef; border-color:var(--mint); color:#1c6b47; }
+  .choicebtn.wrong{ background:#fdecec; border-color:var(--coral); color:#a13636; }
+  .choicebtn[disabled]{ cursor:default; }
+  .feedback{ margin-top:6px; padding:11px 13px; border-radius:10px; background:#f3f8f8; font-size:13.5px; line-height:1.5; color:var(--muted); display:none; }
+  .feedback strong{ color:var(--ink); }
+  .feedback.ok{ background:#e7f8ef; color:#1c6b47; }
+  .feedback.ok strong{ color:#1c6b47; }
+  .actions{ margin-top:auto; padding-top:12px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  button.primary{
+    background:var(--teal); color:white; border:none; padding:11px 20px; border-radius:12px;
+    font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 8px 18px rgba(15,106,117,0.35);
+  }
+  button.primary:hover{ background:var(--teal-dark); }
+  button.primary[disabled]{ opacity:.4; cursor:default; box-shadow:none; }
+  button.ghost{ background:none; border:2px solid #cfe0e1; color:var(--teal-dark); padding:9px 16px; border-radius:12px; font-weight:700; cursor:pointer; font-size:13px; }
+  .hint{ font-size:12px; color:var(--muted); }
+
+  .panel{ padding:36px 28px 30px; text-align:center; }
+  .panel h2{ font-size:23px; margin:6px 0 8px; }
+  .panel p.lead{ color:var(--muted); font-size:14.5px; line-height:1.6; max-width:480px; margin:0 auto 20px; }
+  .badge{ width:80px;height:80px; border-radius:50%; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:34px; background:linear-gradient(135deg,var(--gold),#f2c463); box-shadow:0 10px 24px rgba(224,166,58,0.45); }
+  .startbtn{ background:linear-gradient(120deg,var(--gold),#eab545); color:#3c2a06; border:none; padding:13px 28px; border-radius:14px; font-size:15.5px; font-weight:800; cursor:pointer; box-shadow:0 12px 26px rgba(224,166,58,0.4); }
+  .startbtn:hover{ filter:brightness(1.05); }
+  .rules{ text-align:left; max-width:460px; margin:0 auto 24px; background:#f3f8f8; border-radius:14px; padding:15px 20px; font-size:13px; color:var(--muted); line-height:1.7; }
+  .rules b{ color:var(--ink); }
+
+  .resultcard{ background:linear-gradient(160deg,#0f6a75,#0a4c54); color:white; border-radius:18px; padding:24px 22px 20px; margin:6px 0 18px; }
+  .resultcard .name{ font-size:13px; letter-spacing:.12em; text-transform:uppercase; opacity:.75; }
+  .resultcard .score{ font-size:50px; font-weight:900; margin:6px 0 2px; }
+  .resultcard .outof{ font-size:14px; opacity:.75; margin-bottom:14px; }
+  .tier{ display:inline-block; margin-top:14px; padding:6px 16px; border-radius:999px; font-weight:800; font-size:13px; background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.3); }
+  .breakdown{ text-align:left; max-width:420px; margin:0 auto 18px; font-size:13.5px; }
+  .breakdown div{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eef4f4; }
+  .howto{ background:#fff7e8; border:1px solid #f1dcae; border-radius:14px; padding:14px 18px; font-size:13.5px; color:#6b4f14; text-align:left; line-height:1.6; margin-bottom:18px; }
+  .howto b{ color:#4a3506; }
+  .replay{ background:none; border:2px solid #cfe0e1; color:var(--teal-dark); padding:10px 22px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; }
+  .hidden{ display:none !important; }
+  .footer-note{ text-align:center; color:rgba(255,255,255,0.55); font-size:12px; margin-top:12px; }
+  svg text{ font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+
+  /* ---- Chapter 2 specific graph styles ---- */
+  .dualgraph{ display:flex; gap:10px; flex-wrap:wrap; }
+  .townbox{ text-align:center; }
+  .townname{ font-size:12px; font-weight:800; color:var(--teal-dark); margin-bottom:4px; }
+  .gapbox{ margin-top:10px; padding:8px 12px; border-radius:10px; font-size:13px; font-weight:700; text-align:center; }
+  .gapbox.shortage{ background:#fdecec; color:#a13636; }
+  .gapbox.surplus{ background:#eaf1fb; color:#2a5aa0; }
+  .gapbox.balanced{ background:#e7f8ef; color:#1c6b47; }
+  .flowarrow{ cursor:pointer; }
+  .flownode rect{ fill:#f3f8f8; stroke:#c9dadb; stroke-width:1.5; }
+  .flownode text{ font-size:9.5px; fill:var(--ink); font-weight:700; text-anchor:middle; }
+
+  @media (max-width:640px){
+    .dualgraph{ justify-content:center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="shell" id="shell">
+
+    <!-- START SCREEN -->
+    <div class="panel" id="startScreen">
+      <div class="badge">🏪</div>
+      <h2>Market Machine</h2>
+      <p class="lead"><b>Chapter 2, Markets and the Economy.</b> Two neighboring towns, a trade deal to strike, a price to discover, and a loop of money to trace. Nothing here is a quiz. You run the towns, drag the sliders, and watch the market do what markets do.</p>
+      <div class="rules">
+        <div><b>🏘️ Two towns, two goods.</b> Rivertown and Laketown each split their workers between bread and furniture. Their trade-offs are different, and that difference is the whole point.</div>
+        <div><b>💱 Trade changes what's possible.</b> On their own, each town is stuck on its own frontier. Trade at the right rate and both towns end up with more than they could make alone.</div>
+        <div><b>📸 Screenshot the results screen</b> when you finish and upload it for credit.</div>
+      </div>
+      <button class="startbtn" id="startBtn">Open for business →</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div class="hidden" id="gameScreen">
+      <div class="topbar">
+        <p class="kicker">Market Machine · Chapter 2</p>
+        <h1>Markets and the Economy</h1>
+        <div class="stats">
+          <div class="pill">🎯 Score: <span id="scoreLabel">0</span> / 100</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="stage">
+        <div class="graphcol">
+          <div id="graphArea"></div>
+        </div>
+        <div class="panelcol">
+          <div class="missiontag" id="missionTag">Getting started</div>
+          <p class="missiontitle" id="missionTitle"></p>
+          <p class="missiontext" id="missionText"></p>
+
+          <div class="readout" id="readout"></div>
+
+          <div id="controls"></div>
+
+          <div class="choices hidden" id="choicesWrap"></div>
+
+          <div class="feedback" id="feedback"></div>
+
+          <div class="actions">
+            <span class="hint" id="hintText"></span>
+            <button class="primary" id="actionBtn">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div class="hidden panel" id="endScreen">
+      <div class="resultcard">
+        <div class="name">Market Machine, Results</div>
+        <div class="score" id="finalScore">0</div>
+        <div class="outof">out of 100 points</div>
+        <div class="tier" id="tierLabel">Tier</div>
+      </div>
+      <div class="breakdown" id="breakdown"></div>
+      <div class="howto"><b>📸 One more step.</b> Take a screenshot of this results card with your score visible, then upload it to the Chapter 2 game assignment in Blackboard (or wherever your instructor has you submit it).</div>
+      <button class="replay" id="replayBtn">Reopen the towns</button>
+      <p class="footer-note">ECO 120 · Survey of Economics · Chapter 2 Game</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   MARKET MACHINE, a chapter 2 simulator covering specialization and trade,
+   the price system, and the circular flow, not a quiz. Every mission is
+   solved by manipulating a live simulation and watching what happens.
+   No login, no data collection, no network calls of any kind.
+   ========================================================================== */
+
+/* ---------------- Town production data ---------------- */
+// Each worker produces EITHER bread OR furniture, at a constant rate, so
+// opportunity cost is constant and each town's frontier is a straight line.
+const WORKERS = 12;
+const RIVER = { name: 'Rivertown', breadRate: 4, furnRate: 2 };   // opp cost of furniture = 2 bread
+const LAKE  = { name: 'Laketown',  breadRate: 8, furnRate: 6 };   // opp cost of furniture = 1.33 bread
+
+function townOutput(town, furnWorkers){
+  const breadWorkers = WORKERS - furnWorkers;
+  return { bread: breadWorkers * town.breadRate, furniture: furnWorkers * town.furnRate };
+}
+function townMax(town){
+  return { maxBread: WORKERS * town.breadRate, maxFurniture: WORKERS * town.furnRate };
+}
+
+const AXIS_MAX_FURN = 80;
+const AXIS_MAX_BREAD = 100;
+
+function smallPPFSvg(id, town, furnWorkers, extraPoint){
+  const out = townOutput(town, furnWorkers);
+  const max = townMax(town);
+  const W = 150, H = 150, left = 34, top = 10, w = 104, h = 110;
+  const toX = f => left + (f / AXIS_MAX_FURN) * w;
+  const toY = b => top + h - (b / AXIS_MAX_BREAD) * h;
+  let parts = [];
+  parts.push(`<line x1="${left}" y1="${top}" x2="${left}" y2="${top+h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<line x1="${left}" y1="${top+h}" x2="${left+w}" y2="${top+h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<text x="${left+w/2}" y="${top+h+14}" font-size="8.5" fill="#5c7d82" text-anchor="middle">Furniture</text>`);
+  parts.push(`<text x="9" y="${top+h/2}" font-size="8.5" fill="#5c7d82" text-anchor="middle" transform="rotate(-90 9 ${top+h/2})">Bread</text>`);
+  parts.push(`<line x1="${toX(0)}" y1="${toY(max.maxBread)}" x2="${toX(max.maxFurniture)}" y2="${toY(0)}" stroke="#9fc9cc" stroke-width="2.5"/>`);
+  if (extraPoint){
+    parts.push(`<circle cx="${toX(extraPoint.furniture)}" cy="${toY(extraPoint.bread)}" r="5" fill="none" stroke="#e0a63a" stroke-width="2.5"/>`);
+  }
+  parts.push(`<circle cx="${toX(out.furniture)}" cy="${toY(out.bread)}" r="6" fill="#e35d5d" stroke="white" stroke-width="2"/>`);
+  return `<div class="townbox"><div class="townname">${town.name}</div><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${parts.join('')}</svg>
+    <div style="font-size:11px;color:var(--muted)">Bread ${out.bread} &middot; Furniture ${out.furniture}</div></div>`;
+}
+
+const graphArea = document.getElementById('graphArea');
+
+/* ---------------- Phase state ---------------- */
+let phaseIndex = 0;
+let score = 0;
+const phaseScores = {};
+let riverFurn = 3;   // Rivertown workers on furniture (of 12)
+let lakeFurn = 3;    // Laketown workers on furniture (of 12)
+
+const missionTag = document.getElementById('missionTag');
+const missionTitle = document.getElementById('missionTitle');
+const missionText = document.getElementById('missionText');
+const readout = document.getElementById('readout');
+const controls = document.getElementById('controls');
+const choicesWrap = document.getElementById('choicesWrap');
+const feedback = document.getElementById('feedback');
+const actionBtn = document.getElementById('actionBtn');
+const hintText = document.getElementById('hintText');
+const progressFill = document.getElementById('progressFill');
+const scoreLabel = document.getElementById('scoreLabel');
+
+const PHASES = [
+  { key: 'p0', label: 'Warmup', title: 'Meet the two towns', points: 0 },
+  { key: 'p1', label: 'Mission 1 of 4', title: 'Specialize', points: 25 },
+  { key: 'p2', label: 'Mission 2 of 4', title: 'Strike a fair trade', points: 25 },
+  { key: 'p3', label: 'Mission 3 of 4', title: 'Find the market price', points: 25 },
+  { key: 'p4', label: 'Mission 4 of 4', title: 'Trace the flow', points: 25 },
+];
+
+function setProgress(){ progressFill.style.width = `${(phaseIndex / PHASES.length) * 100}%`; }
+function awardPoints(key, pts){
+  if (phaseScores[key] === undefined){
+    phaseScores[key] = pts; score += pts; scoreLabel.textContent = score;
+  }
+}
+function showChoices(options, onPick){
+  choicesWrap.classList.remove('hidden'); choicesWrap.innerHTML = '';
+  options.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'choicebtn'; b.textContent = opt;
+    b.addEventListener('click', () => onPick(i, b));
+    choicesWrap.appendChild(b);
+  });
+}
+function hideChoices(){ choicesWrap.classList.add('hidden'); choicesWrap.innerHTML = ''; }
+function lockChoices(){ choicesWrap.querySelectorAll('.choicebtn').forEach(b => b.disabled = true); }
+function showFeedback(html, ok){
+  feedback.style.display = 'block';
+  feedback.className = 'feedback' + (ok ? ' ok' : '');
+  feedback.innerHTML = html;
+}
+function hideFeedback(){ feedback.style.display = 'none'; feedback.innerHTML = ''; }
+
+/* ---------------- Phase 0: warmup ---------------- */
+function startPhaseWarmup(){
+  missionTag.textContent = PHASES[0].label;
+  missionTitle.textContent = PHASES[0].title;
+  missionText.textContent = 'Rivertown and Laketown each have 12 workers, split between baking bread and building furniture. Slide each town\'s workforce and watch its own frontier and its own point on that frontier.';
+  hintText.textContent = ''; hideChoices(); hideFeedback();
+  riverFurn = 3; lakeFurn = 3;
+  const draw = () => {
+    graphArea.innerHTML = `<div class="dualgraph">${smallPPFSvg('river', RIVER, riverFurn)}${smallPPFSvg('lake', LAKE, lakeFurn)}</div>`;
+    const r = townOutput(RIVER, riverFurn), l = townOutput(LAKE, lakeFurn);
+    readout.innerHTML = `
+      <div class="readbox">River bread<b>${r.bread}</b></div>
+      <div class="readbox">River furniture<b>${r.furniture}</b></div>
+      <div class="readbox">Lake bread<b>${l.bread}</b></div>
+      <div class="readbox">Lake furniture<b>${l.furniture}</b></div>`;
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Rivertown workers on furniture: <span id="rNum">${riverFurn}</span> of 12</label>
+      <input type="range" min="0" max="12" step="1" value="${riverFurn}" id="rSlider"></div>
+    <div class="sliderrow"><label>Laketown workers on furniture: <span id="lNum">${lakeFurn}</span> of 12</label>
+      <input type="range" min="0" max="12" step="1" value="${lakeFurn}" id="lSlider"></div>`;
+  document.getElementById('rSlider').addEventListener('input', e => { riverFurn = +e.target.value; document.getElementById('rNum').textContent = riverFurn; draw(); });
+  document.getElementById('lSlider').addEventListener('input', e => { lakeFurn = +e.target.value; document.getElementById('lNum').textContent = lakeFurn; draw(); });
+  draw();
+  actionBtn.textContent = "I've explored enough, start the missions →";
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => { phaseIndex = 1; setProgress(); startPhaseSpecialize(); };
+}
+
+/* ---------------- Phase 1: specialize ---------------- */
+function startPhaseSpecialize(){
+  const P = PHASES[1];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = "Laketown's workers out-produce Rivertown's at both goods. Even so, each town gives up less by focusing on one good. Rivertown gives up only 2 bread per furniture, Laketown gives up 1.33. Set Rivertown to all bread and Laketown to all furniture, their comparative advantage goods, then check in.";
+  hintText.textContent = ''; hideChoices(); hideFeedback();
+  riverFurn = 3; lakeFurn = 3;
+  const draw = () => {
+    graphArea.innerHTML = `<div class="dualgraph">${smallPPFSvg('river', RIVER, riverFurn)}${smallPPFSvg('lake', LAKE, lakeFurn)}</div>`;
+    const r = townOutput(RIVER, riverFurn), l = townOutput(LAKE, lakeFurn);
+    readout.innerHTML = `
+      <div class="readbox">River bread<b>${r.bread}</b></div>
+      <div class="readbox">River furniture<b>${r.furniture}</b></div>
+      <div class="readbox">Lake bread<b>${l.bread}</b></div>
+      <div class="readbox">Lake furniture<b>${l.furniture}</b></div>`;
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Rivertown workers on furniture: <span id="rNum">${riverFurn}</span> of 12</label>
+      <input type="range" min="0" max="12" step="1" value="${riverFurn}" id="rSlider"></div>
+    <div class="sliderrow"><label>Laketown workers on furniture: <span id="lNum">${lakeFurn}</span> of 12</label>
+      <input type="range" min="0" max="12" step="1" value="${lakeFurn}" id="lSlider"></div>`;
+  document.getElementById('rSlider').addEventListener('input', e => { riverFurn = +e.target.value; document.getElementById('rNum').textContent = riverFurn; draw(); });
+  document.getElementById('lSlider').addEventListener('input', e => { lakeFurn = +e.target.value; document.getElementById('lNum').textContent = lakeFurn; draw(); });
+  draw();
+  actionBtn.textContent = 'Check specialization';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    if (riverFurn === 0 && lakeFurn === 12){
+      const r = townOutput(RIVER, 0), l = townOutput(LAKE, 12);
+      showFeedback(`<strong>That's full specialization.</strong> Rivertown makes ${r.bread} bread and no furniture. Laketown makes ${l.furniture} furniture and no bread. Between them the world now has ${r.bread} bread and ${l.furniture} furniture, but neither town has both goods yet.`, true);
+      awardPoints('p1', 25);
+      actionBtn.textContent = 'Next mission →';
+      actionBtn.onclick = () => { phaseIndex = 2; setProgress(); startPhaseTrade(); };
+    } else {
+      showFeedback('Not quite full specialization yet. Move Rivertown\'s slider all the way to 0 and Laketown\'s slider all the way to 12.', false);
+    }
+  };
+}
+
+/* ---------------- Phase 2: trade ---------------- */
+function startPhaseTrade(){
+  const P = PHASES[2];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = "Rivertown will ship 24 loaves of bread to Laketown. In return, Laketown ships back furniture at a trade rate you choose, in loaves of bread per piece of furniture. Slide the rate until both towns end up with more of both goods than they could have made alone.";
+  hintText.textContent = 'Rivertown\'s own cost is 2 bread per furniture. Laketown\'s own cost is 1.33 bread per furniture. A fair rate sits between the two.';
+  hideChoices(); hideFeedback();
+  let rate = 1.6;
+  const BREAD_TRADED = 24;
+  const draw = () => {
+    const furnReceived = Math.round((BREAD_TRADED / rate) * 10) / 10;
+    const riverAfter = { bread: 48 - BREAD_TRADED, furniture: furnReceived };
+    const lakeAfter = { bread: 0 + BREAD_TRADED, furniture: 72 - furnReceived };
+    graphArea.innerHTML = `<div class="dualgraph">
+      ${smallPPFSvg('river', RIVER, 0, riverAfter)}
+      ${smallPPFSvg('lake', LAKE, 12, lakeAfter)}
+    </div>`;
+    readout.innerHTML = `
+      <div class="readbox">Trade rate<b>${rate.toFixed(1)}</b></div>
+      <div class="readbox">River gets<b>+${furnReceived} furn.</b></div>
+      <div class="readbox">Lake gets<b>+${BREAD_TRADED} bread</b></div>
+      <div class="readbox">Lake gives<b>${furnReceived} furn.</b></div>`;
+    return { furnReceived, riverAfter, lakeAfter };
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Trade rate, bread per furniture: <span id="rateNum">${rate.toFixed(1)}</span></label>
+      <input type="range" min="1.0" max="2.5" step="0.1" value="${rate}" id="rateSlider"></div>`;
+  document.getElementById('rateSlider').addEventListener('input', e => { rate = +e.target.value; document.getElementById('rateNum').textContent = rate.toFixed(1); draw(); });
+  draw();
+  actionBtn.textContent = 'Check this rate';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    if (rate >= 1.4 && rate <= 1.9){
+      const info = draw();
+      showFeedback(`<strong>That rate works for both.</strong> Rivertown now has furniture it never made itself, and only gave up bread at a better rate than making furniture would have cost at home. Laketown picked up bread cheaper than growing it themselves would cost. Both gold rings sit outside each town's own frontier.`, true);
+      actionBtn.disabled = true;
+      showChoices([
+        'This works because Laketown is simply better at making everything',
+        'This works because each town specialized in the good where it gives up the least, its comparative advantage',
+        'This works because both towns have identical opportunity costs',
+      ], (i, btn) => {
+        lockChoices();
+        if (i === 1){
+          btn.classList.add('correct');
+          showFeedback('<strong>Right.</strong> Comparative advantage, not who is bigger or more productive overall, is what makes trade pay off for both sides.', true);
+          awardPoints('p2', 25);
+        } else {
+          btn.classList.add('wrong');
+          choicesWrap.children[1].classList.add('correct');
+          showFeedback('The reason is comparative advantage: each town gives up less of the other good by specializing, regardless of which town is more productive overall.', false);
+          awardPoints('p2', 15);
+        }
+        actionBtn.disabled = false;
+        actionBtn.textContent = 'Next mission →';
+        actionBtn.onclick = () => { phaseIndex = 3; setProgress(); startPhasePrice(); };
+      });
+    } else {
+      showFeedback(`At ${rate.toFixed(1)} bread per furniture, one side is worse off than producing it at home. Move the rate between Laketown's cost (1.33) and Rivertown's cost (2.0).`, false);
+    }
+  };
+}
+
+/* ---------------- Phase 3: market price ---------------- */
+function sdChartSvg(price){
+  const Qd = Math.max(0, 100 - 4 * price);
+  const Qs = Math.max(0, -20 + 6 * price);
+  const left = 40, top = 12, w = 190, h = 190, W = 260, H = 220;
+  const toX = q => left + (q / 100) * w;
+  const toY = p => top + h - (p / 20) * h;
+  let parts = [];
+  parts.push(`<line x1="${left}" y1="${top}" x2="${left}" y2="${top+h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<line x1="${left}" y1="${top+h}" x2="${left+w}" y2="${top+h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<text x="${left+w/2}" y="${top+h+16}" font-size="10" fill="#5c7d82" text-anchor="middle">Quantity</text>`);
+  parts.push(`<text x="12" y="${top+h/2}" font-size="10" fill="#5c7d82" text-anchor="middle" transform="rotate(-90 12 ${top+h/2})">Price</text>`);
+  // demand line: Q=100-4P -> at P=0,Q=100; at P=20,Q=20
+  parts.push(`<line x1="${toX(100)}" y1="${toY(0)}" x2="${toX(20)}" y2="${toY(20)}" stroke="#e35d5d" stroke-width="2.5"/>`);
+  parts.push(`<text x="${toX(100)+4}" y="${toY(0)-4}" font-size="9" fill="#a13636">Demand</text>`);
+  // supply line: Q=-20+6P -> at P=3.33,Q=0; at P=20,Q=100
+  parts.push(`<line x1="${toX(0)}" y1="${toY(3.33)}" x2="${toX(100)}" y2="${toY(20)}" stroke="#2fae7a" stroke-width="2.5"/>`);
+  parts.push(`<text x="${toX(100)-38}" y="${toY(20)-6}" font-size="9" fill="#1c6b47">Supply</text>`);
+  // current price line
+  parts.push(`<line x1="${left}" y1="${toY(price)}" x2="${left+w}" y2="${toY(price)}" stroke="#e0a63a" stroke-width="1.5" stroke-dasharray="4,3"/>`);
+  parts.push(`<circle cx="${toX(Qd)}" cy="${toY(price)}" r="5" fill="#e35d5d" stroke="white" stroke-width="1.5"/>`);
+  parts.push(`<circle cx="${toX(Qs)}" cy="${toY(price)}" r="5" fill="#2fae7a" stroke="white" stroke-width="1.5"/>`);
+  return { svg: `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${parts.join('')}</svg>`, Qd, Qs };
+}
+function startPhasePrice(){
+  const P = PHASES[3];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = 'This is the market for Tools. Nobody sets the price by decree, buyers and sellers just react to it. Slide the price and watch quantity demanded and quantity supplied move apart or together. Find the price where they land on exactly the same number.';
+  hintText.textContent = ''; hideChoices(); hideFeedback();
+  let price = 8;
+  const draw = () => {
+    const { svg, Qd, Qs } = sdChartSvg(price);
+    graphArea.innerHTML = svg;
+    const gap = Qd - Qs;
+    let gapLabel, gapClass;
+    if (Math.abs(gap) < 0.5){ gapLabel = 'Balanced, quantity demanded equals quantity supplied'; gapClass = 'balanced'; }
+    else if (gap > 0){ gapLabel = `Shortage of ${Math.round(gap)} units, buyers want more than sellers offer`; gapClass = 'shortage'; }
+    else { gapLabel = `Surplus of ${Math.round(-gap)} units, sellers offer more than buyers want`; gapClass = 'surplus'; }
+    readout.innerHTML = `
+      <div class="readbox">Price<b>$${price}</b></div>
+      <div class="readbox">Qty demanded<b>${Math.round(Qd)}</b></div>
+      <div class="readbox">Qty supplied<b>${Math.round(Qs)}</b></div>`;
+    controls.querySelector('.gapbox')?.remove();
+    const gapDiv = document.createElement('div');
+    gapDiv.className = `gapbox ${gapClass}`;
+    gapDiv.textContent = gapLabel;
+    controls.appendChild(gapDiv);
+    return { Qd, Qs };
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Price per Tool: $<span id="priceNum">${price}</span></label>
+      <input type="range" min="5" max="20" step="1" value="${price}" id="priceSlider"></div>`;
+  document.getElementById('priceSlider').addEventListener('input', e => { price = +e.target.value; document.getElementById('priceNum').textContent = price; draw(); });
+  draw();
+  actionBtn.textContent = 'Check this price';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    if (price === 12){
+      showFeedback('<strong>That\'s the market-clearing price.</strong> At $12, quantity demanded and quantity supplied both land on 52. Nobody had to set that price on purpose, a shortage below it pushes price up, a surplus above it pushes price down, until it settles right here.', true);
+      awardPoints('p3', 25);
+      actionBtn.disabled = true;
+      showChoices([
+        'If sellers priced Tools at $8 instead, the shortage would push the price down further',
+        'If sellers priced Tools at $8 instead, the shortage would push the price up toward $12',
+      ], (i, btn) => {
+        lockChoices();
+        if (i === 1){
+          btn.classList.add('correct');
+          showFeedback('<strong>Right.</strong> A shortage means buyers are willing to pay more than the current price, which bids the price upward until it clears.', true);
+        } else {
+          btn.classList.add('wrong');
+          choicesWrap.children[1].classList.add('correct');
+          showFeedback('A shortage pushes price up, not down. Buyers who cannot get a Tool at $8 start offering more, and price rises toward $12.', false);
+        }
+        actionBtn.disabled = false;
+        actionBtn.textContent = 'Final mission →';
+        actionBtn.onclick = () => { phaseIndex = 4; setProgress(); startPhaseFlow(); };
+      });
+    } else {
+      const { Qd, Qs } = draw();
+      showFeedback(`At $${price}, quantity demanded is ${Math.round(Qd)} and quantity supplied is ${Math.round(Qs)}, not equal yet. Keep adjusting the price.`, false);
+    }
+  };
+}
+
+/* ---------------- Phase 4: circular flow ---------------- */
+const FLOW_ORDER = ['A', 'B', 'C', 'D'];
+let flowProgress = 0;
+function flowDiagramSvg(){
+  const nodes = {
+    H: { x: 60, y: 40, label: 'Households' },
+    PM: { x: 210, y: 40, label: 'Product Market' },
+    F: { x: 210, y: 190, label: 'Firms' },
+    FM: { x: 60, y: 190, label: 'Factor Market' },
+  };
+  const arrows = {
+    A: { from: 'H', to: 'PM', mid: [135, 30] },
+    B: { from: 'PM', to: 'F', mid: [225, 115] },
+    C: { from: 'F', to: 'FM', mid: [135, 200] },
+    D: { from: 'FM', to: 'H', mid: [45, 115] },
+  };
+  let parts = [];
+  Object.entries(arrows).forEach(([key, a]) => {
+    const n1 = nodes[a.from], n2 = nodes[a.to];
+    const done = FLOW_ORDER.indexOf(key) < flowProgress;
+    const isNext = FLOW_ORDER[flowProgress] === key;
+    const color = done ? '#2fae7a' : (isNext ? '#e0a63a' : '#c9dadb');
+    parts.push(`<line x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="${color}" stroke-width="${done||isNext?4:3}" class="flowarrow" data-key="${key}"/>`);
+    parts.push(`<circle cx="${a.mid[0]}" cy="${a.mid[1]}" r="9" fill="${color}" opacity="0.15" class="flowarrow" data-key="${key}"/>`);
+  });
+  Object.entries(nodes).forEach(([key, n]) => {
+    parts.push(`<g class="flownode"><rect x="${n.x-42}" y="${n.y-16}" width="84" height="32" rx="8"/><text x="${n.x}" y="${n.y+4}">${n.label}</text></g>`);
+  });
+  return `<svg width="270" height="230" viewBox="0 0 270 230">${parts.join('')}</svg>`;
+}
+function startPhaseFlow(){
+  const P = PHASES[4];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = "You buy bread from a Rivertown bakery. Trace where your money actually goes: click the four arrows in order, starting from Households, to follow it all the way around the loop and back to where it started.";
+  hintText.textContent = 'Money and goods move in opposite directions around this loop.';
+  hideChoices(); hideFeedback();
+  flowProgress = 0;
+  const draw = () => { graphArea.innerHTML = flowDiagramSvg(); wireFlowClicks(); };
+  function wireFlowClicks(){
+    graphArea.querySelectorAll('.flowarrow').forEach(el => {
+      el.addEventListener('click', () => {
+        const key = el.getAttribute('data-key');
+        if (key === FLOW_ORDER[flowProgress]){
+          flowProgress++;
+          draw();
+          if (flowProgress === FLOW_ORDER.length){
+            showFeedback('<strong>That\'s the full loop.</strong> Your money moved Households to Product Market to Firms to Factor Market and back to Households, paying wages along the way. The bread itself, and your labor, move around the loop in the opposite direction.', true);
+            awardPoints('p4', 25);
+            actionBtn.disabled = false;
+            actionBtn.textContent = 'See my results →';
+            actionBtn.onclick = finishGame;
+          }
+        } else {
+          showFeedback('Not the next step yet. Follow the loop in order: Households, Product Market, Firms, Factor Market, back to Households.', false);
+        }
+      });
+    });
+  }
+  controls.innerHTML = '';
+  readout.innerHTML = `<div class="readbox">Steps traced<b id="stepCount">0 / 4</b></div>`;
+  const origDraw = draw;
+  draw();
+  const obs = new MutationObserver(() => { const el = document.getElementById('stepCount'); if (el) el.textContent = `${flowProgress} / 4`; });
+  obs.observe(graphArea, { childList: true, subtree: true });
+  actionBtn.textContent = 'Trace all four to continue';
+  actionBtn.disabled = true;
+}
+
+/* ---------------- End screen ---------------- */
+function finishGame(){
+  document.getElementById('gameScreen').classList.add('hidden');
+  const endScreen = document.getElementById('endScreen');
+  endScreen.classList.remove('hidden');
+  progressFill.style.width = '100%';
+  document.getElementById('finalScore').textContent = score;
+  let tier = 'Bronze, keep practicing';
+  if (score >= 90) tier = '🏆 Platinum, market master';
+  else if (score >= 75) tier = '🥇 Gold, strong grasp';
+  else if (score >= 55) tier = '🥈 Silver, solid effort';
+  document.getElementById('tierLabel').textContent = tier;
+  const labels = {
+    p1: 'Specializing by comparative advantage',
+    p2: 'Striking a mutually beneficial trade rate',
+    p3: 'Finding the market clearing price',
+    p4: 'Tracing the circular flow',
+  };
+  const rows = Object.keys(labels).map(k => {
+    const pts = phaseScores[k] !== undefined ? phaseScores[k] : 0;
+    return `<div><span>${labels[k]}</span><span>${pts} / 25</span></div>`;
+  }).join('');
+  document.getElementById('breakdown').innerHTML = rows;
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  setProgress();
+  startPhaseWarmup();
+});
+document.getElementById('replayBtn').addEventListener('click', () => location.reload());
+</script>
+</body>
+</html>

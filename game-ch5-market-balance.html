@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Balance, Chapter 5: Market Equilibrium</title>
+<style>
+  :root{
+    --teal:#0f6a75;
+    --teal-dark:#0a4c54;
+    --gold:#e0a63a;
+    --coral:#e35d5d;
+    --mint:#2fae7a;
+    --sand:#f2d9a1;
+    --bg1:#0a4c54;
+    --card:#ffffff;
+    --ink:#12333a;
+    --muted:#5c7d82;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 800px at 20% -10%, #1c8b93 0%, var(--bg1) 45%, #062f34 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    color:var(--ink);
+  }
+  .wrap{ width:100%; max-width:820px; }
+  .shell{
+    background:var(--card);
+    border-radius:20px;
+    box-shadow:0 30px 60px rgba(0,0,0,0.35), 0 2px 0 rgba(255,255,255,0.4) inset;
+    overflow:hidden;
+    position:relative;
+  }
+  .topbar{
+    background:linear-gradient(120deg,var(--teal) 0%, var(--teal-dark) 100%);
+    color:white;
+    padding:16px 22px 14px;
+  }
+  .topbar .kicker{ font-size:12px; letter-spacing:.14em; text-transform:uppercase; opacity:.8; margin:0 0 4px; }
+  .topbar h1{ margin:0; font-size:21px; font-weight:800; }
+  .stats{ display:flex; gap:12px; margin-top:12px; font-size:13px; flex-wrap:wrap; }
+  .pill{ background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.25); padding:5px 12px; border-radius:999px; display:flex; align-items:center; gap:6px; font-weight:600; }
+  .progress-track{ height:8px; background:rgba(255,255,255,0.18); border-radius:999px; margin-top:12px; overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#f6cf7f); border-radius:999px; transition:width .45s ease; }
+
+  .stage{ padding:22px 24px 22px; display:flex; flex-direction:column; gap:16px; }
+  @media (min-width:640px){ .stage{ flex-direction:row; } }
+
+  .graphcol{ flex:0 0 auto; }
+  .panelcol{ flex:1 1 auto; display:flex; flex-direction:column; min-width:0; }
+
+  .missiontag{ display:inline-block; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); background:#e6f3f2; padding:4px 10px; border-radius:999px; margin-bottom:10px; width:fit-content; }
+  .missiontitle{ font-size:17px; font-weight:800; margin:0 0 6px; line-height:1.35; }
+  .missiontext{ font-size:14px; line-height:1.55; color:var(--muted); margin:0 0 12px; }
+  .readout{ display:flex; gap:10px; margin:6px 0 14px; flex-wrap:wrap; }
+  .readbox{ background:#f3f8f8; border-radius:12px; padding:8px 14px; font-size:13px; text-align:center; min-width:78px; }
+  .readbox b{ display:block; font-size:19px; color:var(--ink); }
+  .sliderrow{ margin:4px 0 10px; }
+  .sliderrow label{ display:block; font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+  input[type=range]{ width:100%; accent-color:var(--teal); }
+  .choices{ display:grid; gap:8px; margin:10px 0; }
+  .choicebtn{ text-align:left; padding:10px 14px; border-radius:10px; border:2px solid #e2edee; background:#fbfeff; font-size:13.5px; font-weight:600; color:var(--ink); cursor:pointer; }
+  .choicebtn:hover{ border-color:var(--teal); }
+  .choicebtn.correct{ background:#e7f8ef; border-color:var(--mint); color:#1c6b47; }
+  .choicebtn.wrong{ background:#fdecec; border-color:var(--coral); color:#a13636; }
+  .choicebtn[disabled]{ cursor:default; }
+  .feedback{ margin-top:6px; padding:11px 13px; border-radius:10px; background:#f3f8f8; font-size:13.5px; line-height:1.5; color:var(--muted); display:none; }
+  .feedback strong{ color:var(--ink); }
+  .feedback.ok{ background:#e7f8ef; color:#1c6b47; }
+  .feedback.ok strong{ color:#1c6b47; }
+  .actions{ margin-top:auto; padding-top:12px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  button.primary{
+    background:var(--teal); color:white; border:none; padding:11px 20px; border-radius:12px;
+    font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 8px 18px rgba(15,106,117,0.35);
+  }
+  button.primary:hover{ background:var(--teal-dark); }
+  button.primary[disabled]{ opacity:.4; cursor:default; box-shadow:none; }
+  button.ghost{ background:none; border:2px solid #cfe0e1; color:var(--teal-dark); padding:9px 16px; border-radius:12px; font-weight:700; cursor:pointer; font-size:13px; }
+  .hint{ font-size:12px; color:var(--muted); }
+
+  .panel{ padding:36px 28px 30px; text-align:center; }
+  .panel h2{ font-size:23px; margin:6px 0 8px; }
+  .panel p.lead{ color:var(--muted); font-size:14.5px; line-height:1.6; max-width:480px; margin:0 auto 20px; }
+  .badge{ width:80px;height:80px; border-radius:50%; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:34px; background:linear-gradient(135deg,var(--gold),#f2c463); box-shadow:0 10px 24px rgba(224,166,58,0.45); }
+  .startbtn{ background:linear-gradient(120deg,var(--gold),#eab545); color:#3c2a06; border:none; padding:13px 28px; border-radius:14px; font-size:15.5px; font-weight:800; cursor:pointer; box-shadow:0 12px 26px rgba(224,166,58,0.4); }
+  .startbtn:hover{ filter:brightness(1.05); }
+  .rules{ text-align:left; max-width:460px; margin:0 auto 24px; background:#f3f8f8; border-radius:14px; padding:15px 20px; font-size:13px; color:var(--muted); line-height:1.7; }
+  .rules b{ color:var(--ink); }
+
+  .resultcard{ background:linear-gradient(160deg,#0f6a75,#0a4c54); color:white; border-radius:18px; padding:24px 22px 20px; margin:6px 0 18px; }
+  .resultcard .name{ font-size:13px; letter-spacing:.12em; text-transform:uppercase; opacity:.75; }
+  .resultcard .score{ font-size:50px; font-weight:900; margin:6px 0 2px; }
+  .resultcard .outof{ font-size:14px; opacity:.75; margin-bottom:14px; }
+  .tier{ display:inline-block; margin-top:14px; padding:6px 16px; border-radius:999px; font-weight:800; font-size:13px; background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.3); }
+  .breakdown{ text-align:left; max-width:420px; margin:0 auto 18px; font-size:13.5px; }
+  .breakdown div{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eef4f4; }
+  .howto{ background:#fff7e8; border:1px solid #f1dcae; border-radius:14px; padding:14px 18px; font-size:13.5px; color:#6b4f14; text-align:left; line-height:1.6; margin-bottom:18px; }
+  .howto b{ color:#4a3506; }
+  .replay{ background:none; border:2px solid #cfe0e1; color:var(--teal-dark); padding:10px 22px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; }
+  .hidden{ display:none !important; }
+  .footer-note{ text-align:center; color:rgba(255,255,255,0.55); font-size:12px; margin-top:12px; }
+  svg text{ font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+
+  /* ---- Chapter 5 specific styles ---- */
+  .togglegrid{ display:flex; flex-direction:column; gap:6px; margin:6px 0 4px; }
+  .togglebtn{
+    text-align:left; padding:8px 12px; border-radius:10px; border:2px solid #e2edee;
+    background:#fbfeff; font-size:12.5px; font-weight:600; color:var(--ink); cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .togglebtn .tstate{ font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+  .togglebtn.active{ background:#fff7e8; border-color:var(--gold); }
+  .togglebtn.active .tstate{ color:#a5761f; font-weight:800; }
+  .gapbox{ margin-top:8px; padding:8px 12px; border-radius:10px; font-size:13px; font-weight:700; text-align:center; }
+  .gapbox.shortage{ background:#fdecec; color:#a13636; }
+  .gapbox.surplus{ background:#eaf1fb; color:#2a5aa0; }
+  .gapbox.balanced{ background:#e7f8ef; color:#1c6b47; }
+  .gapbox.match{ background:#e7f8ef; color:#1c6b47; }
+
+  @media (max-width:640px){
+    .togglebtn{ font-size:12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="shell" id="shell">
+
+    <!-- START SCREEN -->
+    <div class="panel" id="startScreen">
+      <div class="badge">⚖️</div>
+      <h2>Market Balance</h2>
+      <p class="lead"><b>Chapter 5, Market Equilibrium.</b> Same iced coffee stand, buyers and sellers on the same graph now. Find the one price where nobody is turned away and nothing goes unsold, see what a shortage or surplus actually looks like, and discover why that one price also happens to create the most total value for everyone. Nothing here is a quiz.</p>
+      <div class="rules">
+        <div><b>⚖️ Equilibrium.</b> The price where quantity demanded exactly equals quantity supplied, no shortage, no surplus.</div>
+        <div><b>🥧 Surplus.</b> Consumer surplus is what buyers gain, producer surplus is what sellers gain. Together they measure the total value a market creates.</div>
+        <div><b>📸 Screenshot the results screen</b> when you finish and upload it for credit.</div>
+      </div>
+      <button class="startbtn" id="startBtn">Open the market →</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div class="hidden" id="gameScreen">
+      <div class="topbar">
+        <p class="kicker">Market Balance · Chapter 5</p>
+        <h1>Market Equilibrium</h1>
+        <div class="stats">
+          <div class="pill">🎯 Score: <span id="scoreLabel">0</span> / 100</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="stage">
+        <div class="graphcol">
+          <div id="graphArea"></div>
+        </div>
+        <div class="panelcol">
+          <div class="missiontag" id="missionTag">Getting started</div>
+          <p class="missiontitle" id="missionTitle"></p>
+          <p class="missiontext" id="missionText"></p>
+
+          <div class="readout" id="readout"></div>
+
+          <div id="controls"></div>
+
+          <div class="choices hidden" id="choicesWrap"></div>
+
+          <div class="feedback" id="feedback"></div>
+
+          <div class="actions">
+            <span class="hint" id="hintText"></span>
+            <button class="primary" id="actionBtn">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div class="hidden panel" id="endScreen">
+      <div class="resultcard">
+        <div class="name">Market Balance, Results</div>
+        <div class="score" id="finalScore">0</div>
+        <div class="outof">out of 100 points</div>
+        <div class="tier" id="tierLabel">Tier</div>
+      </div>
+      <div class="breakdown" id="breakdown"></div>
+      <div class="howto"><b>📸 One more step.</b> Take a screenshot of this results card with your score visible, then upload it to the Chapter 5 game assignment in Blackboard (or wherever your instructor has you submit it).</div>
+      <button class="replay" id="replayBtn">Reopen the market</button>
+      <p class="footer-note">ECO 120 · Survey of Economics · Chapter 5 Game</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   MARKET BALANCE, a chapter 5 simulator covering market equilibrium,
+   shortage and surplus, and consumer and producer surplus. Not a quiz.
+   Every mission is solved by manipulating a live simulation and watching
+   what happens. No login, no data collection, no network calls of any kind.
+   ========================================================================== */
+
+/* ---------------- Demand and supply model ---------------- */
+// Same iced coffee stand as chapters 3 and 4. Qd = 100 - 5P, Qs = -10 + 5P.
+// Equilibrium: 100-5P = -10+5P -> P = 11, Q = 45.
+function baseQd(price, shift){ return Math.max(0, 100 - 5 * price + (shift||0)); }
+function baseQs(price, shift){ return Math.max(0, -10 + 5 * price + (shift||0)); }
+const EQ_PRICE = 11, EQ_QTY = 45;
+
+const D_TOGGLES = { heatWave: { label: 'Heat wave forecast for next week', effect: 20 } };
+const S_TOGGLES = { beanPriceUp: { label: 'Coffee bean prices just rose', effect: -10 } };
+
+const AXIS_MAX_Q = 100;
+const AXIS_MAX_P = 20;
+const PLOT = { left: 42, top: 12, w: 210, h: 190 };
+function toX(q){ return PLOT.left + (q / AXIS_MAX_Q) * PLOT.w; }
+function toY(p){ return PLOT.top + PLOT.h - (p / AXIS_MAX_P) * PLOT.h; }
+
+function demandPath(shiftD){
+  const qAtP0 = Math.min(AXIS_MAX_Q, 100 + shiftD);
+  const pAtQ0 = Math.max(0, (100 + shiftD) / 5);
+  return `M ${toX(qAtP0)},${toY(0)} L ${toX(0)},${toY(Math.min(AXIS_MAX_P, pAtQ0))}`;
+}
+function supplyPath(shiftS){
+  const pAtQ0 = Math.max(0, (10 - shiftS) / 5);
+  const qAtPmax = Math.max(0, -10 + 5 * AXIS_MAX_P + shiftS);
+  return `M ${toX(0)},${toY(Math.min(AXIS_MAX_P, pAtQ0))} L ${toX(Math.min(AXIS_MAX_Q, qAtPmax))},${toY(AXIS_MAX_P)}`;
+}
+function findEquilibrium(shiftD, shiftS){
+  // 100-5P+shiftD = -10+5P+shiftS -> P = (110+shiftD-shiftS)/10
+  const p = (110 + shiftD - shiftS) / 10;
+  const q = baseQd(p, shiftD);
+  return { price: p, qty: Math.round(q * 10) / 10 };
+}
+
+function marketChartSvg(opts){
+  opts = opts || {};
+  const shiftD = opts.shiftD || 0, shiftS = opts.shiftS || 0;
+  const price = opts.price;
+  let parts = [];
+  parts.push(`<line x1="${PLOT.left}" y1="${PLOT.top}" x2="${PLOT.left}" y2="${PLOT.top+PLOT.h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<line x1="${PLOT.left}" y1="${PLOT.top+PLOT.h}" x2="${PLOT.left+PLOT.w}" y2="${PLOT.top+PLOT.h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<text x="${PLOT.left+PLOT.w/2}" y="${PLOT.top+PLOT.h+16}" font-size="10" fill="#5c7d82" text-anchor="middle">Cups per day</text>`);
+  parts.push(`<text x="12" y="${PLOT.top+PLOT.h/2}" font-size="10" fill="#5c7d82" text-anchor="middle" transform="rotate(-90 12 ${PLOT.top+PLOT.h/2})">Price</text>`);
+
+  if (opts.surplusAt !== undefined){
+    const P = opts.surplusAt;
+    const qd = baseQd(P, 0), qs = baseQs(P, 0);
+    const qTraded = Math.min(qd, qs);
+    const pdAtQ = 20 - qTraded / 5;
+    const psAtQ = 2 + qTraded / 5;
+    // consumer surplus polygon: (0,P) -> (0,20) -> (qTraded, pdAtQ) -> (qTraded, P)
+    const csPts = [ [0,P], [0,20], [qTraded,pdAtQ], [qTraded,P] ].map(pt => `${toX(pt[0])},${toY(pt[1])}`).join(' ');
+    parts.push(`<polygon points="${csPts}" fill="#0f6a75" opacity="0.18"/>`);
+    // producer surplus polygon: (0,2) -> (0,P) -> (qTraded,P) -> (qTraded, psAtQ)
+    const psPts = [ [0,2], [0,P], [qTraded,P], [qTraded,psAtQ] ].map(pt => `${toX(pt[0])},${toY(pt[1])}`).join(' ');
+    parts.push(`<polygon points="${psPts}" fill="#2fae7a" opacity="0.18"/>`);
+  }
+
+  parts.push(`<path d="${demandPath(shiftD)}" fill="none" stroke="#e35d5d" stroke-width="2.5"/>`);
+  parts.push(`<text x="${toX(2)}" y="${toY(19)}" font-size="9" fill="#a13636">Demand</text>`);
+  parts.push(`<path d="${supplyPath(shiftS)}" fill="none" stroke="#2fae7a" stroke-width="2.5"/>`);
+  parts.push(`<text x="${toX(2)}" y="${toY(2.6)}" font-size="9" fill="#1c6b47">Supply</text>`);
+
+  if (price !== undefined){
+    const qd = baseQd(price, shiftD), qs = baseQs(price, shiftS);
+    parts.push(`<line x1="${PLOT.left}" y1="${toY(price)}" x2="${PLOT.left+PLOT.w}" y2="${toY(price)}" stroke="#e0a63a" stroke-width="1.5" stroke-dasharray="4,3"/>`);
+    parts.push(`<circle cx="${toX(qd)}" cy="${toY(price)}" r="6" fill="#e35d5d" stroke="white" stroke-width="1.5"/>`);
+    parts.push(`<circle cx="${toX(qs)}" cy="${toY(price)}" r="6" fill="#2fae7a" stroke="white" stroke-width="1.5"/>`);
+  }
+  return `<svg width="270" height="230" viewBox="0 0 270 230">${parts.join('')}</svg>`;
+}
+
+function surplusAt(price){
+  const qd = baseQd(price, 0), qs = baseQs(price, 0);
+  const q = Math.min(qd, qs);
+  const cs = (20 - price) * q - (q * q) / 10;
+  const ps = (price - 2) * q - (q * q) / 10;
+  return { q, cs: Math.max(0, cs), ps: Math.max(0, ps), total: Math.max(0, cs) + Math.max(0, ps) };
+}
+
+const graphArea = document.getElementById('graphArea');
+const missionTag = document.getElementById('missionTag');
+const missionTitle = document.getElementById('missionTitle');
+const missionText = document.getElementById('missionText');
+const readout = document.getElementById('readout');
+const controls = document.getElementById('controls');
+const choicesWrap = document.getElementById('choicesWrap');
+const feedback = document.getElementById('feedback');
+const actionBtn = document.getElementById('actionBtn');
+const hintText = document.getElementById('hintText');
+const progressFill = document.getElementById('progressFill');
+const scoreLabel = document.getElementById('scoreLabel');
+
+let phaseIndex = 0;
+let score = 0;
+const phaseScores = {};
+
+const PHASES = [
+  { key: 'p0', label: 'Warmup', title: 'Meet both curves at once', points: 0 },
+  { key: 'p1', label: 'Mission 1 of 4', title: 'Find equilibrium', points: 25 },
+  { key: 'p2', label: 'Mission 2 of 4', title: 'Hit the target gap', points: 25 },
+  { key: 'p3', label: 'Mission 3 of 4', title: 'Maximize total surplus', points: 25 },
+  { key: 'p4', label: 'Mission 4 of 4', title: 'Shock the market', points: 25 },
+];
+
+function setProgress(){ progressFill.style.width = `${(phaseIndex / PHASES.length) * 100}%`; }
+function awardPoints(key, pts){
+  if (phaseScores[key] === undefined){
+    phaseScores[key] = pts; score += pts; scoreLabel.textContent = score;
+  }
+}
+function showChoices(options, onPick){
+  choicesWrap.classList.remove('hidden'); choicesWrap.innerHTML = '';
+  options.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'choicebtn'; b.textContent = opt;
+    b.addEventListener('click', () => onPick(i, b));
+    choicesWrap.appendChild(b);
+  });
+}
+function hideChoices(){ choicesWrap.classList.add('hidden'); choicesWrap.innerHTML = ''; }
+function lockChoices(){ choicesWrap.querySelectorAll('.choicebtn').forEach(b => b.disabled = true); }
+function showFeedback(html, ok){
+  feedback.style.display = 'block';
+  feedback.className = 'feedback' + (ok ? ' ok' : '');
+  feedback.innerHTML = html;
+}
+function hideFeedback(){ feedback.style.display = 'none'; feedback.innerHTML = ''; }
+
+/* ---------------- Phase 0: warmup ---------------- */
+function startPhaseWarmup(){
+  missionTag.textContent = PHASES[0].label; missionTitle.textContent = PHASES[0].title;
+  missionText.textContent = "Here are both curves for iced coffee at once, red for demand, green for supply. Drag the price slider and watch the two dots, one on each curve, move apart or together.";
+  hintText.textContent = ''; hideChoices(); hideFeedback();
+  let price = 8;
+  const draw = () => {
+    graphArea.innerHTML = marketChartSvg({ price });
+    readout.innerHTML = `
+      <div class="readbox">Price<b>$${price.toFixed(0)}</b></div>
+      <div class="readbox">Qty demanded<b>${baseQd(price,0)}</b></div>
+      <div class="readbox">Qty supplied<b>${baseQs(price,0)}</b></div>`;
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Price per cup: $<span id="priceNum">${price}</span></label>
+      <input type="range" min="0" max="20" step="1" value="${price}" id="priceSlider"></div>`;
+  document.getElementById('priceSlider').addEventListener('input', e => { price = +e.target.value; document.getElementById('priceNum').textContent = price; draw(); });
+  draw();
+  actionBtn.textContent = "I've got it, start the missions →";
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => { phaseIndex = 1; setProgress(); startPhaseEquilibrium(); };
+}
+
+/* ---------------- Phase 1: find equilibrium ---------------- */
+function startPhaseEquilibrium(){
+  const P = PHASES[1];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = "Find the one price where quantity demanded and quantity supplied land on exactly the same number, no shortage, no surplus.";
+  hintText.textContent = ''; hideChoices(); hideFeedback();
+  let price = 8;
+  const draw = () => {
+    graphArea.innerHTML = marketChartSvg({ price });
+    const qd = baseQd(price,0), qs = baseQs(price,0);
+    readout.innerHTML = `
+      <div class="readbox">Price<b>$${price.toFixed(0)}</b></div>
+      <div class="readbox">Qty demanded<b>${qd}</b></div>
+      <div class="readbox">Qty supplied<b>${qs}</b></div>`;
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Price per cup: $<span id="priceNum">${price}</span></label>
+      <input type="range" min="0" max="20" step="1" value="${price}" id="priceSlider"></div>`;
+  document.getElementById('priceSlider').addEventListener('input', e => { price = +e.target.value; document.getElementById('priceNum').textContent = price; draw(); });
+  draw();
+  actionBtn.textContent = 'Check this price';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    const qd = baseQd(price,0), qs = baseQs(price,0);
+    if (price === EQ_PRICE){
+      showFeedback(`<strong>That's equilibrium.</strong> At $${EQ_PRICE}, both quantity demanded and quantity supplied land on ${EQ_QTY}. Every buyer willing to pay $${EQ_PRICE} finds a cup, every seller willing to sell at $${EQ_PRICE} finds a buyer.`, true);
+      awardPoints('p1', 25);
+      actionBtn.textContent = 'Next mission →';
+      actionBtn.onclick = () => { phaseIndex = 2; setProgress(); startPhaseGap(); };
+    } else {
+      showFeedback(`At $${price}, quantity demanded is ${qd} and quantity supplied is ${qs}, not equal yet. Keep adjusting the price.`, false);
+    }
+  };
+}
+
+/* ---------------- Phase 2: hit the target gap ---------------- */
+function startPhaseGap(){
+  const P = PHASES[2];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = "Move away from equilibrium on purpose this time. Find a price where there is a surplus of exactly 20 cups, sellers offering 20 more than buyers want.";
+  hintText.textContent = ''; hideChoices(); hideFeedback();
+  let price = 8;
+  const draw = () => {
+    graphArea.innerHTML = marketChartSvg({ price });
+    const qd = baseQd(price,0), qs = baseQs(price,0);
+    const gap = qs - qd;
+    let label, cls;
+    if (Math.abs(gap) < 0.5){ label = 'Balanced'; cls = 'balanced'; }
+    else if (gap > 0){ label = `Surplus of ${Math.round(gap)}`; cls = 'surplus'; }
+    else { label = `Shortage of ${Math.round(-gap)}`; cls = 'shortage'; }
+    readout.innerHTML = `
+      <div class="readbox">Price<b>$${price.toFixed(0)}</b></div>
+      <div class="readbox">Qty demanded<b>${qd}</b></div>
+      <div class="readbox">Qty supplied<b>${qs}</b></div>`;
+    let box = controls.querySelector('.gapbox');
+    if (!box){ box = document.createElement('div'); box.className = 'gapbox'; controls.appendChild(box); }
+    box.className = 'gapbox ' + cls;
+    box.textContent = label;
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Price per cup: $<span id="priceNum">${price}</span></label>
+      <input type="range" min="0" max="20" step="1" value="${price}" id="priceSlider"></div>`;
+  document.getElementById('priceSlider').addEventListener('input', e => { price = +e.target.value; document.getElementById('priceNum').textContent = price; draw(); });
+  draw();
+  actionBtn.textContent = 'Check this price';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    const qd = baseQd(price,0), qs = baseQs(price,0);
+    const gap = qs - qd;
+    if (gap === 20){
+      showFeedback(`<strong>Exactly right.</strong> At $${price}, ${qs} cups are supplied but only ${qd} are demanded, a surplus of 20. Unsold coffee is exactly the pressure that pushes price back down toward equilibrium.`, true);
+      awardPoints('p2', 25);
+      actionBtn.textContent = 'Next mission →';
+      actionBtn.onclick = () => { phaseIndex = 3; setProgress(); startPhaseSurplus(); };
+    } else {
+      const desc = gap > 0 ? `a surplus of ${Math.round(gap)}` : (gap < 0 ? `a shortage of ${Math.round(-gap)}` : 'balanced');
+      showFeedback(`At $${price}, that's ${desc}, not the surplus of 20 you're after. Try a different price.`, false);
+    }
+  };
+}
+
+/* ---------------- Phase 3: maximize total surplus ---------------- */
+function startPhaseSurplus(){
+  const P = PHASES[3];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = "The blue shaded area is consumer surplus, what buyers gain. The green shaded area is producer surplus, what sellers gain. Slide the price and watch both areas change size. Find the price where their combined area is as large as it can be.";
+  hintText.textContent = '';
+  hideChoices(); hideFeedback();
+  let price = 6;
+  let bestTotal = 0;
+  const draw = () => {
+    graphArea.innerHTML = marketChartSvg({ price, surplusAt: price });
+    const s = surplusAt(price);
+    bestTotal = Math.max(bestTotal, s.total);
+    readout.innerHTML = `
+      <div class="readbox">Consumer surplus<b>$${s.cs.toFixed(0)}</b></div>
+      <div class="readbox">Producer surplus<b>$${s.ps.toFixed(0)}</b></div>
+      <div class="readbox">Total surplus<b>$${s.total.toFixed(0)}</b></div>`;
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Price per cup: $<span id="priceNum">${price}</span></label>
+      <input type="range" min="2" max="20" step="1" value="${price}" id="priceSlider"></div>`;
+  document.getElementById('priceSlider').addEventListener('input', e => { price = +e.target.value; document.getElementById('priceNum').textContent = price; draw(); });
+  draw();
+  actionBtn.textContent = 'Check this price';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    if (price === EQ_PRICE){
+      const s = surplusAt(price);
+      showFeedback(`<strong>Maximum total surplus.</strong> At the equilibrium price, total surplus is $${s.total.toFixed(0)}, split about evenly here between buyers and sellers. Move price either direction and some trades that used to make both sides better off stop happening, shrinking the total.`, true);
+      awardPoints('p3', 25);
+      actionBtn.textContent = 'Final mission →';
+      actionBtn.onclick = () => { phaseIndex = 4; setProgress(); startPhaseShock(); };
+    } else {
+      const s = surplusAt(price);
+      showFeedback(`At $${price}, total surplus is $${s.total.toFixed(0)}. Try sliding toward the price where quantity demanded and quantity supplied were equal back in mission 1.`, false);
+    }
+  };
+}
+
+/* ---------------- Phase 4: shock the market ---------------- */
+function startPhaseShock(){
+  const P = PHASES[4];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = "Toggle each shock below, one at a time, and watch where the new equilibrium point lands compared to the gold starting point.";
+  hintText.textContent = '';
+  hideChoices(); hideFeedback();
+  const active = { heatWave: false, beanPriceUp: false };
+  const baseEq = findEquilibrium(0, 0);
+  const draw = () => {
+    const shiftD = active.heatWave ? D_TOGGLES.heatWave.effect : 0;
+    const shiftS = active.beanPriceUp ? S_TOGGLES.beanPriceUp.effect : 0;
+    const eq = findEquilibrium(shiftD, shiftS);
+    graphArea.innerHTML = marketChartSvg({ shiftD, shiftS, price: eq.price }) +
+      `<div style="font-size:11px;color:var(--muted);text-align:center;margin-top:4px;">Gold dot below marks the original equilibrium, $${baseEq.price.toFixed(0)} at ${baseEq.qty} cups.</div>`;
+    readout.innerHTML = `
+      <div class="readbox">New price<b>$${eq.price.toFixed(1)}</b></div>
+      <div class="readbox">New quantity<b>${eq.qty}</b></div>`;
+  };
+  controls.innerHTML = `<div class="togglegrid" id="toggleGrid"></div>`;
+  const grid = document.getElementById('toggleGrid');
+  [['heatWave', D_TOGGLES], ['beanPriceUp', S_TOGGLES]].forEach(([key, source]) => {
+    const t = source[key];
+    const btn = document.createElement('button');
+    btn.className = 'togglebtn'; btn.type = 'button';
+    btn.innerHTML = `<span>${t.label}</span><span class="tstate">Off</span>`;
+    btn.addEventListener('click', () => {
+      active[key] = !active[key];
+      btn.classList.toggle('active', active[key]);
+      btn.querySelector('.tstate').textContent = active[key] ? 'On' : 'Off';
+      draw();
+    });
+    grid.appendChild(btn);
+  });
+  draw();
+  actionBtn.textContent = 'Continue';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    if (!active.heatWave || !active.beanPriceUp){
+      showFeedback('Toggle both shocks on at some point first, so you can compare their effects on the new equilibrium.', false);
+      return;
+    }
+    actionBtn.disabled = true;
+    showChoices([
+      'A rise in demand alone pushes equilibrium price up and quantity up; a drop in supply alone pushes equilibrium price up but quantity down',
+      'A rise in demand alone pushes equilibrium price down; a drop in supply alone pushes equilibrium price down too',
+      'Both shocks always move equilibrium price and quantity in exactly the same way',
+    ], (i, btn) => {
+      lockChoices();
+      if (i === 0){
+        btn.classList.add('correct');
+        showFeedback('<strong>Right.</strong> More demand pulls the equilibrium point up and to the right along supply. Less supply pushes it up and to the left along demand. Price rises either way, but quantity moves in opposite directions.', true);
+        awardPoints('p4', 25);
+      } else {
+        btn.classList.add('wrong');
+        choicesWrap.children[0].classList.add('correct');
+        showFeedback('Try toggling each shock alone and watching the quantity readout. A demand increase raises both price and quantity, a supply decrease raises price but lowers quantity.', false);
+        awardPoints('p4', 15);
+      }
+      actionBtn.disabled = false;
+      actionBtn.textContent = 'See my results →';
+      actionBtn.onclick = finishGame;
+    });
+  };
+}
+
+/* ---------------- End screen ---------------- */
+function finishGame(){
+  document.getElementById('gameScreen').classList.add('hidden');
+  const endScreen = document.getElementById('endScreen');
+  endScreen.classList.remove('hidden');
+  progressFill.style.width = '100%';
+  document.getElementById('finalScore').textContent = score;
+  let tier = 'Bronze, keep practicing';
+  if (score >= 90) tier = '🏆 Platinum, market master';
+  else if (score >= 75) tier = '🥇 Gold, strong grasp';
+  else if (score >= 55) tier = '🥈 Silver, solid effort';
+  document.getElementById('tierLabel').textContent = tier;
+  const labels = {
+    p1: 'Finding market equilibrium',
+    p2: 'Reading a shortage or surplus',
+    p3: 'Maximizing total surplus',
+    p4: 'Comparing demand and supply shocks',
+  };
+  const rows = Object.keys(labels).map(k => {
+    const pts = phaseScores[k] !== undefined ? phaseScores[k] : 0;
+    return `<div><span>${labels[k]}</span><span>${pts} / 25</span></div>`;
+  }).join('');
+  document.getElementById('breakdown').innerHTML = rows;
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  setProgress();
+  startPhaseWarmup();
+});
+document.getElementById('replayBtn').addEventListener('click', () => location.reload());
+</script>
+</body>
+</html>

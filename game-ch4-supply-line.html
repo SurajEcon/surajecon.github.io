@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supply Line, Chapter 4: Supply</title>
+<style>
+  :root{
+    --teal:#0f6a75;
+    --teal-dark:#0a4c54;
+    --gold:#e0a63a;
+    --coral:#e35d5d;
+    --mint:#2fae7a;
+    --sand:#f2d9a1;
+    --bg1:#0a4c54;
+    --card:#ffffff;
+    --ink:#12333a;
+    --muted:#5c7d82;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 800px at 20% -10%, #1c8b93 0%, var(--bg1) 45%, #062f34 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    color:var(--ink);
+  }
+  .wrap{ width:100%; max-width:820px; }
+  .shell{
+    background:var(--card);
+    border-radius:20px;
+    box-shadow:0 30px 60px rgba(0,0,0,0.35), 0 2px 0 rgba(255,255,255,0.4) inset;
+    overflow:hidden;
+    position:relative;
+  }
+  .topbar{
+    background:linear-gradient(120deg,var(--teal) 0%, var(--teal-dark) 100%);
+    color:white;
+    padding:16px 22px 14px;
+  }
+  .topbar .kicker{ font-size:12px; letter-spacing:.14em; text-transform:uppercase; opacity:.8; margin:0 0 4px; }
+  .topbar h1{ margin:0; font-size:21px; font-weight:800; }
+  .stats{ display:flex; gap:12px; margin-top:12px; font-size:13px; flex-wrap:wrap; }
+  .pill{ background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.25); padding:5px 12px; border-radius:999px; display:flex; align-items:center; gap:6px; font-weight:600; }
+  .progress-track{ height:8px; background:rgba(255,255,255,0.18); border-radius:999px; margin-top:12px; overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#f6cf7f); border-radius:999px; transition:width .45s ease; }
+
+  .stage{ padding:22px 24px 22px; display:flex; flex-direction:column; gap:16px; }
+  @media (min-width:640px){ .stage{ flex-direction:row; } }
+
+  .graphcol{ flex:0 0 auto; }
+  .panelcol{ flex:1 1 auto; display:flex; flex-direction:column; min-width:0; }
+
+  .missiontag{ display:inline-block; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); background:#e6f3f2; padding:4px 10px; border-radius:999px; margin-bottom:10px; width:fit-content; }
+  .missiontitle{ font-size:17px; font-weight:800; margin:0 0 6px; line-height:1.35; }
+  .missiontext{ font-size:14px; line-height:1.55; color:var(--muted); margin:0 0 12px; }
+  .readout{ display:flex; gap:10px; margin:6px 0 14px; flex-wrap:wrap; }
+  .readbox{ background:#f3f8f8; border-radius:12px; padding:8px 14px; font-size:13px; text-align:center; min-width:78px; }
+  .readbox b{ display:block; font-size:19px; color:var(--ink); }
+  .sliderrow{ margin:4px 0 10px; }
+  .sliderrow label{ display:block; font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+  input[type=range]{ width:100%; accent-color:var(--teal); }
+  .choices{ display:grid; gap:8px; margin:10px 0; }
+  .choicebtn{ text-align:left; padding:10px 14px; border-radius:10px; border:2px solid #e2edee; background:#fbfeff; font-size:13.5px; font-weight:600; color:var(--ink); cursor:pointer; }
+  .choicebtn:hover{ border-color:var(--teal); }
+  .choicebtn.correct{ background:#e7f8ef; border-color:var(--mint); color:#1c6b47; }
+  .choicebtn.wrong{ background:#fdecec; border-color:var(--coral); color:#a13636; }
+  .choicebtn[disabled]{ cursor:default; }
+  .feedback{ margin-top:6px; padding:11px 13px; border-radius:10px; background:#f3f8f8; font-size:13.5px; line-height:1.5; color:var(--muted); display:none; }
+  .feedback strong{ color:var(--ink); }
+  .feedback.ok{ background:#e7f8ef; color:#1c6b47; }
+  .feedback.ok strong{ color:#1c6b47; }
+  .actions{ margin-top:auto; padding-top:12px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  button.primary{
+    background:var(--teal); color:white; border:none; padding:11px 20px; border-radius:12px;
+    font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 8px 18px rgba(15,106,117,0.35);
+  }
+  button.primary:hover{ background:var(--teal-dark); }
+  button.primary[disabled]{ opacity:.4; cursor:default; box-shadow:none; }
+  button.ghost{ background:none; border:2px solid #cfe0e1; color:var(--teal-dark); padding:9px 16px; border-radius:12px; font-weight:700; cursor:pointer; font-size:13px; }
+  .hint{ font-size:12px; color:var(--muted); }
+
+  .panel{ padding:36px 28px 30px; text-align:center; }
+  .panel h2{ font-size:23px; margin:6px 0 8px; }
+  .panel p.lead{ color:var(--muted); font-size:14.5px; line-height:1.6; max-width:480px; margin:0 auto 20px; }
+  .badge{ width:80px;height:80px; border-radius:50%; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:34px; background:linear-gradient(135deg,var(--gold),#f2c463); box-shadow:0 10px 24px rgba(224,166,58,0.45); }
+  .startbtn{ background:linear-gradient(120deg,var(--gold),#eab545); color:#3c2a06; border:none; padding:13px 28px; border-radius:14px; font-size:15.5px; font-weight:800; cursor:pointer; box-shadow:0 12px 26px rgba(224,166,58,0.4); }
+  .startbtn:hover{ filter:brightness(1.05); }
+  .rules{ text-align:left; max-width:460px; margin:0 auto 24px; background:#f3f8f8; border-radius:14px; padding:15px 20px; font-size:13px; color:var(--muted); line-height:1.7; }
+  .rules b{ color:var(--ink); }
+
+  .resultcard{ background:linear-gradient(160deg,#0f6a75,#0a4c54); color:white; border-radius:18px; padding:24px 22px 20px; margin:6px 0 18px; }
+  .resultcard .name{ font-size:13px; letter-spacing:.12em; text-transform:uppercase; opacity:.75; }
+  .resultcard .score{ font-size:50px; font-weight:900; margin:6px 0 2px; }
+  .resultcard .outof{ font-size:14px; opacity:.75; margin-bottom:14px; }
+  .tier{ display:inline-block; margin-top:14px; padding:6px 16px; border-radius:999px; font-weight:800; font-size:13px; background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.3); }
+  .breakdown{ text-align:left; max-width:420px; margin:0 auto 18px; font-size:13.5px; }
+  .breakdown div{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eef4f4; }
+  .howto{ background:#fff7e8; border:1px solid #f1dcae; border-radius:14px; padding:14px 18px; font-size:13.5px; color:#6b4f14; text-align:left; line-height:1.6; margin-bottom:18px; }
+  .howto b{ color:#4a3506; }
+  .replay{ background:none; border:2px solid #cfe0e1; color:var(--teal-dark); padding:10px 22px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; }
+  .hidden{ display:none !important; }
+  .footer-note{ text-align:center; color:rgba(255,255,255,0.55); font-size:12px; margin-top:12px; }
+  svg text{ font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+
+  /* ---- Chapter 4 specific styles ---- */
+  .togglegrid{ display:flex; flex-direction:column; gap:6px; margin:6px 0 4px; }
+  .togglebtn{
+    text-align:left; padding:8px 12px; border-radius:10px; border:2px solid #e2edee;
+    background:#fbfeff; font-size:12.5px; font-weight:600; color:var(--ink); cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .togglebtn .tstate{ font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+  .togglebtn.active{ background:#fff7e8; border-color:var(--gold); }
+  .togglebtn.active .tstate{ color:#a5761f; font-weight:800; }
+  .shiftreadout{ margin-top:8px; padding:8px 12px; border-radius:10px; background:#f3f8f8; font-size:13px; font-weight:700; text-align:center; }
+  .shiftreadout.match{ background:#e7f8ef; color:#1c6b47; }
+  .profitbox{ margin-top:8px; padding:8px 12px; border-radius:10px; font-size:13px; font-weight:700; text-align:center; }
+  .profitbox.up{ background:#e7f8ef; color:#1c6b47; }
+  .profitbox.down{ background:#fdecec; color:#a13636; }
+  .profitbox.peak{ background:#fff7e8; color:#a5761f; }
+
+  @media (max-width:640px){
+    .togglebtn{ font-size:12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="shell" id="shell">
+
+    <!-- START SCREEN -->
+    <div class="panel" id="startScreen">
+      <div class="badge">☕</div>
+      <h2>Supply Line</h2>
+      <p class="lead"><b>Chapter 4, Supply.</b> Same iced coffee stand, now from behind the counter. Drag the price and watch how much you're willing to sell along one curve. Change something else, bean prices, a new machine, a new tax, and the whole curve moves. Then decide, cup by cup, when it stops being worth making another.</p>
+      <div class="rules">
+        <div><b>🎯 Move along the curve.</b> A price change slides you to a different point on the same supply curve.</div>
+        <div><b>↔️ Shift the whole curve.</b> Everything else, input costs, technology, competitors, taxes, moves the entire curve left or right.</div>
+        <div><b>📸 Screenshot the results screen</b> when you finish and upload it for credit.</div>
+      </div>
+      <button class="startbtn" id="startBtn">Step behind the counter →</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div class="hidden" id="gameScreen">
+      <div class="topbar">
+        <p class="kicker">Supply Line · Chapter 4</p>
+        <h1>Supply</h1>
+        <div class="stats">
+          <div class="pill">🎯 Score: <span id="scoreLabel">0</span> / 100</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="stage">
+        <div class="graphcol">
+          <div id="graphArea"></div>
+        </div>
+        <div class="panelcol">
+          <div class="missiontag" id="missionTag">Getting started</div>
+          <p class="missiontitle" id="missionTitle"></p>
+          <p class="missiontext" id="missionText"></p>
+
+          <div class="readout" id="readout"></div>
+
+          <div id="controls"></div>
+
+          <div class="choices hidden" id="choicesWrap"></div>
+
+          <div class="feedback" id="feedback"></div>
+
+          <div class="actions">
+            <span class="hint" id="hintText"></span>
+            <button class="primary" id="actionBtn">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div class="hidden panel" id="endScreen">
+      <div class="resultcard">
+        <div class="name">Supply Line, Results</div>
+        <div class="score" id="finalScore">0</div>
+        <div class="outof">out of 100 points</div>
+        <div class="tier" id="tierLabel">Tier</div>
+      </div>
+      <div class="breakdown" id="breakdown"></div>
+      <div class="howto"><b>📸 One more step.</b> Take a screenshot of this results card with your score visible, then upload it to the Chapter 4 game assignment in Blackboard (or wherever your instructor has you submit it).</div>
+      <button class="replay" id="replayBtn">Reopen the counter</button>
+      <p class="footer-note">ECO 120 · Survey of Economics · Chapter 4 Game</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   SUPPLY LINE, a chapter 4 simulator covering the law of supply, the
+   determinants of supply, and producer decisions at the margin. Not a
+   quiz. Every mission is solved by manipulating a live simulation and
+   watching what happens. No login, no data collection, no network calls
+   of any kind.
+   ========================================================================== */
+
+/* ---------------- Supply model ---------------- */
+// Base law of supply: Qs = -10 + 5P (zero below $2). A price change moves
+// you along this line. The toggles below add a fixed shift to the whole
+// line, moving it left or right without touching price at all.
+function baseQs(price, shift){ return Math.max(0, -10 + 5 * price + shift); }
+
+const TOGGLES = {
+  inputCostUp:   { label: 'Coffee bean prices just rose',        effect: -15 },
+  techUp:        { label: 'A faster new espresso machine arrived', effect: 20 },
+  sellersUp:     { label: 'A new competing stand just opened',    effect: 25 },
+  taxUp:         { label: 'The city added a $1 per cup tax',      effect: -20 },
+  expectPriceUp: { label: 'You expect prices to rise next month', effect: -10 },
+};
+
+const AXIS_MAX_Q = 100;
+const AXIS_MAX_P = 20;
+const PLOT = { left: 42, top: 12, w: 210, h: 190 };
+function toX(q){ return PLOT.left + (q / AXIS_MAX_Q) * PLOT.w; }
+function toY(p){ return PLOT.top + PLOT.h - (p / AXIS_MAX_P) * PLOT.h; }
+
+function supplyLinePath(shift){
+  // Qs = -10 + 5P + shift => P = (Qs + 10 - shift) / 5
+  const pAtQ0 = Math.max(0, (10 - shift) / 5);
+  const qAtPmax = Math.max(0, -10 + 5 * AXIS_MAX_P + shift);
+  return `M ${toX(0)},${toY(Math.min(AXIS_MAX_P, pAtQ0))} L ${toX(Math.min(AXIS_MAX_Q, qAtPmax))},${toY(AXIS_MAX_P)}`;
+}
+
+function supplyChartSvg(opts){
+  opts = opts || {};
+  const shift = opts.shift || 0;
+  const price = opts.price;
+  let parts = [];
+  parts.push(`<line x1="${PLOT.left}" y1="${PLOT.top}" x2="${PLOT.left}" y2="${PLOT.top+PLOT.h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<line x1="${PLOT.left}" y1="${PLOT.top+PLOT.h}" x2="${PLOT.left+PLOT.w}" y2="${PLOT.top+PLOT.h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<text x="${PLOT.left+PLOT.w/2}" y="${PLOT.top+PLOT.h+16}" font-size="10" fill="#5c7d82" text-anchor="middle">Cups per day</text>`);
+  parts.push(`<text x="12" y="${PLOT.top+PLOT.h/2}" font-size="10" fill="#5c7d82" text-anchor="middle" transform="rotate(-90 12 ${PLOT.top+PLOT.h/2})">Price</text>`);
+  if (opts.ghostShift !== undefined){
+    parts.push(`<path d="${supplyLinePath(opts.ghostShift)}" fill="none" stroke="#c9dadb" stroke-width="2" stroke-dasharray="4,4"/>`);
+  }
+  if (opts.targetShift !== undefined){
+    parts.push(`<path d="${supplyLinePath(opts.targetShift)}" fill="none" stroke="#e0a63a" stroke-width="2" stroke-dasharray="3,3"/>`);
+    parts.push(`<text x="${PLOT.left+PLOT.w-4}" y="${PLOT.top+10}" font-size="9" fill="#a5761f" text-anchor="end">Target curve</text>`);
+  }
+  parts.push(`<path d="${supplyLinePath(shift)}" fill="none" stroke="#2fae7a" stroke-width="2.5"/>`);
+  if (price !== undefined){
+    const qs = baseQs(price, shift);
+    parts.push(`<line x1="${PLOT.left}" y1="${toY(price)}" x2="${toX(qs)}" y2="${toY(price)}" stroke="#0f6a75" stroke-width="1" stroke-dasharray="3,2"/>`);
+    parts.push(`<circle cx="${toX(qs)}" cy="${toY(price)}" r="6" fill="#0f6a75" stroke="white" stroke-width="2"/>`);
+  }
+  return `<svg width="270" height="230" viewBox="0 0 270 230">${parts.join('')}</svg>`;
+}
+
+/* ---------------- Marginal cost model (mission 4) ---------------- */
+const SELL_PRICE = 10;
+function marginalCost(q){ return 2 + 0.5 * q; }
+function totalCost(q){ return 2 * q + 0.25 * q * q; }
+function profitAt(q){ return SELL_PRICE * q - totalCost(q); }
+const MC_PLOT = { left: 42, top: 12, w: 210, h: 190 };
+function mcToX(q){ return MC_PLOT.left + (q / 20) * MC_PLOT.w; }
+function mcToY(d){ return MC_PLOT.top + MC_PLOT.h - (d / 14) * MC_PLOT.h; }
+function mcChartSvg(q){
+  let parts = [];
+  parts.push(`<line x1="${MC_PLOT.left}" y1="${MC_PLOT.top}" x2="${MC_PLOT.left}" y2="${MC_PLOT.top+MC_PLOT.h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<line x1="${MC_PLOT.left}" y1="${MC_PLOT.top+MC_PLOT.h}" x2="${MC_PLOT.left+MC_PLOT.w}" y2="${MC_PLOT.top+MC_PLOT.h}" stroke="#c9dadb" stroke-width="1.5"/>`);
+  parts.push(`<text x="${MC_PLOT.left+MC_PLOT.w/2}" y="${MC_PLOT.top+MC_PLOT.h+16}" font-size="10" fill="#5c7d82" text-anchor="middle">Cups produced</text>`);
+  parts.push(`<text x="12" y="${MC_PLOT.top+MC_PLOT.h/2}" font-size="10" fill="#5c7d82" text-anchor="middle" transform="rotate(-90 12 ${MC_PLOT.top+MC_PLOT.h/2})">$ per cup</text>`);
+  parts.push(`<line x1="${mcToX(0)}" y1="${mcToY(marginalCost(0))}" x2="${mcToX(20)}" y2="${mcToY(marginalCost(20))}" stroke="#e35d5d" stroke-width="2.5"/>`);
+  parts.push(`<text x="${mcToX(20)-2}" y="${mcToY(marginalCost(20))-6}" font-size="9" fill="#a13636" text-anchor="end">Marginal cost</text>`);
+  parts.push(`<line x1="${mcToX(0)}" y1="${mcToY(SELL_PRICE)}" x2="${mcToX(20)}" y2="${mcToY(SELL_PRICE)}" stroke="#0f6a75" stroke-width="2" stroke-dasharray="4,3"/>`);
+  parts.push(`<text x="${mcToX(20)-2}" y="${mcToY(SELL_PRICE)+12}" font-size="9" fill="#0f6a75" text-anchor="end">Price you sell at</text>`);
+  const mc = marginalCost(q);
+  parts.push(`<line x1="${mcToX(q)}" y1="${mcToY(mc)}" x2="${mcToX(q)}" y2="${mcToY(SELL_PRICE)}" stroke="#e0a63a" stroke-width="2"/>`);
+  parts.push(`<circle cx="${mcToX(q)}" cy="${mcToY(mc)}" r="5" fill="#e35d5d" stroke="white" stroke-width="1.5"/>`);
+  return `<svg width="270" height="230" viewBox="0 0 270 230">${parts.join('')}</svg>`;
+}
+
+const graphArea = document.getElementById('graphArea');
+const missionTag = document.getElementById('missionTag');
+const missionTitle = document.getElementById('missionTitle');
+const missionText = document.getElementById('missionText');
+const readout = document.getElementById('readout');
+const controls = document.getElementById('controls');
+const choicesWrap = document.getElementById('choicesWrap');
+const feedback = document.getElementById('feedback');
+const actionBtn = document.getElementById('actionBtn');
+const hintText = document.getElementById('hintText');
+const progressFill = document.getElementById('progressFill');
+const scoreLabel = document.getElementById('scoreLabel');
+
+let phaseIndex = 0;
+let score = 0;
+const phaseScores = {};
+
+const PHASES = [
+  { key: 'p0', label: 'Warmup', title: 'Meet the supply curve', points: 0 },
+  { key: 'p1', label: 'Mission 1 of 4', title: 'Slide to the target', points: 25 },
+  { key: 'p2', label: 'Mission 2 of 4', title: 'Slide or shift?', points: 25 },
+  { key: 'p3', label: 'Mission 3 of 4', title: 'Match the target curve', points: 25 },
+  { key: 'p4', label: 'Mission 4 of 4', title: 'Decide at the margin', points: 25 },
+];
+
+function setProgress(){ progressFill.style.width = `${(phaseIndex / PHASES.length) * 100}%`; }
+function awardPoints(key, pts){
+  if (phaseScores[key] === undefined){
+    phaseScores[key] = pts; score += pts; scoreLabel.textContent = score;
+  }
+}
+function showChoices(options, onPick){
+  choicesWrap.classList.remove('hidden'); choicesWrap.innerHTML = '';
+  options.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'choicebtn'; b.textContent = opt;
+    b.addEventListener('click', () => onPick(i, b));
+    choicesWrap.appendChild(b);
+  });
+}
+function hideChoices(){ choicesWrap.classList.add('hidden'); choicesWrap.innerHTML = ''; }
+function lockChoices(){ choicesWrap.querySelectorAll('.choicebtn').forEach(b => b.disabled = true); }
+function showFeedback(html, ok){
+  feedback.style.display = 'block';
+  feedback.className = 'feedback' + (ok ? ' ok' : '');
+  feedback.innerHTML = html;
+}
+function hideFeedback(){ feedback.style.display = 'none'; feedback.innerHTML = ''; }
+
+/* ---------------- Phase 0: warmup ---------------- */
+function startPhaseWarmup(){
+  missionTag.textContent = PHASES[0].label; missionTitle.textContent = PHASES[0].title;
+  missionText.textContent = "This is your supply curve for iced coffee. Drag the price slider and watch the dot move along the same curve. Nothing about the curve itself changes, only how much you're willing to sell at that price.";
+  hintText.textContent = ''; hideChoices(); hideFeedback();
+  let price = 8;
+  const draw = () => {
+    graphArea.innerHTML = supplyChartSvg({ shift: 0, price });
+    readout.innerHTML = `
+      <div class="readbox">Price<b>$${price.toFixed(0)}</b></div>
+      <div class="readbox">Cups supplied<b>${baseQs(price, 0)}</b></div>`;
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Price per cup: $<span id="priceNum">${price}</span></label>
+      <input type="range" min="0" max="20" step="1" value="${price}" id="priceSlider"></div>`;
+  document.getElementById('priceSlider').addEventListener('input', e => { price = +e.target.value; document.getElementById('priceNum').textContent = price; draw(); });
+  draw();
+  actionBtn.textContent = "I've got it, start the missions →";
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => { phaseIndex = 1; setProgress(); startPhaseTarget(); };
+}
+
+/* ---------------- Phase 1: slide to target ---------------- */
+function startPhaseTarget(){
+  const P = PHASES[1];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = "No shocks this time, just the base curve. Find the price where exactly 25 cups a day are supplied.";
+  hintText.textContent = ''; hideChoices(); hideFeedback();
+  let price = 8;
+  const draw = () => {
+    graphArea.innerHTML = supplyChartSvg({ shift: 0, price });
+    readout.innerHTML = `
+      <div class="readbox">Price<b>$${price.toFixed(0)}</b></div>
+      <div class="readbox">Cups supplied<b>${baseQs(price, 0)}</b></div>`;
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Price per cup: $<span id="priceNum">${price}</span></label>
+      <input type="range" min="0" max="20" step="1" value="${price}" id="priceSlider"></div>`;
+  document.getElementById('priceSlider').addEventListener('input', e => { price = +e.target.value; document.getElementById('priceNum').textContent = price; draw(); });
+  draw();
+  actionBtn.textContent = 'Check this price';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    const qs = baseQs(price, 0);
+    if (qs === 25){
+      showFeedback(`<strong>That's it.</strong> At $${price}, exactly 25 cups a day are supplied. You found it by sliding along one curve, price is the only thing that changed.`, true);
+      awardPoints('p1', 25);
+      actionBtn.textContent = 'Next mission →';
+      actionBtn.onclick = () => { phaseIndex = 2; setProgress(); startPhaseSlideShift(); };
+    } else {
+      showFeedback(`At $${price}, quantity supplied is ${qs}, not 25 yet. Keep adjusting the price.`, false);
+    }
+  };
+}
+
+/* ---------------- Phase 2: slide or shift ---------------- */
+function startPhaseSlideShift(){
+  const P = PHASES[2];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = "Coffee bean prices just rose. Flip the switch below and watch what happens to the curve, without touching the price slider at all.";
+  hintText.textContent = ''; hideChoices(); hideFeedback();
+  let price = 8;
+  let costOn = false;
+  const draw = () => {
+    const shift = costOn ? TOGGLES.inputCostUp.effect : 0;
+    graphArea.innerHTML = supplyChartSvg({ shift, price, ghostShift: costOn ? 0 : undefined });
+    readout.innerHTML = `
+      <div class="readbox">Price<b>$${price.toFixed(0)}</b></div>
+      <div class="readbox">Cups supplied<b>${baseQs(price, shift)}</b></div>`;
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Price per cup: $<span id="priceNum">${price}</span></label>
+      <input type="range" min="0" max="20" step="1" value="${price}" id="priceSlider"></div>
+    <div class="togglegrid">
+      <button class="togglebtn" id="costToggle" type="button">
+        <span>${TOGGLES.inputCostUp.label}</span><span class="tstate">Off</span>
+      </button>
+    </div>`;
+  document.getElementById('priceSlider').addEventListener('input', e => { price = +e.target.value; document.getElementById('priceNum').textContent = price; draw(); });
+  document.getElementById('costToggle').addEventListener('click', (e) => {
+    costOn = !costOn;
+    e.currentTarget.classList.toggle('active', costOn);
+    e.currentTarget.querySelector('.tstate').textContent = costOn ? 'On' : 'Off';
+    draw();
+  });
+  draw();
+  actionBtn.textContent = 'Continue';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    if (!costOn){
+      showFeedback('Flip the bean price switch on first, then continue.', false);
+      return;
+    }
+    actionBtn.disabled = true;
+    showChoices([
+      'This is a movement along the supply curve, because price changed',
+      'This is a shift of the whole supply curve, because something other than price changed',
+    ], (i, btn) => {
+      lockChoices();
+      if (i === 1){
+        btn.classList.add('correct');
+        showFeedback('<strong>Right.</strong> The price of iced coffee never moved. A higher input cost makes every quantity more expensive to produce, so the entire curve slid to the left.', true);
+        awardPoints('p2', 25);
+      } else {
+        btn.classList.add('wrong');
+        choicesWrap.children[1].classList.add('correct');
+        showFeedback('The price slider never moved, only the input cost did. A non-price change always shifts the whole curve rather than sliding you along it.', false);
+        awardPoints('p2', 15);
+      }
+      actionBtn.disabled = false;
+      actionBtn.textContent = 'Next mission →';
+      actionBtn.onclick = () => { phaseIndex = 3; setProgress(); startPhaseMatch(); };
+    });
+  };
+}
+
+/* ---------------- Phase 3: match the target curve ---------------- */
+const TARGET_SHIFT = 30;
+function startPhaseMatch(){
+  const P = PHASES[3];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = "The gold dashed line is where supply needs to end up. Flip determinants on or off, in any combination, until your solid curve lands exactly on top of it. There is more than one right combination.";
+  hintText.textContent = '';
+  hideChoices(); hideFeedback();
+  const active = { inputCostUp:false, techUp:false, sellersUp:false, taxUp:false, expectPriceUp:false };
+  const currentShift = () => Object.keys(active).reduce((s,k) => s + (active[k] ? TOGGLES[k].effect : 0), 0);
+  const draw = () => {
+    const shift = currentShift();
+    graphArea.innerHTML = supplyChartSvg({ shift, targetShift: TARGET_SHIFT });
+    const matched = shift === TARGET_SHIFT;
+    readout.innerHTML = `<div class="readbox">Your net shift<b>${shift >= 0 ? '+' : ''}${shift}</b></div><div class="readbox">Target<b>+${TARGET_SHIFT}</b></div>`;
+    let box = controls.querySelector('.shiftreadout');
+    if (!box){ box = document.createElement('div'); box.className = 'shiftreadout'; controls.appendChild(box); }
+    box.className = 'shiftreadout' + (matched ? ' match' : '');
+    box.textContent = matched ? 'Matched! Your curve sits right on the target.' : 'Not matched yet, keep adjusting.';
+    actionBtn.disabled = !matched;
+  };
+  controls.innerHTML = `<div class="togglegrid" id="toggleGrid"></div>`;
+  const grid = document.getElementById('toggleGrid');
+  Object.keys(TOGGLES).forEach(key => {
+    const t = TOGGLES[key];
+    const btn = document.createElement('button');
+    btn.className = 'togglebtn'; btn.type = 'button';
+    btn.innerHTML = `<span>${t.label}</span><span class="tstate">Off</span>`;
+    btn.addEventListener('click', () => {
+      active[key] = !active[key];
+      btn.classList.toggle('active', active[key]);
+      btn.querySelector('.tstate').textContent = active[key] ? 'On' : 'Off';
+      draw();
+    });
+    grid.appendChild(btn);
+  });
+  draw();
+  actionBtn.textContent = 'Lock in this match';
+  actionBtn.disabled = true;
+  actionBtn.onclick = () => {
+    showFeedback(`<strong>Matched.</strong> Your net shift is +${currentShift()}, same as the target. Different determinants can add up to the same net shift, what matters is the total effect on supply at every price, not any single cause.`, true);
+    awardPoints('p3', 25);
+    actionBtn.textContent = 'Final mission →';
+    actionBtn.onclick = () => { phaseIndex = 4; setProgress(); startPhaseMargin(); };
+  };
+}
+
+/* ---------------- Phase 4: decide at the margin ---------------- */
+function startPhaseMargin(){
+  const P = PHASES[4];
+  missionTag.textContent = P.label; missionTitle.textContent = P.title;
+  missionText.textContent = `You sell each cup for $${SELL_PRICE}, but every extra cup costs a little more to make than the last one, more milk, more time, more cleanup. Slide the number of cups you make today until your profit is as high as it can possibly be.`;
+  hintText.textContent = '';
+  hideChoices(); hideFeedback();
+  let q = 5;
+  let bestSeen = -Infinity;
+  const draw = () => {
+    graphArea.innerHTML = mcChartSvg(q);
+    const mc = marginalCost(q);
+    const profit = profitAt(q);
+    readout.innerHTML = `
+      <div class="readbox">Cups made<b>${q}</b></div>
+      <div class="readbox">Cost of next cup<b>$${mc.toFixed(2)}</b></div>
+      <div class="readbox">Profit today<b>$${profit.toFixed(2)}</b></div>`;
+    let box = controls.querySelector('.profitbox');
+    if (!box){ box = document.createElement('div'); box.className = 'profitbox'; controls.appendChild(box); }
+    if (q === 16){
+      box.className = 'profitbox peak';
+      box.textContent = 'This is the peak, the cost of the next cup just equals the price you sell it for.';
+    } else if (mc < SELL_PRICE){
+      box.className = 'profitbox up';
+      box.textContent = 'The next cup would cost less than you sell it for, making more would raise profit.';
+    } else {
+      box.className = 'profitbox down';
+      box.textContent = 'The next cup would cost more than you sell it for, making fewer would raise profit.';
+    }
+    bestSeen = Math.max(bestSeen, profit);
+    return profit;
+  };
+  controls.innerHTML = `
+    <div class="sliderrow"><label>Cups made today: <span id="qNum">${q}</span></label>
+      <input type="range" min="0" max="20" step="1" value="${q}" id="qSlider"></div>`;
+  document.getElementById('qSlider').addEventListener('input', e => { q = +e.target.value; document.getElementById('qNum').textContent = q; draw(); });
+  draw();
+  actionBtn.textContent = 'Check this quantity';
+  actionBtn.disabled = false;
+  actionBtn.onclick = () => {
+    if (q === 16){
+      showFeedback(`<strong>That's the peak.</strong> At 16 cups, profit is $${profitAt(16).toFixed(2)}, the most you can make. The cost of cup number 16 is exactly $${marginalCost(16).toFixed(2)}, the same as the price. Any cup beyond that costs more to make than it sells for.`, true);
+      awardPoints('p4a', 15);
+      actionBtn.disabled = true;
+      showChoices([
+        'Making cup 17 would lower profit because its cost would exceed the price you sell it for',
+        'Making cup 17 would lower profit because customers would refuse to buy it',
+      ], (i, btn) => {
+        lockChoices();
+        if (i === 0){
+          btn.classList.add('correct');
+          showFeedback('<strong>Right.</strong> Producing more only pays off while the cost of the next unit is below the price. Past that point, every extra unit loses money even if someone would buy it.', true);
+          awardPoints('p4b', 10);
+        } else {
+          btn.classList.add('wrong');
+          choicesWrap.children[0].classList.add('correct');
+          showFeedback('Nothing here models customers refusing to buy. The reason to stop at 16 is purely cost, cup 17 costs more to make than it sells for.', false);
+          awardPoints('p4b', 5);
+        }
+        actionBtn.disabled = false;
+        actionBtn.textContent = 'See my results →';
+        actionBtn.onclick = finishGame;
+      });
+    } else {
+      const profit = profitAt(q);
+      showFeedback(`At ${q} cups, profit is $${profit.toFixed(2)}. That's not the peak yet, watch whether the cost of the next cup is above or below $${SELL_PRICE} to see which way to move.`, false);
+    }
+  };
+}
+
+/* ---------------- End screen ---------------- */
+function finishGame(){
+  document.getElementById('gameScreen').classList.add('hidden');
+  const endScreen = document.getElementById('endScreen');
+  endScreen.classList.remove('hidden');
+  progressFill.style.width = '100%';
+  document.getElementById('finalScore').textContent = score;
+  let tier = 'Bronze, keep practicing';
+  if (score >= 90) tier = '🏆 Platinum, supply master';
+  else if (score >= 75) tier = '🥇 Gold, strong grasp';
+  else if (score >= 55) tier = '🥈 Silver, solid effort';
+  document.getElementById('tierLabel').textContent = tier;
+  const p4total = (phaseScores.p4a || 0) + (phaseScores.p4b || 0);
+  const labels = {
+    p1: ['Reading a point off the supply curve', 25],
+    p2: ['Telling a slide apart from a shift', 25],
+    p3: ['Combining determinants into one shift', 25],
+    p4: ['Deciding how much to produce at the margin', 25],
+  };
+  const rows = Object.keys(labels).map(k => {
+    const pts = k === 'p4' ? p4total : (phaseScores[k] !== undefined ? phaseScores[k] : 0);
+    return `<div><span>${labels[k][0]}</span><span>${pts} / ${labels[k][1]}</span></div>`;
+  }).join('');
+  document.getElementById('breakdown').innerHTML = rows;
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  setProgress();
+  startPhaseWarmup();
+});
+document.getElementById('replayBtn').addEventListener('click', () => location.reload());
+</script>
+</body>
+</html>
